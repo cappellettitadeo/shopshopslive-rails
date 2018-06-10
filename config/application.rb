@@ -29,5 +29,10 @@ module ShopshopsHub
     # Middleware like session, flash, cookies can be added back manually.
     # Skip views, helpers and assets when generating a new resource.
     config.api_only = true
+    config.autoload_paths << Rails.root.join('lib')
+    config.middleware.use Rack::MethodOverride
+    config.i18n.default_locale = "zh-CN"
+    config.active_record.belongs_to_required_by_default = false
+    config.time_zone = 'Beijing'
   end
 end

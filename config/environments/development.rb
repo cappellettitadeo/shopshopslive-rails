@@ -34,6 +34,11 @@ Rails.application.configure do
   # Print deprecation notices to the Rails logger.
   config.active_support.deprecation = :log
 
+  # Puma logs
+  config.logger = Logger.new(STDOUT)
+  log_level = ENV['LOG_LEVEL'] ? ENV['LOG_LEVEL'].upcase : 'DEBUG'
+  config.logger.level = Logger.const_get(log_level)
+  
   # Raise an error on page load if there are pending migrations.
   config.active_record.migration_error = :page_load
 
