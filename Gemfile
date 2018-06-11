@@ -44,3 +44,12 @@ end
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
+
+# Utility
+gem 'jwt'
+gem 'carrierwave'
+gem 'mini_magick'
+gem 'cloudinary'
+gem 'rails_12factor', group: :production
+gem 'dotenv-rails'
+gem 'httparty'
