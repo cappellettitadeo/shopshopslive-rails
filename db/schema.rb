@@ -10,11 +10,34 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180612143936) do
+ActiveRecord::Schema.define(version: 20180613015855) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
   enable_extension "hstore"
+
+  create_table "product_variants", force: :cascade do |t|
+    t.string "name"
+    t.integer "product_id"
+    t.string "ctr_sku_id"
+    t.integer "source_id"
+    t.string "source_sku"
+    t.float "original_price"
+    t.float "price"
+    t.boolean "discounted"
+    t.string "color"
+    t.integer "size_id"
+    t.integer "inventory"
+    t.string "currency"
+    t.string "barcode"
+    t.float "weight"
+    t.string "weight_unit"
+    t.boolean "available"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["product_id"], name: "index_product_variants_on_product_id"
+    t.index ["source_id"], name: "index_product_variants_on_source_id"
+  end
 
   create_table "products", force: :cascade do |t|
     t.string "name"
