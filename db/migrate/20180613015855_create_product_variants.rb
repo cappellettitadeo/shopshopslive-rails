@@ -17,6 +17,7 @@ class CreateProductVariants < ActiveRecord::Migration[5.1]
       t.float :weight
       t.string :weight_unit
       t.boolean :available
+      t.datetime :deleted_at
 
       t.timestamps
     end

@@ -10,11 +10,26 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180613015855) do
+ActiveRecord::Schema.define(version: 20180613023009) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
   enable_extension "hstore"
+
+  create_table "photos", force: :cascade do |t|
+    t.string "name"
+    t.string "file"
+    t.string "target_type"
+    t.integer "target_id"
+    t.string "photo_type"
+    t.integer "position"
+    t.integer "width"
+    t.integer "height"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["position"], name: "index_photos_on_position"
+    t.index ["target_type", "target_id"], name: "index_photos_on_target_type_and_target_id"
+  end
 
   create_table "product_variants", force: :cascade do |t|
     t.string "name"
@@ -33,6 +48,7 @@ ActiveRecord::Schema.define(version: 20180613015855) do
     t.float "weight"
     t.string "weight_unit"
     t.boolean "available"
+    t.datetime "deleted_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["product_id"], name: "index_product_variants_on_product_id"
