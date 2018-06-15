@@ -1,0 +1,2 @@
+class SyncLog < ApplicationRecord
+end
