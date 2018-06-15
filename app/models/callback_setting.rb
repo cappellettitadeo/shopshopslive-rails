@@ -1,0 +1,2 @@
+class CallbackSetting < ApplicationRecord
+end

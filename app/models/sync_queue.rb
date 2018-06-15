@@ -1,0 +1,2 @@
+class SyncQueue < ApplicationRecord
+end
