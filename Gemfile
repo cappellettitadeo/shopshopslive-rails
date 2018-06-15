@@ -7,7 +7,10 @@ git_source(:github) do |repo_name|
   "https://github.com/#{repo_name}.git"
 end
 
-
+#Shopify Application Rails engine and generator
+gem 'shopify_app'
+#The Shopify API gem allows Ruby developers to programmatically access the admin section of Shopify stores.
+gem 'shopify_api'
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails', '~> 5.1.5'
 # Use postgres as the database for Active Record
