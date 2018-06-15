@@ -10,11 +10,20 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180615024345) do
+ActiveRecord::Schema.define(version: 20180615121951) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
   enable_extension "hstore"
+
+  create_table "callback_settings", force: :cascade do |t|
+    t.string "callback_type"
+    t.string "url"
+    t.string "mode"
+    t.integer "bunch_size"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
 
   create_table "categories", force: :cascade do |t|
     t.string "name"
@@ -86,6 +95,7 @@ ActiveRecord::Schema.define(version: 20180615024345) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["available"], name: "index_products_on_available"
+    t.index ["ctr_product_id"], name: "index_products_on_ctr_product_id"
     t.index ["source_id"], name: "index_products_on_source_id"
     t.index ["store_id"], name: "index_products_on_store_id"
     t.index ["vendor_id"], name: "index_products_on_vendor_id"
@@ -147,6 +157,13 @@ ActiveRecord::Schema.define(version: 20180615024345) do
     t.text "target_ids", default: [], array: true
     t.text "raw_request"
     t.text "raw_response"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "sync_queues", force: :cascade do |t|
+    t.string "target_type"
+    t.integer "target_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
