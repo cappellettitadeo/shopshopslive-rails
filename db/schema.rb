@@ -10,11 +10,20 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180613132730) do
+ActiveRecord::Schema.define(version: 20180615121951) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
   enable_extension "hstore"
+
+  create_table "callback_settings", force: :cascade do |t|
+    t.string "callback_type"
+    t.string "url"
+    t.string "mode"
+    t.integer "bunch_size"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
 
   create_table "categories", force: :cascade do |t|
     t.string "name"
@@ -86,9 +95,21 @@ ActiveRecord::Schema.define(version: 20180613132730) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["available"], name: "index_products_on_available"
+    t.index ["ctr_product_id"], name: "index_products_on_ctr_product_id"
     t.index ["source_id"], name: "index_products_on_source_id"
     t.index ["store_id"], name: "index_products_on_store_id"
     t.index ["vendor_id"], name: "index_products_on_vendor_id"
+  end
+
+  create_table "scrapers", force: :cascade do |t|
+    t.string "source"
+    t.string "source_type"
+    t.string "status"
+    t.string "url"
+    t.text "error"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["source"], name: "index_scrapers_on_source"
   end
 
   create_table "sizes", force: :cascade do |t|
@@ -96,6 +117,18 @@ ActiveRecord::Schema.define(version: 20180613132730) do
     t.string "size"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+  end
+
+  create_table "store_hours", force: :cascade do |t|
+    t.integer "store_id"
+    t.string "hour_type"
+    t.datetime "open_time"
+    t.datetime "close_time"
+    t.integer "weekday"
+    t.datetime "deleted_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["store_id"], name: "index_store_hours_on_store_id"
   end
 
   create_table "stores", force: :cascade do |t|
@@ -112,6 +145,25 @@ ActiveRecord::Schema.define(version: 20180613132730) do
     t.float "longitude"
     t.float "local_rate"
     t.datetime "deleted_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "sync_logs", force: :cascade do |t|
+    t.string "method"
+    t.string "url"
+    t.integer "status_code"
+    t.string "target_type"
+    t.text "target_ids", default: [], array: true
+    t.text "raw_request"
+    t.text "raw_response"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "sync_queues", force: :cascade do |t|
+    t.string "target_type"
+    t.integer "target_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
