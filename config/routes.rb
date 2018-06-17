@@ -4,11 +4,18 @@ Rails.application.routes.draw do
     resources :products do
       collection do
         get :query
+        get :hi
       end
     end
     resources :callback_settings do
     end
     resources :inventory do
+    end
+
+    resources :shopify_app do
+      collection do
+        get :hi
+      end
     end
   end
 end
