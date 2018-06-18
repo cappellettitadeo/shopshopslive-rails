@@ -8,7 +8,7 @@ module Feed
         params[:limit] = (params[:limit] || 50).to_i
         params[:page] = (params[:page] || 1).to_i
         query_string = build_query(params)
-        products = Product.where(query_string)
+        products = Product.where(query_string).order("created_at DESC").page(params[:page]).limit(params[:limit])
       end
       products
 		end
