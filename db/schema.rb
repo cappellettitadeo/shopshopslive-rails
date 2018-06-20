@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180615121951) do
+ActiveRecord::Schema.define(version: 20180620071929) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -164,6 +164,19 @@ ActiveRecord::Schema.define(version: 20180615121951) do
   create_table "sync_queues", force: :cascade do |t|
     t.string "target_type"
     t.integer "target_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "vendors", force: :cascade do |t|
+    t.string "name"
+    t.integer "ctr_vendor_id"
+    t.text "destription"
+    t.string "phone"
+    t.string "street"
+    t.string "city"
+    t.string "state"
+    t.string "zipcode"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
