@@ -1,0 +1,4 @@
+:schedule:
+  ProductsSyncWorker:
+    cron: '0 59 23 * * * Asia/Shanghai'   # Runs once per minute
+    enabled: true
