@@ -10,11 +10,22 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180620071929) do
+ActiveRecord::Schema.define(version: 20180621154015) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
   enable_extension "hstore"
+
+  create_table "api_keys", force: :cascade do |t|
+    t.string "name"
+    t.string "key"
+    t.string "auth_token"
+    t.datetime "expires_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["auth_token"], name: "index_api_keys_on_auth_token"
+    t.index ["key"], name: "index_api_keys_on_key"
+  end
 
   create_table "callback_settings", force: :cascade do |t|
     t.string "callback_type"
