@@ -18,6 +18,7 @@ class Api::CallbackSettingsController < ApiController
       setting.bunch_size = bunch_size if bunch_size
       setting.save
     end
+    render json: {}, status: :ok
   end
 
 

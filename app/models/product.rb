@@ -27,4 +27,8 @@ class Product < ApplicationRecord
     cat_2 = category_2nd
     cat_2.id if cat_2
   end
+
+  def ctr_vendor_id
+    vendor.ctr_vendor_id if vendor
+  end
 end

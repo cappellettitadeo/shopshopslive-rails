@@ -3,6 +3,7 @@ Rails.application.routes.draw do
 
   # 根据中心系统要求进行routes配置
   get 'product/query', to: 'products#query'
+  get 'inventory/query', to: 'inventory#query'
   post 'setting/callback', to: 'callback_settings#callback'
 
   # RESTful规范的routes定义如下
