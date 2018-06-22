@@ -1,5 +1,5 @@
 class CallbackSetting < ApplicationRecord
-  scope :products, -> { where(callback_type: 'product') }
+  scope :product, -> { where(callback_type: 'product') }
 
   def bunch_update?
     mode == 'bunch'

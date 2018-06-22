@@ -70,3 +70,4 @@ gem 'newrelic_rpm'
 gem 'geocoder'
 gem "paranoia", "~> 2.2"
 gem 'simple_command'
+gem 'hashids'
