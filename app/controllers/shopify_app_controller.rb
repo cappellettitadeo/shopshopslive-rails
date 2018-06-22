@@ -21,9 +21,8 @@ class ShopifyAppController < ApplicationController
 
   def install
     session = ShopifyAPI::Session.new(request.params['shop'])
-    scope = %w(read_orders, read_products)
+    scope = %w(read_orders, read_products, read_inventory)
     permission_url = session.create_permission_url(scope, "#{APP_URL}/shopify_app/auth")
-    logger.debug permission_url
     redirect_to permission_url
   end
 
@@ -38,6 +37,10 @@ class ShopifyAppController < ApplicationController
       shop = request.params['shop']
       code = request.params['code']
       get_shop_access_token(shop,API_KEY,API_SECRET,code)
+      save_shop
+      save_products
+      create_products_webhooks
+      #save_inventory_items
       render 'welcome'
     else
       render 'unauthorized'
@@ -47,6 +50,57 @@ class ShopifyAppController < ApplicationController
   def unauthorized
   end
 
+  def product_create
+    # inspect hmac value in header and verify webhook
+    hmac = request.env['HTTP_X_SHOPIFY_HMAC_SHA256']
+
+    request.body.rewind
+    data = request.body.read
+    webhook_ok = verify_webhook(hmac, data)
+
+    if webhook_ok
+      shop = request.env['HTTP_X_SHOPIFY_SHOP_DOMAIN']
+      token = @tokens[shop]
+
+      if not token.nil?
+        session = ShopifyAPI::Session.new(shop, token)
+        ShopifyAPI::Base.activate_session(session)
+      else
+        return [403, "You're not authorized to perform this action."]
+      end
+    else
+      return [403, "You're not authorized to perform this action."]
+    end
+
+    # parse the request body as JSON data
+    json_data = JSON.parse data
+    logger.debug json_data
+
+    line_items = json_data['line_items']
+
+    line_items.each do |line_item|
+      variant_id = line_item['variant_id']
+
+      variant = ShopifyAPI::Variant.find(variant_id)
+
+      variant.metafields.each do |field|
+        if field.key == 'ingredients'
+          items = field.value.split(',')
+
+          items.each do |item|
+            gift_item = ShopifyAPI::Variant.find(item)
+            gift_item.inventory_quantity = gift_item.inventory_quantity - 1
+            gift_item.save
+          end
+        end
+      end
+    end
+
+    return [200, "Webhook notification received successfully."]
+
+  end
+
+  #some helper methods
   private
   def valid_request_from_shopify?(request)
     hmac = request.params['hmac']
@@ -74,25 +128,11 @@ class ShopifyAppController < ApplicationController
       # if the response is successful, obtain the token and store it in a hash
       if response.code == 200
         @tokens[shop] = response['access_token']
-        logger.debug @tokens
-
-
-
       else
         return [500, "Something went wrong."]
       end
 
-      get_products_url = "https://#{shop}/admin/products.json"
       instantiate_session(shop)
-      get_products_response = HTTParty.get(get_products_url, headers: {
-          "Content-type" => "application/json",
-          'X-Shopify-Access-Token'=> @tokens[shop]
-      })
-      if get_products_response.code == 200
-        collects = get_products_response['products']
-        logger.debug collects
-      end
-
     end
   end
 
@@ -100,8 +140,43 @@ class ShopifyAppController < ApplicationController
     # now that the token is available, instantiate a session
     session = ShopifyAPI::Session.new(shop, @tokens[shop])
     ShopifyAPI::Base.activate_session(session)
+  end
+
+  def save_shop
     shop = ShopifyAPI::Shop.current
-    logger.debug shop
+    #logger.debug shop.domain
+  end
+
+  def save_products
+    all_products = ShopifyAPI::Product.find(:all)
+    logger.debug all_products
+  end
+
+  def save_inventory_items
+    inventory_item = ShopifyAPI::InventoryItem.find(1087668256825)
+    logger.debug inventory_item
+  end
+
+  def webhook_ok?(hmac, data)
+    digest = OpenSSL::Digest.new('sha256')
+    calculated_hmac = Base64.encode64(OpenSSL::HMAC.digest(digest, API_SECRET, data)).strip
+
+    ActiveSupport::SecurityUtils.secure_compare(hmac, calculated_hmac)
+  end
+
+  def create_products_webhooks
+    create_products_create_webhook
+  end
+
+  def create_products_create_webhook
+    unless ShopifyAPI::Webhook.find(:all, :params => {:topic => 'products/create'}).nil?
+      webhook = {
+          topic: 'products/create',
+          address: "#{APP_URL}/shopify_app/product_create",
+          format: 'json'
+      }
+      ShopifyAPI::Webhook.create(webhook)
+    end
   end
 
 

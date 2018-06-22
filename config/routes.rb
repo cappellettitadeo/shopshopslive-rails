@@ -19,6 +19,7 @@ Rails.application.routes.draw do
       get :install
       get :unauthorized
       get :welcome
+      post :product_create
     end
   end
 
