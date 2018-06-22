@@ -4,7 +4,6 @@ Rails.application.routes.draw do
     resources :products do
       collection do
         get :query
-        get :hi
       end
     end
     resources :callback_settings do
@@ -12,10 +11,15 @@ Rails.application.routes.draw do
     resources :inventory do
     end
 
-    resources :shopify_app do
-      collection do
-        get :hi
-      end
+  end
+
+  resources :shopify_app do
+    collection do
+      get :auth
+      get :install
+      get :unauthorized
+      get :welcome
     end
   end
+
 end

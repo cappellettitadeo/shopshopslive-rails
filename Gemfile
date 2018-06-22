@@ -9,8 +9,6 @@ end
 
 #respond_to has been extracted to the responders gem
 gem 'responders'
-#Shopify Application Rails engine and generator
-gem 'shopify_app'
 #The Shopify API gem allows Ruby developers to programmatically access the admin section of Shopify stores.
 gem 'shopify_api'
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
