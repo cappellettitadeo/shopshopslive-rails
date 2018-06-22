@@ -54,6 +54,8 @@ gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
 
 # Utility
 gem 'jwt'
+gem 'swagger-docs'
+gem 'swagger-ui_rails'
 gem 'carrierwave'
 gem 'mini_magick'
 gem 'cloudinary'
