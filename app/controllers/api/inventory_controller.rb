@@ -1,5 +1,4 @@
 class Api::InventoryController < ApiController
-  respond_to :json
 
   def query
     ### 参数列表：
