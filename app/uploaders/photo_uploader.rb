@@ -9,7 +9,7 @@ class PhotoUploader < CarrierWave::Uploader::Base
 
   process :eager => true
   process :use_filename => true
-  process :tags => ['user_photo']
+  process :tags => ['product_photo']
   process resize_to_fit: [400, 400]
 
   # Create different versions of uploaded files:
@@ -33,7 +33,7 @@ class PhotoUploader < CarrierWave::Uploader::Base
   end
 
   def dir
-    "#{Rails.env}/products/#{model.target_id}/"
+    "#{Rails.env}/shopshops/#{model.target_id}/"
   end
 
   protected

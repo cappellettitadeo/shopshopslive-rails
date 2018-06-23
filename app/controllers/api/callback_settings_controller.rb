@@ -1,6 +1,6 @@
 class Api::CallbackSettingsController < ApiController
 
-  swagger_controller :callback_settings, "回调配置"
+  swagger_controller :callback_settings, "回调配置", resource_path: "/setting/callback"
 
   swagger_api :callback do
     summary "设置回调URL与模式"

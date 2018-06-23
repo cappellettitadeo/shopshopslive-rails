@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180621154015) do
+ActiveRecord::Schema.define(version: 20180623085136) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -71,7 +71,7 @@ ActiveRecord::Schema.define(version: 20180621154015) do
     t.string "name"
     t.integer "product_id"
     t.string "ctr_sku_id"
-    t.integer "source_id"
+    t.string "source_id"
     t.string "source_sku"
     t.float "original_price"
     t.float "price"
@@ -96,7 +96,7 @@ ActiveRecord::Schema.define(version: 20180621154015) do
     t.integer "store_id"
     t.integer "vendor_id"
     t.string "ctr_product_id"
-    t.integer "source_id"
+    t.string "source_id"
     t.integer "scraper_id"
     t.text "description"
     t.text "keywords", default: [], array: true
@@ -158,6 +158,7 @@ ActiveRecord::Schema.define(version: 20180621154015) do
     t.datetime "deleted_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "unit_no"
   end
 
   create_table "sync_logs", force: :cascade do |t|
@@ -182,7 +183,7 @@ ActiveRecord::Schema.define(version: 20180621154015) do
   create_table "vendors", force: :cascade do |t|
     t.string "name"
     t.integer "ctr_vendor_id"
-    t.text "destription"
+    t.text "description"
     t.string "phone"
     t.string "street"
     t.string "city"
@@ -190,6 +191,7 @@ ActiveRecord::Schema.define(version: 20180621154015) do
     t.string "zipcode"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "unit_no"
   end
 
 end
