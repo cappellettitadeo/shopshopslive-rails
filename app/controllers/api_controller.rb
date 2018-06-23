@@ -1,4 +1,6 @@
 class ApiController < ActionController::API
+  include Swagger::Docs::ImpotentMethods
+
   before_action :authenticate_request
 
   private

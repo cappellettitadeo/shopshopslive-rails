@@ -9,6 +9,9 @@ class Api::CallbackSettingsController < ApiController
     param :form, :'settings[inventory]', :Inventory, :optional, '库存回调配置'
     param :form, :'settings[store]', :Store, :optional, '商家回调配置'
     param :form, :'settings[vendor]', :Vendor, :optional, '品牌回调配置'
+
+    response :bad_request
+    response :ok
   end
 
   swagger_model :Product do
