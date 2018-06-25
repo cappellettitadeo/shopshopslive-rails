@@ -23,9 +23,15 @@ class Api::ProductsController < ApiController
 
   def query
     products = Feed::Api.search(params)
-    fields = params[:fields] ? params[:fields].split(',').map(&:strip) : []
-    options = { fields: fields }
-    hash = ProductSerializer.new(products, options).serializable_hash
+    hash = ProductSerializer.new(products).serializable_hash
+    fields = params[:fields] ? params[:fields].split(',').map(&:strip).map(&:downcase) : []
+    if fields.present?
+      selected_hash = { data: [] }
+      hash[:data].each do |product|
+        selected_hash[:data] << product.select { |key, value| fields.include?(key.to_s.downcase) }
+      end
+      hash = selected_hash
+    end
     render json: hash, status: :ok
   end
 end
