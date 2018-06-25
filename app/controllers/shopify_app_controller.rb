@@ -6,13 +6,10 @@ class ShopifyAppController < ApplicationController
   respond_to :json
 
   attr_reader :tokens
-  API_KEY = ENV['API_KEY']
-  API_SECRET = ENV['API_SECRET']
-  APP_URL = ENV['APP_URL']
 
   def initialize
     @tokens = {}
-    ShopifyAPI::Session.setup(api_key: API_KEY, secret: API_SECRET)
+    ShopifyAPI::Session.setup(api_key: ShopifyApp::Const::API_KEY, secret: ShopifyApp::Const::API_SECRET)
     super
   end
 
@@ -22,8 +19,8 @@ class ShopifyAppController < ApplicationController
 
   def install
     session = ShopifyAPI::Session.new(request.params['shop'])
-    scope = %w(read_orders, read_products, read_inventory)
-    permission_url = session.create_permission_url(scope, "#{APP_URL}/shopify_app/auth")
+    scope = %w(read_orders read_products read_inventory)
+    permission_url = session.create_permission_url(scope, "#{ShopifyApp::Const::APP_URL}/auth")
     redirect_to permission_url
   end
 
@@ -37,7 +34,7 @@ class ShopifyAppController < ApplicationController
     if ShopifyApp::Utils.valid_request_from_shopify?(request)
       shop = request.params['shop']
       code = request.params['code']
-      @tokens[shop] = ShopifyApp::Utils.get_shop_access_token(shop,API_KEY,API_SECRET,code)
+      @tokens[shop] = ShopifyApp::Utils.get_shop_access_token(shop, ShopifyApp::Const::API_KEY, ShopifyApp::Const::API_SECRET, code)
       ShopifyApp::Utils.instantiate_session(shop, @tokens[shop])
       save_shop
       save_products
@@ -97,6 +94,7 @@ class ShopifyAppController < ApplicationController
   end
 
   #some helper methods
+
   private
 
   def save_shop
@@ -116,7 +114,7 @@ class ShopifyAppController < ApplicationController
 
   def webhook_ok?(hmac, data)
     digest = OpenSSL::Digest.new('sha256')
-    calculated_hmac = Base64.encode64(OpenSSL::HMAC.digest(digest, API_SECRET, data)).strip
+    calculated_hmac = Base64.encode64(OpenSSL::HMAC.digest(digest, ShopifyApp::Const::API_SECRET, data)).strip
 
     ActiveSupport::SecurityUtils.secure_compare(hmac, calculated_hmac)
   end
