@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/jiasilu/fast_jsonapi.git
-  revision: 79ccd342a0714cfb8f73bff0bc0f55572984b1aa
+  revision: ec3cec62a3ebc79f9a190cfa1212487e89a86730
   specs:
     fast_jsonapi (1.1.1)
       activesupport (>= 4.2)
