@@ -1,0 +1,124 @@
+{
+  "apiVersion": "1.0",
+  "swaggerVersion": "1.2",
+  "basePath": "https://shopshops-hub.herokuapp.com",
+  "resourcePath": "products",
+  "apis": [
+    {
+      "path": "/api/product/query.json",
+      "operations": [
+        {
+          "summary": "List all products",
+          "parameters": [
+            {
+              "paramType": "header",
+              "name": "Authorization",
+              "type": "string",
+              "description": "当前用户Auth token",
+              "required": true
+            },
+            {
+              "paramType": "query",
+              "name": "ids",
+              "type": "string",
+              "description": "Return only certain products, specified by a comma-separated list of product IDs.",
+              "required": false
+            },
+            {
+              "paramType": "query",
+              "name": "page",
+              "type": "integer",
+              "description": "Return a specific page of results. default: 1",
+              "required": false
+            },
+            {
+              "paramType": "query",
+              "name": "limit",
+              "type": "integer",
+              "description": "Return up to this many results per page. default: 50, max: 250",
+              "required": false
+            },
+            {
+              "paramType": "query",
+              "name": "title",
+              "type": "string",
+              "description": "Filter results by product title.",
+              "required": false
+            },
+            {
+              "paramType": "query",
+              "name": "vendor",
+              "type": "string",
+              "description": "Filter results by product vendor.",
+              "required": false
+            },
+            {
+              "paramType": "query",
+              "name": "category",
+              "type": "string",
+              "description": "Filter results by category.",
+              "required": false
+            },
+            {
+              "paramType": "query",
+              "name": "product_type",
+              "type": "string",
+              "description": "Filter results by product type.",
+              "required": false
+            },
+            {
+              "paramType": "query",
+              "name": "created_at_min",
+              "type": "string",
+              "description": "Show products created after date. (format: 2014-04-25T16:15:47-04:00).",
+              "required": false
+            },
+            {
+              "paramType": "query",
+              "name": "created_at_max",
+              "type": "string",
+              "description": "Show products created before date. (format: 2014-04-25T16:15:47-04:00).",
+              "required": false
+            },
+            {
+              "paramType": "query",
+              "name": "updated_at_min",
+              "type": "string",
+              "description": "Show products updated after date. (format: 2014-04-25T16:15:47-04:00).",
+              "required": false
+            },
+            {
+              "paramType": "query",
+              "name": "updated_at_max",
+              "type": "string",
+              "description": "Show products updated before date. (format: 2014-04-25T16:15:47-04:00).",
+              "required": false
+            },
+            {
+              "paramType": "query",
+              "name": "fields",
+              "type": "string",
+              "description": "Show only certain fields, specified by a comma-separated list of field names. By default, should reply with all fields.",
+              "required": false
+            }
+          ],
+          "responseMessages": [
+            {
+              "code": 200,
+              "responseModel": null,
+              "message": "Ok"
+            },
+            {
+              "code": 400,
+              "responseModel": null,
+              "message": "Bad Request"
+            }
+          ],
+          "nickname": "Api::Products#query",
+          "method": "get"
+        }
+      ]
+    }
+  ],
+  "authorizations": null
+}

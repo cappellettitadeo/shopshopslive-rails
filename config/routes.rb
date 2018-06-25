@@ -1,3 +1,7 @@
+# 为了在Rails API使用Swagger Gem，需要提前设置base_api_controller
+Swagger::Docs::Config.base_api_controller = ActionController::API
+include Swagger::Docs::ImpotentMethods
+
 Rails.application.routes.draw do
   # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
 
@@ -17,7 +21,9 @@ Rails.application.routes.draw do
       end
     end
     resources :callback_settings do
-      post :callback
+      collection do
+        post :callback
+      end
     end
     resources :inventory do
     end

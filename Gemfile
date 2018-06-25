@@ -52,6 +52,10 @@ end
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
 
+# Assets
+gem 'bootstrap', '~> 4.0.0'
+gem 'jquery-rails'
+
 # Utility
 gem 'jwt'
 gem 'swagger-docs'
@@ -73,3 +77,4 @@ gem 'geocoder'
 gem "paranoia", "~> 2.2"
 gem 'simple_command'
 gem 'hashids'
+gem 'kaminari'

@@ -3,7 +3,7 @@ class ProductVariant < ApplicationRecord
   belongs_to :size
   has_many :photos, as: :target, dependent: :destroy
 
-  def size
+  def sizes
     size.size if size
   end
 

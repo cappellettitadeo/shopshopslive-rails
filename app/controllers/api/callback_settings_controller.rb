@@ -1,6 +1,6 @@
 class Api::CallbackSettingsController < ApiController
 
-  swagger_controller :callback_settings, "回调配置", resource_path: "/setting/callback"
+  #swagger_controller :callback_settings, "Callback Settings"
 
   swagger_api :callback do
     summary "设置回调URL与模式"
@@ -43,6 +43,7 @@ class Api::CallbackSettingsController < ApiController
   end
 
   def callback
+    binding.pry
     ### 参数列表：
     setting_params.each do |key, value|
       url = value[:callback].strip rescue nil

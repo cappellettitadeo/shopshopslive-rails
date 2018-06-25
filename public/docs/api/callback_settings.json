@@ -1,0 +1,154 @@
+{
+  "apiVersion": "1.0",
+  "swaggerVersion": "1.2",
+  "basePath": "http://localhost:3000",
+  "resourcePath": "callback_settings",
+  "apis": [
+    {
+      "path": "/api/setting/callback.json",
+      "operations": [
+        {
+          "summary": "设置回调URL与模式",
+          "parameters": [
+            {
+              "paramType": "header",
+              "name": "Authorization",
+              "type": "string",
+              "description": "当前用户auth token",
+              "required": true
+            },
+            {
+              "paramType": "form",
+              "name": "settings[product]",
+              "type": "Product",
+              "description": "产品回调配置",
+              "required": false
+            },
+            {
+              "paramType": "form",
+              "name": "settings[inventory]",
+              "type": "Inventory",
+              "description": "库存回调配置",
+              "required": false
+            },
+            {
+              "paramType": "form",
+              "name": "settings[store]",
+              "type": "Store",
+              "description": "商家回调配置",
+              "required": false
+            },
+            {
+              "paramType": "form",
+              "name": "settings[vendor]",
+              "type": "Vendor",
+              "description": "品牌回调配置",
+              "required": false
+            }
+          ],
+          "responseMessages": [
+            {
+              "code": 200,
+              "responseModel": null,
+              "message": "Ok"
+            },
+            {
+              "code": 400,
+              "responseModel": null,
+              "message": "Bad Request"
+            }
+          ],
+          "nickname": "Api::CallbackSettings#callback",
+          "method": "post"
+        }
+      ]
+    }
+  ],
+  "authorizations": null,
+  "models": {
+    "Product": {
+      "id": "Product",
+      "required": [
+        "callback"
+      ],
+      "properties": {
+        "callback": {
+          "type": "string",
+          "description": "回调URL"
+        },
+        "mode": {
+          "type": "string",
+          "description": "工作模式：immediate: 一有商品更新就立刻进行回调, bunch: 批量进行商品回调，此模式需要设置bunchsize"
+        },
+        "bunchsize": {
+          "type": "string",
+          "description": "用于指定每次商品批量更新的尺寸"
+        }
+      },
+      "description": "产品回调配置"
+    },
+    "Inventory": {
+      "id": "Inventory",
+      "required": [
+        "callback"
+      ],
+      "properties": {
+        "callback": {
+          "type": "string",
+          "description": "回调URL"
+        },
+        "mode": {
+          "type": "string",
+          "description": "工作模式：immediate: 一有商品更新就立刻进行回调, bunch: 批量进行商品回调，此模式需要设置bunchsize"
+        },
+        "bunchsize": {
+          "type": "string",
+          "description": "用于指定每次商品批量更新的尺寸"
+        }
+      },
+      "description": "库存回调配置"
+    },
+    "Store": {
+      "id": "Store",
+      "required": [
+        "callback"
+      ],
+      "properties": {
+        "callback": {
+          "type": "string",
+          "description": "回调URL"
+        },
+        "mode": {
+          "type": "string",
+          "description": "工作模式：immediate: 一有商品更新就立刻进行回调, bunch: 批量进行商品回调，此模式需要设置bunchsize"
+        },
+        "bunchsize": {
+          "type": "string",
+          "description": "用于指定每次商品批量更新的尺寸"
+        }
+      },
+      "description": "商家回调配置"
+    },
+    "Vendor": {
+      "id": "Vendor",
+      "required": [
+        "callback"
+      ],
+      "properties": {
+        "callback": {
+          "type": "string",
+          "description": "回调URL"
+        },
+        "mode": {
+          "type": "string",
+          "description": "工作模式：immediate: 一有商品更新就立刻进行回调, bunch: 批量进行商品回调，此模式需要设置bunchsize"
+        },
+        "bunchsize": {
+          "type": "string",
+          "description": "用于指定每次商品批量更新的尺寸"
+        }
+      },
+      "description": "品牌回调配置"
+    }
+  }
+}

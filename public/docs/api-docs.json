@@ -3,7 +3,10 @@
   "swaggerVersion": "1.2",
   "basePath": "https://shopshops-hub.herokuapp.com",
   "apis": [
-
+    {
+      "path": "/docs/api/products.{format}",
+      "description": "Products"
+    }
   ],
   "authorizations": null
 }

@@ -50,6 +50,11 @@ product_2 = Product.create name: 'Love Scarf', vendor: gucci, store: west_field,
                            description: 'A beautiful scarf that fits all your occasions!', material: 'Silk', available: true
 product_3 = Product.create name: 'High heel shoe', vendor: gucci, store: west_field, source_id: '3211531104', keywords: ['gucci', 'high heel', 'shoe'],
                            description: 'The 2018 high heel shoe is the most popular shoe from Gucci.', material: 'leather', available: true
+women.products << product_1
+women.products << product_2
+women.products << product_3
+top.products << product_1
+scarf.products << product_2
 
 # 7. Create product variants
 pv_1_1 = product_1.product_variants.create name: 'Small size', source_id: '3215391104-1', source_sku: 'PARAD2018TOP', original_price: 450, price: 450,

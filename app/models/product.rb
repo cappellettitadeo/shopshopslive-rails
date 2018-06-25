@@ -14,6 +14,11 @@ class Product < ApplicationRecord
     categories.level_1.first
   end
 
+  def category_1st_name
+    cat_1 = category_1st
+    cat_1.name if cat_1
+  end
+
   def category_1st_id
     cat_1 = category_1st
     cat_1.id if cat_1
@@ -21,6 +26,11 @@ class Product < ApplicationRecord
 
   def category_2nd
     categories.level_2.first
+  end
+
+  def category_2nd_name
+    cat_2 = category_2nd
+    cat_2.name if cat_2
   end
 
   def category_2nd_id
