@@ -7,6 +7,7 @@ Rails.application.routes.draw do
 
   # API交互文档
   get 'docs' => 'docs#index'
+  root to: redirect('/docs')
 
   namespace :api do
     # 根据中心系统要求进行routes配置
