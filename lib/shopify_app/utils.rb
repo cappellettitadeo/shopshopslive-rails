@@ -2,17 +2,20 @@ require 'httparty'
 
 module ShopifyApp
   class Utils
-    API_KEY = ENV['API_KEY']
-    API_SECRET = ENV['API_SECRET']
-    APP_URL = ENV['APP_URL']
+
     class << self
+      EVENTS_TOPICS = {
+          :products => %w(create delete update),
+          :shop => %w(update),
+          :app => %w(uninstalled)}
+
       def valid_request_from_shopify?(request)
         hmac = request.params['hmac']
 
         if not hmac.nil?
           hash = request.params.reject {|k, _| k == 'hmac' || k == 'controller' || k == 'action'}
           query = URI.escape(hash.sort.collect {|k, v| "#{k}=#{v}"}.join('&'))
-          digest = OpenSSL::HMAC.hexdigest(OpenSSL::Digest.new('sha256'), API_SECRET, query)
+          digest = OpenSSL::HMAC.hexdigest(OpenSSL::Digest.new('sha256'), ShopifyApp::Const::API_SECRET, query)
 
           ActiveSupport::SecurityUtils.secure_compare(hmac, digest)
         else
@@ -43,19 +46,19 @@ module ShopifyApp
       end
 
       def create_webhooks
-        events_topics = {:products => %w(create, delete, update),
-                         :shop => %w(update),
-                         :app => %w(uninstalled)}
-        events_topics.each do |event, topics|
+
+        EVENTS_TOPICS.each do |event, topics|
           topics.each do |topic|
-            webhook = {
-                topic: "#{event}/#{topic}",
-                address: "#{APP_URL}/shopify_app/#{event}_#{topic}",
-                format: 'json'
-            }
-            ShopifyAPI::Webhook.create(webhook)
+            unless ShopifyAPI::Webhook.find(:all, :params => {:topic => "#{event}/#{topic}"}).any?
+              new_webhook_attrs = {
+                  topic: "#{event}/#{topic}",
+                  address: "#{ShopifyApp::Const::APP_URL}/#{event}_#{topic}",
+                  format: 'json'}
+              ShopifyAPI::Webhook.create(new_webhook_attrs)
+            end
           end
         end
+        Rails.logger.debug ShopifyAPI::Webhook.find(:all)
       end
 
     end
