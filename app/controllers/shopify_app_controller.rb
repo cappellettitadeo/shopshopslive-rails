@@ -36,6 +36,8 @@ class ShopifyAppController < ApplicationController
       ShopifyApp::Utils.instantiate_session(shop, @tokens[shop])
       ShopifyApp::Utils.create_new_store(@tokens[shop])
       ShopifyApp::Utils.create_webhooks
+      ### TODO: 1. Create a store record in our DB
+      # 2. Call the Scraper worker to fetch all products from the store
       render 'welcome'
     else
       render 'unauthorized'
