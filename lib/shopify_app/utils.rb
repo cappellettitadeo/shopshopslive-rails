@@ -4,10 +4,6 @@ module ShopifyApp
   class Utils
 
     class << self
-      EVENTS_TOPICS = {
-          :products => %w(create delete update),
-          :shop => %w(update),
-          :app => %w(uninstalled)}
 
       def valid_request_from_shopify?(request)
         hmac = request.params['hmac']
@@ -51,7 +47,7 @@ module ShopifyApp
 
 
       def create_webhooks
-        EVENTS_TOPICS.each do |event, topics|
+        ShopifyApp::Const::EVENTS_TOPICS.each do |event, topics|
           topics.each do |topic|
             new_topic = "#{event}/#{topic}"
             new_address = "#{ShopifyApp::Const::APP_URL}/#{event}_#{topic}"
@@ -65,7 +61,6 @@ module ShopifyApp
             end
           end
         end
-        Rails.logger.debug ShopifyAPI::Webhook.find(:all)
       end
 
       def webhook_ok?(hmac, data)

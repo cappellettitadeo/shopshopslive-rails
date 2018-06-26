@@ -58,11 +58,10 @@ class ShopifyAppController < ApplicationController
 
     if ShopifyApp::Utils.webhook_ok?(hmac, data)
       shop = request.env['HTTP_X_SHOPIFY_SHOP_DOMAIN']
-      token = @tokens[shop]
+      logger.debug 'webhook ok.'
 
-      if not token.nil?
-        session = ShopifyAPI::Session.new(shop, token)
-        ShopifyAPI::Base.activate_session(session)
+      if not @tokens[shop].nil?
+        ShopifyApp::Utils.instantiate_session(shop, @tokens[shop])
       else
         render json: {ec: 403, em: "You're not authorized to perform this action."}, status: unauthorized
       end
@@ -78,11 +77,11 @@ class ShopifyAppController < ApplicationController
   end
 
   def products_update
-
+    logger.debug 'product updated.'
   end
 
   def products_delete
-
+    logger.debug 'product deleted'
   end
 
   def shop_update
