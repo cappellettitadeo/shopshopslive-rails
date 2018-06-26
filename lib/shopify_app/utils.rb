@@ -56,8 +56,7 @@ module ShopifyApp
             new_topic = "#{event}/#{topic}"
             new_address = "#{ShopifyApp::Const::APP_URL}/#{event}_#{topic}"
             #you may create as many webhooks as you want for one of the topics
-            webhook = ShopifyAPI::Webhook.find(:all, :params => {:topic => new_topic, :address => new_address})
-            unless webhook.any?
+            unless ShopifyAPI::Webhook.where(:topic => new_topic, :address => new_address).any?
               new_webhook_attrs = {
                   topic: new_topic,
                   address: new_address,
@@ -66,6 +65,7 @@ module ShopifyApp
             end
           end
         end
+        Rails.logger.debug ShopifyAPI::Webhook.find(:all)
       end
 
       def webhook_ok?(hmac, data)
