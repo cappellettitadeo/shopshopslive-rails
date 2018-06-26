@@ -1,12 +1,12 @@
 class ApiController < ActionController::API
+  include Swagger::Docs::ImpotentMethods
+
   before_action :authenticate_request
 
   private
 
   def authenticate_request
-    request_api_key = headers['Authorization']
-    if request_api_key != ENV['CTR_API_KEY']
-      render json: { error: 'Not Authorized' }, status: 401
-    end
+    @api_key = AuthorizeApiRequest.call(request.headers).result
+    render json: { error: 'Not Authorized' }, status: 401 unless @api_key
   end
 end

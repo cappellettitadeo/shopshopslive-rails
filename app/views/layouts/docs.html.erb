@@ -1,0 +1,19 @@
+<!doctype html>
+<!--[if IE 8]>         <html class="no-js ie lt-ie10 lt-ie9 ie8" xmlns:ng="https://angularjs.org"  ng-app="KEMS"> <![endif]-->
+<!--[if IE 9]>         <html class="no-js ie lt-ie10 ie9"        xmlns:ng="https://angularjs.org"  ng-app="KEMS"> <![endif]-->
+<!--[if gt IE 9]><!--> <html class="no-js"                       xmlns:ng="https://angularjs.org"  data-ng-app="KEMS"> <!--<![endif]-->
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.js"></script>
+<%= stylesheet_link_tag "application", media: "all" %>
+<%= javascript_include_tag "application" %>
+
+<style>
+body { font: 15px open sans,lucida grande,sans-serif; }
+.swagger-ui-wrap { max-width: 1200px !important; }
+.container { max-width: 1200px !important; padding: 0px; }
+</style>
+
+<body>
+  <%= yield %>
+</body>
+</html>

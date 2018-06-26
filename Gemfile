@@ -45,14 +45,39 @@ group :development do
   gem 'spring-watcher-listen', '~> 2.0.0'
 end
 
+group :test do
+  gem 'factory_bot_rails', '~> 4.0'
+  gem 'shoulda-matchers', '~> 3.1'
+  gem 'faker'
+  gem 'database_cleaner'
+end
+
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
 
+# Assets
+gem 'bootstrap', '~> 4.0.0'
+gem 'jquery-rails'
+
 # Utility
 gem 'jwt'
+gem 'swagger-docs'
+gem 'swagger-ui_rails'
 gem 'carrierwave'
 gem 'mini_magick'
 gem 'cloudinary'
 gem 'rails_12factor', group: :production
 gem 'dotenv-rails'
 gem 'httparty'
+gem 'fast_jsonapi', git: 'https://github.com/jiasilu/fast_jsonapi.git'
+gem 'nokogiri'
+gem "nilify_blanks"
+gem 'sidekiq'
+gem 'sidekiq-scheduler'
+gem 'airbrake', '~> 7.3'
+gem 'newrelic_rpm'
+gem 'geocoder'
+gem "paranoia", "~> 2.2"
+gem 'simple_command'
+gem 'hashids'
+gem 'kaminari'

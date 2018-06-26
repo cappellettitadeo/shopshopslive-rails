@@ -9,8 +9,8 @@ require "action_controller/railtie"
 require "action_mailer/railtie"
 require "action_view/railtie"
 require "action_cable/engine"
-require "rails/test_unit/railtie"
 require "sprockets/railtie"
+# require "rails/test_unit/railtie"
 
 # Require the gems listed in Gemfile, including any gems
 # you've limited to :test, :development, or :production.
@@ -30,9 +30,28 @@ module ShopshopsHub
     # Skip views, helpers and assets when generating a new resource.
     config.api_only = true
     config.autoload_paths << Rails.root.join('lib')
+    config.middleware.use ActionDispatch::Flash
+    config.middleware.use ActionDispatch::Cookies
+    config.middleware.use ActionDispatch::Session::CookieStore
+    config.session_store :cookie_store
     config.middleware.use Rack::MethodOverride
     config.i18n.default_locale = "zh-CN"
     config.active_record.belongs_to_required_by_default = false
     config.time_zone = 'Beijing'
+
+    # Enable sidekiq for active jobs
+    config.active_job.queue_adapter = :sidekiq
+
+    Sidekiq.configure_client do |config|
+      config.redis = { :size => 1 }
+    end
+
+    # TODO: Temp enable CORS for any domains
+    #config.middleware.insert_before 0, "Rack::Cors" do
+    #  allow do
+    #    origins '*'
+    #    resource '*', :headers => :any, :methods => [:get, :post, :update, :options]
+    #  end
+    #end
   end
 end

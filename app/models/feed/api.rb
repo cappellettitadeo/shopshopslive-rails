@@ -8,7 +8,7 @@ module Feed
         params[:limit] = (params[:limit] || 50).to_i
         params[:page] = (params[:page] || 1).to_i
         query_string = build_query(params)
-        products = Product.where(query_string)
+        products = Product.where(query_string).order("created_at DESC").page(params[:page]).limit(params[:limit])
       end
       products
 		end
@@ -16,18 +16,17 @@ module Feed
     def self.build_query(params)
       query_array = []
       if params[:title]
-        query_array << "(title = #{params[:title]})"
+        query_array << "(name = '#{params[:title]}')"
       end
       if params[:vendor]
-        vendor = Vendor.find_by_name(params[:vendor])
-        query_array << "(vendor_id = #{vendor.id})" if vendor
+        vendor_id = Vendor.find_by_name(params[:vendor]).id rescue 0
+        query_array << "(vendor_id = #{vendor_id})"
       end
       if params[:category]
         category = Category.find_by_name(params[:category])
-        if category
-          ids = category.products.pluck(:id)
-          query_array << "(id IN (#{ids}))"
-        end
+        ids = category.products.pluck(:id) rescue []
+        ids = 0 if ids.empty?
+        query_array << "(id IN (#{ids}))"
       end
       if params[:created_at_min]
         query_array << "(created_at >= #{params[:created_at_min]})"
