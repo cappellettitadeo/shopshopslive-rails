@@ -30,13 +30,13 @@ class ShopifyAppController < ApplicationController
 
   def auth
     if ShopifyApp::Utils.valid_request_from_shopify?(request)
+      #param shop is actually shop's myshopify.com domain
       shop = request.params['shop']
       code = request.params['code']
       @tokens[shop] = ShopifyApp::Utils.get_shop_access_token(shop, ShopifyApp::Const::API_KEY, ShopifyApp::Const::API_SECRET, code)
       ShopifyApp::Utils.instantiate_session(shop, @tokens[shop])
-      ShopifyApp::Utils.create_new_store(@tokens[shop])
+      ShopifyApp::Utils.create_new_store(shop,@tokens[shop])
       ShopifyApp::Utils.create_webhooks
-      ### TODO: 1. Create a store record in our DB
       # 2. Call the Scraper worker to fetch all products from the store
       render 'welcome'
     else

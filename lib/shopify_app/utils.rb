@@ -36,13 +36,26 @@ module ShopifyApp
         end
       end
 
-      def instantiate_session(shop, token)
-        session = ShopifyAPI::Session.new(shop, token)
+      def instantiate_session(myshopify_domain, token)
+        session = ShopifyAPI::Session.new(myshopify_domain, token)
         ShopifyAPI::Base.activate_session(session)
       end
 
-      def create_new_store(access_token)
-        shop = ShopifyAPI::Shop.current
+      def create_new_store(myshopify_domain, access_token)
+        unless Store.find_by(source_url: myshopify_domain).present?
+          self.instantiate_session(myshopify_domain, access_token)
+          shopify_shop = ShopifyAPI::Shop.current
+          Rails.logger.debug shopify_shop
+          store = Store.create name: shopify_shop.name, description: '',
+                               website: shopify_shop.domain, phone: shopify_shop.phone,
+                               street: shopify_shop.address1, city: shopify_shop.city,
+                               unit_no: shopify_shop.address2, zipcode: shopify_shop.zip,
+                               latitude: shopify_shop.latitude, longitude: shopify_shop.longitude, local_rate: nil,
+                               source_url: myshopify_domain, source_token: access_token, source_id: shopify_shop.id, source_type: 'shopify'
+          if store.save
+
+          end
+        end
       end
 
 
@@ -51,7 +64,7 @@ module ShopifyApp
           topics.each do |topic|
             new_topic = "#{event}/#{topic}"
             new_address = "#{ShopifyApp::Const::APP_URL}/#{event}_#{topic}"
-            #you may create as many webhooks as you want for one of the topics
+            #you may create as many webhooks as you want for each topic
             unless ShopifyAPI::Webhook.where(:topic => new_topic, :address => new_address).any?
               new_webhook_attrs = {
                   topic: new_topic,
