@@ -6,6 +6,10 @@ class Product < ApplicationRecord
   belongs_to :vendor
   belongs_to :scraper
 
+  def create_from_shopify_object(store, object)
+    # TODO Save object to DB
+  end
+
   def brandName
     vendor.name if vendor
   end
