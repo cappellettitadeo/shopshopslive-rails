@@ -1,5 +1,3 @@
-require 'httparty'
-require 'dotenv/load'
 require 'shopify_app'
 
 class ShopifyAppController < ApplicationController
@@ -36,10 +34,8 @@ class ShopifyAppController < ApplicationController
       code = request.params['code']
       @tokens[shop] = ShopifyApp::Utils.get_shop_access_token(shop, ShopifyApp::Const::API_KEY, ShopifyApp::Const::API_SECRET, code)
       ShopifyApp::Utils.instantiate_session(shop, @tokens[shop])
-      save_shop
-      save_products
+      ShopifyApp::Utils.create_new_store(@tokens[shop])
       ShopifyApp::Utils.create_webhooks
-      #save_inventory_items
       render 'welcome'
     else
       render 'unauthorized'
@@ -60,7 +56,7 @@ class ShopifyAppController < ApplicationController
     request.body.rewind
     data = request.body.read
 
-    if webhook_ok?(hmac, data)
+    if ShopifyApp::Utils.webhook_ok?(hmac, data)
       shop = request.env['HTTP_X_SHOPIFY_SHOP_DOMAIN']
       token = @tokens[shop]
 
@@ -68,17 +64,17 @@ class ShopifyAppController < ApplicationController
         session = ShopifyAPI::Session.new(shop, token)
         ShopifyAPI::Base.activate_session(session)
       else
-        [403, "You're not authorized to perform this action."]
+        render json: {ec: 403, em: "You're not authorized to perform this action."}, status: unauthorized
       end
     else
-      [403, "You're not authorized to perform this action."]
+      render json: {ec: 403, em: "You're not authorized to perform this action."}, status: unauthorized
     end
 
     # parse the request body as JSON data
     json_data = JSON.parse data
     logger.debug json_data
 
-    [200, "Webhook notification received successfully."]
+    render json: {status: 'Webhook notification received successfully.'}, status: :ok
   end
 
   def products_update
@@ -92,32 +88,5 @@ class ShopifyAppController < ApplicationController
   def shop_update
 
   end
-
-  #some helper methods
-
-  private
-
-  def save_shop
-    shop = ShopifyAPI::Shop.current
-    #logger.debug shop.domain
-  end
-
-  def save_products
-    all_products = ShopifyAPI::Product.find(:all)
-    logger.debug all_products
-  end
-
-  def save_inventory_items
-    inventory_item = ShopifyAPI::InventoryItem.find(1087668256825)
-    logger.debug inventory_item
-  end
-
-  def webhook_ok?(hmac, data)
-    digest = OpenSSL::Digest.new('sha256')
-    calculated_hmac = Base64.encode64(OpenSSL::HMAC.digest(digest, ShopifyApp::Const::API_SECRET, data)).strip
-
-    ActiveSupport::SecurityUtils.secure_compare(hmac, calculated_hmac)
-  end
-
 
 end

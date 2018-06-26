@@ -45,20 +45,34 @@ module ShopifyApp
         ShopifyAPI::Base.activate_session(session)
       end
 
-      def create_webhooks
+      def create_new_store(access_token)
+        shop = ShopifyAPI::Shop.current
+      end
 
+
+      def create_webhooks
         EVENTS_TOPICS.each do |event, topics|
           topics.each do |topic|
-            unless ShopifyAPI::Webhook.find(:all, :params => {:topic => "#{event}/#{topic}"}).any?
+            new_topic = "#{event}/#{topic}"
+            new_address = "#{ShopifyApp::Const::APP_URL}/#{event}_#{topic}"
+            #you may create as many webhooks as you want for one of the topics
+            webhook = ShopifyAPI::Webhook.find(:all, :params => {:topic => new_topic, :address => new_address})
+            unless webhook.any?
               new_webhook_attrs = {
-                  topic: "#{event}/#{topic}",
-                  address: "#{ShopifyApp::Const::APP_URL}/#{event}_#{topic}",
+                  topic: new_topic,
+                  address: new_address,
                   format: 'json'}
               ShopifyAPI::Webhook.create(new_webhook_attrs)
             end
           end
         end
-        Rails.logger.debug ShopifyAPI::Webhook.find(:all)
+      end
+
+      def webhook_ok?(hmac, data)
+        digest = OpenSSL::Digest.new('sha256')
+        calculated_hmac = Base64.encode64(OpenSSL::HMAC.digest(digest, ShopifyApp::Const::API_SECRET, data)).strip
+
+        ActiveSupport::SecurityUtils.secure_compare(hmac, calculated_hmac)
       end
 
     end
