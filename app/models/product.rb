@@ -8,6 +8,7 @@ class Product < ApplicationRecord
 
   def create_from_shopify_object(store, object)
     # TODO Save object to DB
+
   end
 
   def brandName

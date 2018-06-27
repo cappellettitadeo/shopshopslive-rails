@@ -12,9 +12,11 @@ class Scrapers::Shopify::Scraper < Scrapers::Scraper
       unless myshopify_domain.nil? && access_token.nil?
         ShopifyApp::Utils.instantiate_session(myshopify_domain, access_token)
         products = ShopifyAPI::Product.find(:all)
-        # 2. Call worker to create products
-        products.each do |product|
-          ShopifyCreateProductWorker.new.perform(store, product)
+        if products.any?
+          # 2. Call worker to create products
+          products.each do |product|
+            ShopifyCreateProductWorker.new.perform(store, product)
+          end
         end
       end
     end

@@ -33,6 +33,7 @@ class ShopifyAppController < ApplicationController
       code = request.params['code']
       access_token = ShopifyApp::Utils.get_shop_access_token(shop, code)
       ShopifyApp::Utils.instantiate_session(shop, access_token)
+      #create a store if this shopify user not exists in our db
       if ShopifyApp::Utils.persist_if_not_exists(shop, access_token)
         #Call the Scraper worker to fetch all products from the store
         ShopifyStoresScraperWorker.perform_async
