@@ -5,15 +5,15 @@ class Scrapers::Shopify::Scraper < Scrapers::Scraper
     scraper = Scraper.create(source: store.source, source_type: store.source_type, url: store.source_url)
     scraper.save
 
-    # 1. Call shopify API to fetch all products
     if store.source_type.equal? 'shopify'
       myshopify_domain = store.source_url
       access_token = store.source_token
-      unless myshopify_domain.nil? && access_token.nil?
+      unless myshopify_domain.nil? || access_token.nil?
         ShopifyApp::Utils.instantiate_session(myshopify_domain, access_token)
+        #Call shopify API to fetch all products
         products = ShopifyAPI::Product.find(:all)
         if products.any?
-          # 2. Call worker to create products
+          #Call worker to create products
           products.each do |product|
             ShopifyCreateProductWorker.new.perform(store, product)
           end
