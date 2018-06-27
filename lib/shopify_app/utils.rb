@@ -19,12 +19,12 @@ module ShopifyApp
         end
       end
 
-      def get_shop_access_token(shop, client_id, client_secret, code)
+      def get_shop_access_token(shop, code)
         url = "https://#{shop}/admin/oauth/access_token"
 
         payload = {
-            client_id: client_id,
-            client_secret: client_secret,
+            client_id: ShopifyApp::Const::API_KEY,
+            client_secret: ShopifyApp::Const::API_SECRET,
             code: code}
 
         response = HTTParty.post(url, body: payload)
@@ -41,21 +41,19 @@ module ShopifyApp
         ShopifyAPI::Base.activate_session(session)
       end
 
-      def create_new_store(myshopify_domain, access_token)
+      def persist_if_not_exists(myshopify_domain, access_token)
         unless Store.find_by(source_url: myshopify_domain).present?
           self.instantiate_session(myshopify_domain, access_token)
           shopify_shop = ShopifyAPI::Shop.current
-          Rails.logger.debug shopify_shop
           store = Store.create name: shopify_shop.name, description: '',
                                website: shopify_shop.domain, phone: shopify_shop.phone,
                                street: shopify_shop.address1, city: shopify_shop.city,
                                unit_no: shopify_shop.address2, zipcode: shopify_shop.zip,
                                latitude: shopify_shop.latitude, longitude: shopify_shop.longitude, local_rate: nil,
                                source_url: myshopify_domain, source_token: access_token, source_id: shopify_shop.id, source_type: 'shopify'
-          if store.save
-
-          end
+          return store.save
         end
+        false
       end
 
 

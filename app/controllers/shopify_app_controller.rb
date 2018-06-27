@@ -3,12 +3,10 @@ require 'shopify_app'
 class ShopifyAppController < ApplicationController
   respond_to :json
 
-  attr_reader :tokens
 
   def initialize
-    @tokens = {}
-    ShopifyAPI::Session.setup(api_key: ShopifyApp::Const::API_KEY, secret: ShopifyApp::Const::API_SECRET)
     super
+    ShopifyAPI::Session.setup(api_key: ShopifyApp::Const::API_KEY, secret: ShopifyApp::Const::API_SECRET)
   end
 
   def index
@@ -30,14 +28,17 @@ class ShopifyAppController < ApplicationController
 
   def auth
     if ShopifyApp::Utils.valid_request_from_shopify?(request)
-      #param shop is actually shop's myshopify.com domain
+      #param shop is actually shop's myshopify.com domain, which is unique identifier for each shopify store
       shop = request.params['shop']
       code = request.params['code']
-      @tokens[shop] = ShopifyApp::Utils.get_shop_access_token(shop, ShopifyApp::Const::API_KEY, ShopifyApp::Const::API_SECRET, code)
-      ShopifyApp::Utils.instantiate_session(shop, @tokens[shop])
-      ShopifyApp::Utils.create_new_store(shop,@tokens[shop])
+      access_token = ShopifyApp::Utils.get_shop_access_token(shop, code)
+      ShopifyApp::Utils.instantiate_session(shop, access_token)
+      if ShopifyApp::Utils.persist_if_not_exists(shop, access_token)
+        #Call the Scraper worker to fetch all products from the store
+        ShopifyStoresScraperWorker.perform_async
+      end
       ShopifyApp::Utils.create_webhooks
-      # 2. Call the Scraper worker to fetch all products from the store
+
       render 'welcome'
     else
       render 'unauthorized'
@@ -61,9 +62,10 @@ class ShopifyAppController < ApplicationController
     if ShopifyApp::Utils.webhook_ok?(hmac, data)
       shop = request.env['HTTP_X_SHOPIFY_SHOP_DOMAIN']
       logger.debug 'webhook ok.'
+      store = Store.find_by(source_url: shop)
 
-      if not @tokens[shop].nil?
-        ShopifyApp::Utils.instantiate_session(shop, @tokens[shop])
+      if store.present? && !store.source_token.nil?
+        ShopifyApp::Utils.instantiate_session(shop, store.source_token)
       else
         render json: {ec: 403, em: "You're not authorized to perform this action."}, status: unauthorized
       end
