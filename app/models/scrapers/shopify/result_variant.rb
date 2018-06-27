@@ -15,8 +15,29 @@ class Scrapers::Shopify::ResultVariant < Scrapers::Result
     @barcode ||= variant[:barcode]
   end
 
+  def color
+    position = nil
+    product[:options].each do |option|
+      if option[:name].downcase.equal? 'color'
+        position = option[:position]
+        next
+      end
+    end
+    @color = variant["option#{position}"] unless position.nil?
+  end
+
   def created_at
     @created_at ||= variant[:created_at]
+  end
+
+  def currency
+    #TODO add currency col to store table
+    @currency ||= store.currency
+  end
+
+  def discounted
+    #TODO
+    @discounted = false
   end
 
   def inventory
@@ -24,11 +45,15 @@ class Scrapers::Shopify::ResultVariant < Scrapers::Result
   end
 
   def name
-    @name ||= product[:title]
+    @name ||= variant[:title]
+  end
+
+  def original_price
+    @original_price = variant[:price]
   end
 
   def product_id
-    @product_id ||= product[:id]
+    @product_id ||= variant[:product_id]
   end
 
 
@@ -37,23 +62,27 @@ class Scrapers::Shopify::ResultVariant < Scrapers::Result
   end
 
   def source_id
+    @source_id ||= store.source_id
+  end
 
+  def source_sku
+    @source_sku ||= variant[:sku]
+  end
+
+  def size_id
+    #TODO add new column, country to store, create a new size and save the size_id
   end
 
   def updated_at
     @updated_at ||= variant[:updated_at]
   end
 
+  def weight
+    @weight ||= variant[:weight]
+  end
 
-
-  t.string "ctr_sku_id"
-  t.string "source_sku"
-  t.float "original_price"
-  t.boolean "discounted"
-  t.string "color"
-  t.integer "size_id"
-  t.string "currency"
-  t.float "weight"
-  t.string "weight_unit"
+  def weight_unit
+    @weight_unit ||= variant[:weight_unit]
+  end
 
 end

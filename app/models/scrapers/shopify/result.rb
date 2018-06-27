@@ -1,7 +1,7 @@
 class Scrapers::Shopify::Result < Scrapers::Result
   def initialize(store, product)
-    @product = product
     @store = store
+    @product = product
   end
 
   attr_reader :product, :store
