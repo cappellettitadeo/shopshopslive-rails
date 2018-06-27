@@ -37,6 +37,7 @@ module ShopifyApp
       end
 
       def instantiate_session(myshopify_domain, token)
+        ShopifyAPI::Base.clear_session
         session = ShopifyAPI::Session.new(myshopify_domain, token)
         ShopifyAPI::Base.activate_session(session)
       end
@@ -55,7 +56,6 @@ module ShopifyApp
         end
         false
       end
-
 
       def create_webhooks
         ShopifyApp::Const::EVENTS_TOPICS.each do |event, topics|
