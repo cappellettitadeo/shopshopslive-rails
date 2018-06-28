@@ -8,7 +8,7 @@ class Scrapers::Shopify::ResultVariant < Scrapers::Result
   attr_reader :variant, :product, :store
 
   def available
-    #inventory_quantity gonna be deprecated
+    #TODO inventory_quantity gonna be deprecated
     @available ||= variant.inventory_quantity.present? && variant.inventory_quantity > 0
   end
 
@@ -52,7 +52,6 @@ class Scrapers::Shopify::ResultVariant < Scrapers::Result
   end
 
   def product_id
-    @product_id ||= variant.product_id
   end
 
 
