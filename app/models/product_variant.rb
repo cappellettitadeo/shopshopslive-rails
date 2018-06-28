@@ -3,6 +3,15 @@ class ProductVariant < ApplicationRecord
   belongs_to :size
   has_many :photos, as: :target, dependent: :destroy
 
+  def lock_inventory(count)
+    if inventory >= count
+      self.inventory -= count
+      self.save
+    else
+      false
+    end
+  end
+
   def sizes
     size.size if size
   end

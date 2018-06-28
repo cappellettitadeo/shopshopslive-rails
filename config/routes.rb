@@ -14,6 +14,7 @@ Rails.application.routes.draw do
     post 'setting/callback', to: 'callback_settings#callback'
     get 'product/query', to: 'products#query'
     get 'inventory/query', to: 'inventory#query'
+    get 'inventory/lock', to: 'inventory#lock'
 
     # RESTful规范的routes定义如下
     resources :products do
