@@ -9,7 +9,7 @@ class Product < ApplicationRecord
   def self.create_from_shopify_object(store, object)
     #save object to DB
     product = Product.new description: object.description, keywords: object.keywords, material: object.material,
-                          name: object.name, store_id: object.store, source_id: object.source_id, scraper_id: object.scraper_id,
+                          name: object.name, store_id: object.store_id, source_id: object.source_id, scraper_id: object.scraper_id,
                           vendor_id: object.vendor_id
     if product.save
       #save all product variants to db

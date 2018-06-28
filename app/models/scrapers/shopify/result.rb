@@ -37,7 +37,7 @@ class Scrapers::Shopify::Result < Scrapers::Result
   def material
     unless @material.present?
       product.options.each do |option|
-        return @material = option.values.join(", ") if option.name.downcase.eql? "material"
+        return @material = option.values.join(", ") if option.name.downcase == "material"
       end
     end
     @material
@@ -61,7 +61,7 @@ class Scrapers::Shopify::Result < Scrapers::Result
   end
 
   def source_id
-    @source_id ||= store.source_id
+    @source_id ||= product.id
   end
 
   def scraper_id
@@ -85,13 +85,12 @@ class Scrapers::Shopify::Result < Scrapers::Result
   end
 
   def vendor_id
-    unless @vendor_id.present?
-      if product.vendor.present?
+    unless @vendor_id
+      if product.vendor
         vendor = Vendor.where(name: product.vendor).first_or_create
         @vendor_id = vendor.id
       end
     end
     @vendor_id
   end
-
 end

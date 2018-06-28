@@ -5,7 +5,7 @@ class Scrapers::Shopify::Scraper < Scrapers::Scraper
     scraper = Scraper.create(source_type: store.source_type, url: store.source_url)
     scraper.save
 
-    if store.source_type.eql? "shopify"
+    if store.source_type == "shopify"
       myshopify_domain = store.source_url
       access_token = store.source_token
 

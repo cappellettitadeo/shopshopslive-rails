@@ -9,7 +9,7 @@ class Scrapers::Shopify::ResultVariant < Scrapers::Result
 
   def available
     #TODO inventory_quantity gonna be deprecated
-    @available ||= variant.inventory_quantity.present? && variant.inventory_quantity > 0
+    @available ||= variant.inventory_quantity && variant.inventory_quantity > 0
   end
 
   def barcode
@@ -19,12 +19,12 @@ class Scrapers::Shopify::ResultVariant < Scrapers::Result
   def color
     position = nil
     product.options.each do |option|
-      if option.name.downcase.eql? "color"
+      if option.name.downcase == "color"
         position = option.position
-        next
+        break
       end
     end
-    @color = variant.send(:"option#{position}") unless position.nil?
+    @color = variant.send(:"option#{position}") if position
   end
 
   def created_at
@@ -52,15 +52,15 @@ class Scrapers::Shopify::ResultVariant < Scrapers::Result
   end
 
   def product_id
+    product.id
   end
-
 
   def price
     @price ||= variant.price
   end
 
   def source_id
-    @source_id ||= store.source_id
+    @source_id ||= variant.id
   end
 
   def source_sku
@@ -68,17 +68,17 @@ class Scrapers::Shopify::ResultVariant < Scrapers::Result
   end
 
   def size_id
-    unless @size_id.present?
+    unless @size_id
       position = nil
       size = nil
       product.options.each do |option|
-        if option.name.downcase.eql? "size"
+        if option.name.downcase == "size"
           position = option.position
-          next
+          break
         end
       end
-      size = variant.send(:"option#{position}") unless position.nil?
-      unless size.nil?
+      size = variant.send(:"option#{position}") if position
+      if size
         size_model = Size.where(size: size).first_or_create
         @size_id = size_model.id
       end
@@ -97,5 +97,4 @@ class Scrapers::Shopify::ResultVariant < Scrapers::Result
   def weight_unit
     @weight_unit ||= variant.weight_unit
   end
-
 end
