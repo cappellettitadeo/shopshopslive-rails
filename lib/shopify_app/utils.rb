@@ -46,8 +46,8 @@ module ShopifyApp
         unless Store.find_by(source_url: myshopify_domain).present?
           self.instantiate_session(myshopify_domain, access_token)
           shopify_shop = ShopifyAPI::Shop.current
-          store = Store.new name: shopify_shop.name, description: '',
-                            website: shopify_shop.domain, phone: shopify_shop.phone,
+          store = Store.new name: shopify_shop.name, description: '', country: shopify_shop.country_code,
+                            website: shopify_shop.domain, phone: shopify_shop.phone, currency: shopify_shop.currency,
                             street: shopify_shop.address1, city: shopify_shop.city,
                             unit_no: shopify_shop.address2, zipcode: shopify_shop.zip,
                             latitude: shopify_shop.latitude, longitude: shopify_shop.longitude, local_rate: nil,

@@ -31,12 +31,10 @@ class Scrapers::Shopify::ResultVariant < Scrapers::Result
   end
 
   def currency
-    #TODO add currency col to store table
     @currency ||= store.currency
   end
 
   def discounted
-    #TODO
     @discounted = false
   end
 

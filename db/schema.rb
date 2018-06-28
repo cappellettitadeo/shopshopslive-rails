@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180626153143) do
+ActiveRecord::Schema.define(version: 20180628002310) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -163,6 +163,8 @@ ActiveRecord::Schema.define(version: 20180626153143) do
     t.string "source_token"
     t.string "source_url"
     t.string "status", default: "active"
+    t.string "country"
+    t.string "currency"
   end
 
   create_table "sync_logs", force: :cascade do |t|
