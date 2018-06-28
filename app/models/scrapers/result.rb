@@ -1,4 +1,4 @@
-require 'hash_traverser/dfs_traverser'
+#require 'hash_traverser/dfs_traverser'
 
 class Scrapers::Result
 

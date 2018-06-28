@@ -8,26 +8,26 @@ class Scrapers::Shopify::ResultVariant < Scrapers::Result
   attr_reader :variant, :product, :store
 
   def available
-    @available ||= variant[:inventory_quantity] > 0
+    @available ||= variant.inventory_quantity > 0
   end
 
   def barcode
-    @barcode ||= variant[:barcode]
+    @barcode ||= variant.barcode
   end
 
   def color
     position = nil
-    product[:options].each do |option|
-      if option[:name].downcase.equal? 'color'
-        position = option[:position]
+    product.options.each do |option|
+      if option.name.downcase.eql? "color"
+        position = option.position
         next
       end
     end
-    @color = variant["option#{position}"] unless position.nil?
+    @color = variant.send(:"option#{position}") unless position.nil?
   end
 
   def created_at
-    @created_at ||= variant[:created_at]
+    @created_at ||= variant.created_at
   end
 
   def currency
@@ -39,24 +39,24 @@ class Scrapers::Shopify::ResultVariant < Scrapers::Result
   end
 
   def inventory
-    @inventory ||= variant[:inventory_quantity]
+    @inventory ||= variant.inventory_quantity
   end
 
   def name
-    @name ||= variant[:title]
+    @name ||= variant.title
   end
 
   def original_price
-    @original_price = variant[:price]
+    @original_price = variant.price
   end
 
   def product_id
-    @product_id ||= variant[:product_id]
+    @product_id ||= variant.product_id
   end
 
 
   def price
-    @price ||= variant[:price]
+    @price ||= variant.price
   end
 
   def source_id
@@ -64,23 +64,37 @@ class Scrapers::Shopify::ResultVariant < Scrapers::Result
   end
 
   def source_sku
-    @source_sku ||= variant[:sku]
+    @source_sku ||= variant.sku
   end
 
   def size_id
-    #TODO add new column, country to store, create a new size and save the size_id
+    position = nil
+    size = nil
+    product.options.each do |option|
+      if option.name.downcase.eql? "size"
+        position = option.position
+        next
+      end
+    end
+    size = variant.send(:"option#{position}") unless position.nil?
+    unless size.nil?
+      unless Size.find_by(size: size).present?
+        new_size_model = Size.create country: store.country, size: size
+        return @size_id = new_size_model.id
+      end
+    end
   end
 
   def updated_at
-    @updated_at ||= variant[:updated_at]
+    @updated_at ||= variant.updated_at
   end
 
   def weight
-    @weight ||= variant[:weight]
+    @weight ||= variant.weight
   end
 
   def weight_unit
-    @weight_unit ||= variant[:weight_unit]
+    @weight_unit ||= variant.weight_unit
   end
 
 end
