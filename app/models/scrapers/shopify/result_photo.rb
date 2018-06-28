@@ -1,21 +1,50 @@
 class Scrapers::Shopify::ResultPhoto < Scrapers::Result
-  def initialize(store, product, variant)
+  def initialize(store, product, photo)
     @store = store
     @product = product
-    @variant = variant
+    @photo = photo
   end
 
-  attr_reader :variant, :product, :store
+  attr_reader :photo, :product, :store
+
+  def created_at
+    @created_at ||= photo.created_at
+  end
+
+  def file
+    #TODO
+  end
+
+  def name
+    #TODO
+  end
+
+  def photo_type
+    #TODO
+  end
+
+  def position
+    @position ||= photo.position
+  end
+
+  def target_type
+    #TODO
+  end
+
+  def target_id
+    #TODO
+  end
+
+  def width
+    @width ||= photo.width
+  end
+
+  def height
+    @height ||= photo.height
+  end
+
+  def updated_at
+    @updated_at ||= updated_at
+  end
 
 end
-
-t.string "name"
-t.string "file"
-t.string "target_type"
-t.integer "target_id"
-t.string "photo_type"
-t.integer "position"
-t.integer "width"
-t.integer "height"
-t.datetime "created_at", null: false
-t.datetime "updated_at", null: false
