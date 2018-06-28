@@ -8,7 +8,8 @@ class Scrapers::Shopify::ResultVariant < Scrapers::Result
   attr_reader :variant, :product, :store
 
   def available
-    @available ||= variant.inventory_quantity > 0
+    #inventory_quantity gonna be deprecated
+    @available ||= variant.inventory_quantity.present? && variant.inventory_quantity > 0
   end
 
   def barcode
