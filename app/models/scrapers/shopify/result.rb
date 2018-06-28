@@ -16,11 +16,10 @@ class Scrapers::Shopify::Result < Scrapers::Result
   end
 
   def variants
-    if @variants.nil?
-      @variants = []
-      variants = product.variants
-      if variants.present?
-        variants.each do |variant|
+    unless @variants.present?
+      if product.variants.present?
+        @variants = []
+        product.variants.each do |variant|
           @variants.push(Scrapers::Shopify::ResultVariant.new(store, product, variant))
         end
       end
@@ -29,7 +28,14 @@ class Scrapers::Shopify::Result < Scrapers::Result
   end
 
   def photos
-    # TODO
-    #@photos = product[:images]
+    unless @photos.present?
+      if product.images.present?
+        @photos = []
+        product.images.each do |image|
+          @photos.push(Scrapers::Shopify::ResultPhoto.new(store, product, variant))
+        end
+      end
+    end
+    @photos
   end
 end
