@@ -16,7 +16,7 @@ class Scrapers::Shopify::Scraper < Scrapers::Scraper
         if products.any?
           #Call worker to create products
           products.each do |product|
-            ShopifyCreateProductWorker.new.perform(store, product)
+            ShopifyCreateProductWorker.new.perform(store, product, scraper)
           end
         end
       end

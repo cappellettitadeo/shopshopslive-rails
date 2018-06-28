@@ -1,13 +1,14 @@
 class Scrapers::Shopify::Result < Scrapers::Result
-  def initialize(store, product)
+  def initialize(store, product, scraper)
     @store = store
     @product = product
+    @scraper = scraper
   end
 
-  attr_reader :product, :store
+  attr_reader :product, :store, :scraper
 
   def available
-    #TODO
+    #default
   end
 
   def created_at
@@ -15,7 +16,7 @@ class Scrapers::Shopify::Result < Scrapers::Result
   end
 
   def ctr_product_id
-    #TODO
+    #not the concern so far
   end
 
   def description
@@ -34,7 +35,12 @@ class Scrapers::Shopify::Result < Scrapers::Result
   end
 
   def material
-    #TODO
+    unless @material.present?
+      product.options.each do |option|
+        return @material = option.values.join(", ") if option.name.downcase.eql? "material"
+      end
+    end
+    @material
   end
 
   def name
@@ -44,10 +50,7 @@ class Scrapers::Shopify::Result < Scrapers::Result
   def photos
     unless @photos.present?
       if product.images.present?
-        @photos = []
-        product.images.each do |photo|
-          @photos.push(Scrapers::Shopify::ResultPhoto.new(store, product, photo))
-        end
+        @photos = product.images
       end
     end
     @photos
@@ -62,7 +65,7 @@ class Scrapers::Shopify::Result < Scrapers::Result
   end
 
   def scraper_id
-    #TODO
+    @scraper_id ||= scraper.id
   end
 
   def updated_at
@@ -82,7 +85,13 @@ class Scrapers::Shopify::Result < Scrapers::Result
   end
 
   def vendor_id
-    #TODO
+    unless @vendor_id.present?
+      if product.vendor.present?
+        vendor = Vendor.where(name: product.vendor).first_or_create
+        @vendor_id = vendor.id
+      end
+    end
+    @vendor_id
   end
 
 end

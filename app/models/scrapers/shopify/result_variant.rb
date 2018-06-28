@@ -68,21 +68,22 @@ class Scrapers::Shopify::ResultVariant < Scrapers::Result
   end
 
   def size_id
-    position = nil
-    size = nil
-    product.options.each do |option|
-      if option.name.downcase.eql? "size"
-        position = option.position
-        next
+    unless @size_id.present?
+      position = nil
+      size = nil
+      product.options.each do |option|
+        if option.name.downcase.eql? "size"
+          position = option.position
+          next
+        end
+      end
+      size = variant.send(:"option#{position}") unless position.nil?
+      unless size.nil?
+        size_model = Size.where(size: size).first_or_create
+        @size_id = size_model.id
       end
     end
-    size = variant.send(:"option#{position}") unless position.nil?
-    unless size.nil?
-      unless Size.find_by(size: size).present?
-        new_size_model = Size.create country: store.country, size: size
-        return @size_id = new_size_model.id
-      end
-    end
+    @size_id
   end
 
   def updated_at
