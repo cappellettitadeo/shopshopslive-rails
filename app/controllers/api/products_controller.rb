@@ -10,7 +10,7 @@ class Api::ProductsController < ApiController
     param :query, :title, :string, :optional, "Filter results by product title."
     param :query, :vendor, :string, :optional, "Filter results by product vendor."
     param :query, :category, :string, :optional, "Filter results by category."
-    param :query, :product_type, :string, :optional, "Filter results by product type."
+    #param :query, :product_type, :string, :optional, "Filter results by product type."
     param :query, :created_at_min, :string, :optional, "Show products created after date. (format: 2014-04-25T16:15:47-04:00)."
     param :query, :created_at_max, :string, :optional, "Show products created before date. (format: 2014-04-25T16:15:47-04:00)."
     param :query, :updated_at_min, :string, :optional, "Show products updated after date. (format: 2014-04-25T16:15:47-04:00)."
