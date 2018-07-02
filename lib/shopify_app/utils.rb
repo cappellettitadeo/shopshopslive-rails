@@ -61,9 +61,9 @@ module ShopifyApp
         ShopifyApp::Const::EVENTS_TOPICS.each do |event, topics|
           topics.each do |topic|
             new_topic = "#{event}/#{topic}"
-            new_address = "#{ShopifyApp::Const::APP_URL}/#{event}_#{topic}"
+            new_address = "#{ShopifyApp::Const::BASE_URL}//api/products/shopify_webhook"
             #you may create as many webhooks as you want for each topic
-            unless ShopifyAPI::Webhook.where(:topic => new_topic, :address => new_address).any?
+            unless ShopifyAPI::Webhook.where(:topic => new_topic, :address => new_address).present?
               new_webhook_attrs = {
                   topic: new_topic,
                   address: new_address,

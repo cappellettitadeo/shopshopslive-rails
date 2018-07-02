@@ -34,4 +34,8 @@ class Api::ProductsController < ApiController
     end
     render json: hash, status: :ok
   end
+
+  def shopify_webhook
+
+  end
 end

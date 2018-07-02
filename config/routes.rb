@@ -19,6 +19,7 @@ Rails.application.routes.draw do
     resources :products do
       collection do
         get :query
+        post :shopify_webhook
       end
     end
     resources :callback_settings do
