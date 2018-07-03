@@ -7,10 +7,8 @@ module ShopifyApp
       end
 
       def products_create(store, product)
-        scraper = Scraper.create(source_type: store.source_type, url: store.source_url)
-        scraper.save
-
-        ShopifyCreateProductWorker.new.perform(store, product, scraper)
+        product_result = Scrapers::Shopify::Result.new(store, product, nil)
+        Product.create_from_shopify_object(store, product_result)
       end
 
       def products_update(updated_product)

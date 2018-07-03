@@ -1,4 +1,5 @@
 class Api::ProductsController < ApiController
+  skip_before_action :authenticate_request, only: [:shopify_webhook]
   swagger_controller :products, "Products"
 
   swagger_api :query do

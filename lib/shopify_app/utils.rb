@@ -52,9 +52,9 @@ module ShopifyApp
                             unit_no: shopify_shop.address2, zipcode: shopify_shop.zip,
                             latitude: shopify_shop.latitude, longitude: shopify_shop.longitude, local_rate: nil,
                             source_url: myshopify_domain, source_token: access_token, source_id: shopify_shop.id, source_type: 'shopify'
-          return store.save
+          store.new
+          store
         end
-        false
       end
 
       def create_webhooks
