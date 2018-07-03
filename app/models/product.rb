@@ -15,12 +15,7 @@ class Product < ApplicationRecord
       #save all product variants to db
       if object.variants.present?
         object.variants.each do |variant|
-          product_variant = ProductVariant.new product: product, barcode: variant.barcode, color: variant.color,
-                                               currency: variant.currency, inventory: variant.inventory, name: variant.name,
-                                               original_price: variant.original_price, product_id: product.id,
-                                               price: variant.price, source_id: variant.source_id, source_sku: variant.source_sku,
-                                               size_id: variant.size_id, weight: variant.weight, weight_unit: variant.weight_unit
-          product_variant.save
+          ProductVariant.create_from_shopify_variant(variant)
         end
       end
       #save all product photos to db
@@ -32,6 +27,7 @@ class Product < ApplicationRecord
     end
   end
 
+
   def self.update_from_shopify_product(updated_product)
     product = Product.find_by_source_id(updated_product.id)
     if product
@@ -42,9 +38,18 @@ class Product < ApplicationRecord
       product.material = product_result.material
       product.vendor_id = product_result.vendor_id
       product.save
-    end
 
-    Rails.logger.debug updated_product.variants
+      Rails.logger.debug updated_product.variants
+      if product_result.variants.present?
+        product_result.variants.each do |variant|
+          if ProductVariant.find_by_source_id variant.source_id.present?
+            ProductVariant.update_from_shopify_variant(variant)
+          else
+            ProductVariant.create_from_shopify_variant(variant)
+          end
+        end
+      end
+    end
 
     Rails.logger.debug product
   end
