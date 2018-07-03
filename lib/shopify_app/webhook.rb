@@ -19,8 +19,9 @@ module ShopifyApp
         Product.find_by_source_id(product.id).destroy
       end
 
-      def shop_update(shop)
-        Rails.logger.debug shop
+      def shop_update(store, updated_shop)
+        Rails.logger.debug updated_shop
+        Store.update_store_from_shopify_shop(store, updated_shop)
       end
 
     end

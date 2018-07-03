@@ -58,7 +58,7 @@ class Api::ProductsController < ApiController
           when "app/uninstalled"
             ShopifyApp::Webhook.app_uninstalled(data_object)
           when "shop/update"
-            ShopifyApp::Webhook.shop_update(data_object)
+            ShopifyApp::Webhook.shop_update(store, data_object)
           when "products/create"
             ShopifyApp::Webhook.products_create(store, data_object)
           when "products/delete"

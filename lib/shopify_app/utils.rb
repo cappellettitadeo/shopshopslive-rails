@@ -46,21 +46,11 @@ module ShopifyApp
         unless Store.find_by(source_url: myshopify_domain).present?
           self.instantiate_session(myshopify_domain, access_token)
           shopify_shop = ShopifyAPI::Shop.current
-          store = Store.new name: shopify_shop.name, description: '', country: shopify_shop.country_code,
-                            website: shopify_shop.domain, phone: shopify_shop.phone, currency: shopify_shop.currency,
-                            street: shopify_shop.address1, city: shopify_shop.city,
-                            unit_no: shopify_shop.address2, zipcode: shopify_shop.zip,
-                            latitude: shopify_shop.latitude, longitude: shopify_shop.longitude, local_rate: nil,
-                            source_url: myshopify_domain, source_token: access_token, source_id: shopify_shop.id, source_type: 'shopify'
-          store.new
-          store
+          Store.create_store_from_shopify_shop(shopify_shop)
         end
       end
 
       def create_webhooks
-        ShopifyAPI::Webhook.find(:all).each do |webhook|
-          webhook.destroy
-        end
         ShopifyApp::Const::EVENTS_TOPICS.each do |event, topics|
           topics.each do |topic|
             new_topic = "#{event}/#{topic}"
@@ -75,7 +65,6 @@ module ShopifyApp
             end
           end
         end
-        Rails.logger.debug ShopifyAPI::Webhook.find(:all)
       end
 
       def webhook_ok?(hmac, data)
