@@ -1,4 +1,5 @@
 require 'shopify_app'
+require 'ostruct'
 
 class ShopifyAppController < ApplicationController
   respond_to :json
@@ -47,11 +48,7 @@ class ShopifyAppController < ApplicationController
   def unauthorized
   end
 
-  def app_uninstalled
-
-  end
-
-  def products_create
+  def shopify_webhook
     # inspect hmac value in header and verify webhook
     hmac = request.env['HTTP_X_SHOPIFY_HMAC_SHA256']
 
@@ -60,35 +57,38 @@ class ShopifyAppController < ApplicationController
 
     if ShopifyApp::Utils.webhook_ok?(hmac, data)
       shop = request.env['HTTP_X_SHOPIFY_SHOP_DOMAIN']
-      logger.debug 'webhook ok.'
       store = Store.find_by(source_url: shop)
 
-      if store.present? && !store.source_token.nil?
-        ShopifyApp::Utils.instantiate_session(shop, store.source_token)
+      if store.present? && store.source_token
+        topic = request.env['HTTP_X_SHOPIFY_TOPIC']
+        if topic
+          ShopifyApp::Utils.instantiate_session(shop, store.source_token)
+          data_object = JSON.parse(data, object_class: OpenStruct)
+          case topic
+          when "app/uninstalled"
+            ShopifyApp::Webhook.app_uninstalled(data_object)
+          when "shop/update"
+            ShopifyApp::Webhook.shop_update(data_object)
+          when "products/create"
+            ShopifyApp::Webhook.products_create(store, data_object)
+          when "products/delete"
+            ShopifyApp::Webhook.products_delete(data_object)
+          when "products/update"
+            ShopifyApp::Webhook.products_update(data_object)
+          else
+            logger.warn "topic handler not found"
+          end
+        else
+          logger.warn "header does not include topic"
+        end
       else
-        render json: {ec: 403, em: "You're not authorized to perform this action."}, status: unauthorized
+        render json: {ec: 403, em: "You're not authorized to perform this action."}, status: :forbidden
       end
     else
-      render json: {ec: 403, em: "You're not authorized to perform this action."}, status: unauthorized
+      render json: {ec: 403, em: "You're not authorized to perform this action."}, status: :forbidden
     end
 
-    # parse the request body as JSON data
-    json_data = JSON.parse data
-    logger.debug json_data
-
-    render json: {status: 'Webhook notification received successfully.'}, status: :ok
-  end
-
-  def products_update
-    logger.debug 'product updated.'
-  end
-
-  def products_delete
-    logger.debug 'product deleted'
-  end
-
-  def shop_update
-
+    render json: {ec: 200, em: 'Webhook notification received successfully.'}, status: :ok
   end
 
 end

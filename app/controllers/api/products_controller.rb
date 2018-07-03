@@ -36,6 +36,30 @@ class Api::ProductsController < ApiController
   end
 
   def shopify_webhook
+    # inspect hmac value in header and verify webhook
+    hmac = request.env['HTTP_X_SHOPIFY_HMAC_SHA256']
 
+    request.body.rewind
+    data = request.body.read
+
+    if ShopifyApp::Utils.webhook_ok?(hmac, data)
+      shop = request.env['HTTP_X_SHOPIFY_SHOP_DOMAIN']
+      logger.debug 'webhook ok.'
+      store = Store.find_by(source_url: shop)
+
+      if store.present? && !store.source_token.nil?
+        ShopifyApp::Utils.instantiate_session(shop, store.source_token)
+      else
+        render json: {ec: 403, em: "You're not authorized to perform this action."}, status: unauthorized
+      end
+    else
+      render json: {ec: 403, em: "You're not authorized to perform this action."}, status: unauthorized
+    end
+
+    # parse the request body as JSON data
+    json_data = JSON.parse data
+    logger.debug json_data
+
+    render json: {status: 'Webhook notification received successfully.'}, status: :ok
   end
 end

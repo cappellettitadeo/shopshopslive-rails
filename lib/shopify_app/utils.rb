@@ -61,7 +61,7 @@ module ShopifyApp
         ShopifyApp::Const::EVENTS_TOPICS.each do |event, topics|
           topics.each do |topic|
             new_topic = "#{event}/#{topic}"
-            new_address = "#{ShopifyApp::Const::BASE_URL}//api/products/shopify_webhook"
+            new_address = "#{ShopifyApp::Const::APP_URL}/shopify_webhook"
             #you may create as many webhooks as you want for each topic
             unless ShopifyAPI::Webhook.where(:topic => new_topic, :address => new_address).present?
               new_webhook_attrs = {
@@ -78,6 +78,8 @@ module ShopifyApp
         digest = OpenSSL::Digest.new('sha256')
         calculated_hmac = Base64.encode64(OpenSSL::HMAC.digest(digest, ShopifyApp::Const::API_SECRET, data)).strip
 
+        Rails.logger.debug digest
+        Rails.logger.debug calculated_hmac
         ActiveSupport::SecurityUtils.secure_compare(hmac, calculated_hmac)
       end
 

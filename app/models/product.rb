@@ -32,6 +32,23 @@ class Product < ApplicationRecord
     end
   end
 
+  def self.update_from_shopify_product(updated_product)
+    product = Product.find_by_source_id(updated_product.id)
+    if product
+      product_result = Scrapers::Shopify::Result.new(nil, updated_product, nil)
+      product.name = product_result.name
+      product.description = product_result.description
+      product.keywords = product_result.keywords
+      product.material = product_result.material
+      product.vendor_id = product_result.vendor_id
+      product.save
+    end
+
+    Rails.logger.debug updated_product.variants
+
+    Rails.logger.debug product
+  end
+
   def brandName
     vendor.name if vendor
   end

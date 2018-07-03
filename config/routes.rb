@@ -38,11 +38,7 @@ Rails.application.routes.draw do
       get :install
       get :unauthorized
       get :welcome
-      post :app_uninstalled
-      post :products_create
-      post :products_update
-      post :products_delete
-      post :shop_update
+      post :shopify_webhook
     end
   end
 
