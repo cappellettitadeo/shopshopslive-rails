@@ -6,14 +6,14 @@ class Store < ApplicationRecord
   scope :active, -> { where(status: 'active') }
   scope :shopify, -> { where(source_type: 'shopify') }
 
-  def self.create_store_from_shopify_shop(shopify_shop)
+  def self.create_store_from_shopify_shop(shopify_shop, myshopify_domain, access_token)
     store = Store.new name: shopify_shop.name, description: '', country: shopify_shop.country_code,
                       website: shopify_shop.domain, phone: shopify_shop.phone, currency: shopify_shop.currency,
                       street: shopify_shop.address1, city: shopify_shop.city, state: shopify_shop.province,
                       unit_no: shopify_shop.address2, zipcode: shopify_shop.zip,
                       latitude: shopify_shop.latitude, longitude: shopify_shop.longitude, local_rate: nil,
                       source_url: myshopify_domain, source_token: access_token, source_id: shopify_shop.id, source_type: 'shopify'
-    store.new
+    store.save
     store
   end
 

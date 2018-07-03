@@ -46,7 +46,7 @@ module ShopifyApp
         unless Store.find_by(source_url: myshopify_domain).present?
           self.instantiate_session(myshopify_domain, access_token)
           shopify_shop = ShopifyAPI::Shop.current
-          Store.create_store_from_shopify_shop(shopify_shop)
+          Store.create_store_from_shopify_shop(shopify_shop, myshopify_domain, access_token)
         end
       end
 
