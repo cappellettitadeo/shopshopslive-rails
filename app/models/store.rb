@@ -19,7 +19,6 @@ class Store < ApplicationRecord
 
   def self.update_store_from_shopify_shop(store, updated_shop)
     if store && updated_shop
-      Rails.logger.debug updated_shop
       store.name = updated_shop.name
       store.country = updated_shop.country_code
       store.website = updated_shop.domain
@@ -34,6 +33,5 @@ class Store < ApplicationRecord
       store.longitude = updated_shop.longitude
       store.save
     end
-    Rails.logger.debug store
   end
 end

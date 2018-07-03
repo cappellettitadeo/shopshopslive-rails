@@ -3,6 +3,7 @@ module ShopifyApp
     class << self
 
       def app_uninstalled(data_obj)
+        #TODO do something after user uninstall our shopify app
         Rails.logger.debug data_obj
       end
 
@@ -20,7 +21,6 @@ module ShopifyApp
       end
 
       def shop_update(store, updated_shop)
-        Rails.logger.debug updated_shop
         Store.update_store_from_shopify_shop(store, updated_shop)
       end
 
