@@ -58,10 +58,13 @@ module ShopifyApp
       end
 
       def create_webhooks
+        ShopifyAPI::Webhook.find(:all).each do |webhook|
+          webhook.destroy
+        end
         ShopifyApp::Const::EVENTS_TOPICS.each do |event, topics|
           topics.each do |topic|
             new_topic = "#{event}/#{topic}"
-            new_address = "#{ShopifyApp::Const::APP_URL}/shopify_webhook"
+            new_address = "#{ShopifyApp::Const::BASE_URL}/api/products/shopify_webhook"
             #you may create as many webhooks as you want for each topic
             unless ShopifyAPI::Webhook.where(:topic => new_topic, :address => new_address).present?
               new_webhook_attrs = {
@@ -72,6 +75,7 @@ module ShopifyApp
             end
           end
         end
+        Rails.logger.debug ShopifyAPI::Webhook.find(:all)
       end
 
       def webhook_ok?(hmac, data)
