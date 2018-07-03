@@ -1,57 +1,64 @@
 class Product < ApplicationRecord
-	has_many :photos, as: :target, dependent: :destroy
-	has_many :product_variants, dependent: :destroy
+  has_many :photos, as: :target, dependent: :destroy
+  has_many :product_variants, dependent: :destroy
   has_and_belongs_to_many :categories
   belongs_to :store
   belongs_to :vendor
   belongs_to :scraper
 
   def self.create_from_shopify_object(store, object)
-    #save object to DB
-    product = Product.new description: object.description, keywords: object.keywords, material: object.material,
-                          name: object.name, store_id: object.store_id, source_id: object.source_id, scraper_id: object.scraper_id,
-                          vendor_id: object.vendor_id
-    if product.save
-      #save all product variants to db
-      if object.variants.present?
-        object.variants.each do |variant|
-          ProductVariant.create_from_shopify_variant(variant)
+    if Product.find_by_source_id(object.source_id).nil?
+      #save object to DB
+      product = Product.new description: object.description, keywords: object.keywords, material: object.material,
+                            name: object.name, store_id: object.store_id, source_id: object.source_id, scraper_id: object.scraper_id,
+                            vendor_id: object.vendor_id
+      if product.save
+        #save all product variants to db
+        if object.variants.present?
+          object.variants.each do |variant|
+            ProductVariant.create_from_shopify_variant(product, variant)
+          end
+        end
+        #save all product photos to db
+        if object.photos.present?
+          object.photos.each do |photo|
+            #TODO shopify photo src
+            Photo.compose(product, 'product', photo.src, photo.width, photo.height, photo.position)
+          end
         end
       end
-      #save all product photos to db
-      if object.photos.present?
-        object.photos.each do |photo|
-          Photo.compose(product, 'product', photo.src, photo.width, photo.height, photo.position)
-        end
-      end
+      product
+    else
+      update_from_shopify_product(store, object)
     end
   end
 
 
-  def self.update_from_shopify_product(updated_product)
-    product = Product.find_by_source_id(updated_product.id)
+  def self.update_from_shopify_product(store, object)
+    product = Product.find_by_source_id(object.source_id)
     if product
-      product_result = Scrapers::Shopify::Result.new(nil, updated_product, nil)
-      product.name = product_result.name
-      product.description = product_result.description
-      product.keywords = product_result.keywords
-      product.material = product_result.material
-      product.vendor_id = product_result.vendor_id
+      product.name = object.name
+      product.description = object.description
+      product.keywords = object.keywords
+      product.material = object.material
+      product.vendor_id = object.vendor_id
       product.save
 
-      Rails.logger.debug updated_product.variants
-      if product_result.variants.present?
-        product_result.variants.each do |variant|
-          if ProductVariant.find_by_source_id variant.source_id.present?
-            ProductVariant.update_from_shopify_variant(variant)
-          else
-            ProductVariant.create_from_shopify_variant(variant)
-          end
+      if object.variants.present?
+        object.variants.each do |variant|
+          ProductVariant.update_from_shopify_variant(product, variant)
         end
       end
-    end
 
-    Rails.logger.debug product
+      if object.photos.present?
+        object.photos.each do |photo|
+          Photo.update(product, 'product', photo.src, photo.width, photo.height, photo.position)
+        end
+      end
+      product
+    else
+      create_from_shopify_object(store, object)
+    end
   end
 
   def brandName

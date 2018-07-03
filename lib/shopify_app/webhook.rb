@@ -2,7 +2,7 @@ module ShopifyApp
   class Webhook
     class << self
 
-      def app_uninstalled(data_obj)
+      def app_uninstalled(store, data_obj)
         #TODO do something after user uninstall our shopify app
         Rails.logger.debug data_obj
       end
@@ -12,8 +12,9 @@ module ShopifyApp
         Product.create_from_shopify_object(store, product_result)
       end
 
-      def products_update(updated_product)
-        Product.update_from_shopify_product(updated_product)
+      def products_update(store, updated_product)
+        product_result = Scrapers::Shopify::Result.new(store, updated_product, nil)
+        Product.update_from_shopify_product(store, product_result)
       end
 
       def products_delete(deleted_product)

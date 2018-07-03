@@ -56,7 +56,7 @@ class Api::ProductsController < ApiController
           data_object = JSON.parse(data, object_class: OpenStruct)
           case topic
           when "app/uninstalled"
-            ShopifyApp::Webhook.app_uninstalled(data_object)
+            ShopifyApp::Webhook.app_uninstalled(store, data_object)
           when "shop/update"
             ShopifyApp::Webhook.shop_update(store, data_object)
           when "products/create"
@@ -64,7 +64,7 @@ class Api::ProductsController < ApiController
           when "products/delete"
             ShopifyApp::Webhook.products_delete(data_object)
           when "products/update"
-            ShopifyApp::Webhook.products_update(data_object)
+            ShopifyApp::Webhook.products_update(store, data_object)
           else
             logger.warn "topic handler not found"
           end
