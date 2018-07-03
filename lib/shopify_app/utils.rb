@@ -71,8 +71,6 @@ module ShopifyApp
         digest = OpenSSL::Digest.new('sha256')
         calculated_hmac = Base64.encode64(OpenSSL::HMAC.digest(digest, ShopifyApp::Const::API_SECRET, data)).strip
 
-        Rails.logger.debug digest
-        Rails.logger.debug calculated_hmac
         ActiveSupport::SecurityUtils.secure_compare(hmac, calculated_hmac)
       end
 

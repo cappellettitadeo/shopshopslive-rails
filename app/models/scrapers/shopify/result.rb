@@ -65,7 +65,7 @@ class Scrapers::Shopify::Result < Scrapers::Result
   end
 
   def scraper_id
-    @scraper_id ||= scraper.id
+    @scraper_id ||= scraper && scraper.id
   end
 
   def updated_at

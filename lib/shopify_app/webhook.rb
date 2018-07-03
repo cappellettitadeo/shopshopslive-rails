@@ -16,8 +16,9 @@ module ShopifyApp
         Product.update_from_shopify_product(updated_product)
       end
 
-      def products_delete(product)
-        Product.find_by_source_id(product.id).destroy
+      def products_delete(deleted_product)
+        product = Product.find_by_source_id(deleted_product.id)
+        product.destroy if product
       end
 
       def shop_update(store, updated_shop)
