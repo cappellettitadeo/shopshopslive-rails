@@ -7,3 +7,7 @@
     cron: '0 0 * * * * Asia/Shanghai'   # Runs every hour
     description: "Fetch all categories from Central app"
     enabled: true
+  ShopifyStoresScraperWorker:
+    cron: '0 0 * * * * Asia/Shanghai'   # Runs every hour
+    description: "Fetch all products from each Shopify stores"
+    enabled: true
