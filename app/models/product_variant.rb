@@ -3,6 +3,15 @@ class ProductVariant < ApplicationRecord
   belongs_to :size
   has_many :photos, as: :target, dependent: :destroy
 
+  def lock_inventory(count)
+    if inventory >= count
+      self.inventory -= count
+      self.save
+    else
+      false
+    end
+  end
+
   def self.create_from_shopify_variant(product, variant)
     if ProductVariant.find_by_source_id(variant.source_id).nil?
       product_variant = ProductVariant.new product: product, barcode: variant.barcode, color: variant.color,

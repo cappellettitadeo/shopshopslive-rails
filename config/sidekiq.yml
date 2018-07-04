@@ -1,4 +1,9 @@
 :schedule:
   ProductsSyncWorker:
     cron: '0 59 23 * * * Asia/Shanghai'   # Runs once per minute
+    description: "Update products in Central app"
+    enabled: true
+  CategoriesSyncWorker:
+    cron: '0 0 * * * * Asia/Shanghai'   # Runs every hour
+    description: "Fetch all categories from Central app"
     enabled: true

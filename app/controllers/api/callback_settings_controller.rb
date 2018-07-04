@@ -43,7 +43,6 @@ class Api::CallbackSettingsController < ApiController
   end
 
   def callback
-    binding.pry
     ### 参数列表：
     setting_params.each do |key, value|
       url = value[:callback].strip rescue nil

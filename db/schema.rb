@@ -14,6 +14,7 @@ ActiveRecord::Schema.define(version: 20180704015545) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+  enable_extension "hstore"
 
   create_table "api_keys", force: :cascade do |t|
     t.string "name"
@@ -79,7 +80,7 @@ ActiveRecord::Schema.define(version: 20180704015545) do
     t.boolean "discounted"
     t.string "color"
     t.integer "size_id"
-    t.integer "inventory"
+    t.integer "inventory", default: 0
     t.string "currency"
     t.string "barcode"
     t.float "weight"
@@ -88,6 +89,7 @@ ActiveRecord::Schema.define(version: 20180704015545) do
     t.datetime "deleted_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["ctr_sku_id"], name: "index_product_variants_on_ctr_sku_id"
     t.index ["product_id"], name: "index_product_variants_on_product_id"
     t.index ["source_id"], name: "index_product_variants_on_source_id"
   end
@@ -167,6 +169,7 @@ ActiveRecord::Schema.define(version: 20180704015545) do
     t.string "status", default: "active"
     t.string "country"
     t.string "currency"
+    t.index ["ctr_store_id"], name: "index_stores_on_ctr_store_id"
   end
 
   create_table "sync_logs", force: :cascade do |t|
@@ -200,6 +203,7 @@ ActiveRecord::Schema.define(version: 20180704015545) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "unit_no"
+    t.index ["ctr_vendor_id"], name: "index_vendors_on_ctr_vendor_id"
   end
 
 end
