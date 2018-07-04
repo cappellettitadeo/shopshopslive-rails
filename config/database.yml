@@ -22,6 +22,8 @@ development:
   database: shopshops_development
   username: shopsadmin
   password: shopspassword
+  host: localhost
+  pool: 5
 
 test:
   <<: *default

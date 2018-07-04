@@ -10,11 +10,10 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180629082208) do
+ActiveRecord::Schema.define(version: 20180704015545) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
-  enable_extension "hstore"
 
   create_table "api_keys", force: :cascade do |t|
     t.string "name"
@@ -63,7 +62,9 @@ ActiveRecord::Schema.define(version: 20180629082208) do
     t.integer "height"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "source_url"
     t.index ["position"], name: "index_photos_on_position"
+    t.index ["source_url"], name: "index_photos_on_source_url"
     t.index ["target_type", "target_id"], name: "index_photos_on_target_type_and_target_id"
   end
 
@@ -165,6 +166,8 @@ ActiveRecord::Schema.define(version: 20180629082208) do
     t.string "source_token"
     t.string "source_url"
     t.string "status", default: "active"
+    t.string "country"
+    t.string "currency"
     t.index ["ctr_store_id"], name: "index_stores_on_ctr_store_id"
   end
 

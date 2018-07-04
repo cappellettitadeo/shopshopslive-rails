@@ -17,3 +17,6 @@
 .keep
 
 .byebug_history
+
+#rubymine
+.idea/*
