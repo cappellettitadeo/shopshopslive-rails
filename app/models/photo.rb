@@ -5,10 +5,11 @@ class Photo < ApplicationRecord
   before_create :set_filename
 
   def self.compose(target, photo_type, photo_url, width, height, position)
-    if Photo.find_by(file: photo_url, target_id: target.id).nil?
+    if Photo.find_by(source_url: photo_url, target_id: target.id).nil?
       photo = new(target: target)
       photo.photo_type = photo_type
       photo.remote_file_url = photo_url if photo_url
+      photo.source_url = photo_url
       photo.width = width
       photo.height = height
       photo.position = position
@@ -21,7 +22,7 @@ class Photo < ApplicationRecord
   end
 
   def self.update(target, photo_type, photo_url, width, height, position)
-    photo = Photo.find_by(file: photo_url, target_id: target.id)
+    photo = Photo.find_by(source_url: photo_url, target_id: target.id)
     if photo
       photo.width = width
       photo.height = height
