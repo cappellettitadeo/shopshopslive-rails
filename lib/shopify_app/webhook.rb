@@ -22,8 +22,8 @@ module ShopifyApp
         product.destroy if product
       end
 
-      def shop_update(store, updated_shop)
-        Store.update_store_from_shopify_shop(store, updated_shop)
+      def shop_update(store, shopify_shop)
+        Store.update_store_from_shopify_shop(store, shopify_shop)
       end
 
     end
