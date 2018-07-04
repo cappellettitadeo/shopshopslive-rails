@@ -5,33 +5,17 @@ class Photo < ApplicationRecord
   before_create :set_filename
 
   def self.compose(target, photo_type, photo_url, width, height, position)
-    if Photo.find_by(source_url: photo_url, target_id: target.id).nil?
-      photo = new(target: target)
-      photo.photo_type = photo_type
-      photo.remote_file_url = photo_url if photo_url
-      photo.source_url = photo_url
-      photo.width = width
-      photo.height = height
-      photo.position = position
-      photo.save
-      photo
-    else
-      update(target, photo_type, photo_url, width, height, position)
-    end
-
-  end
-
-  def self.update(target, photo_type, photo_url, width, height, position)
-    photo = Photo.find_by(source_url: photo_url, target_id: target.id)
-    if photo
-      photo.width = width
-      photo.height = height
-      photo.position = position
-      photo.save
-      photo
-    else
-      Photo.compose(target, photo_type, photo_url, width, height, position)
-    end
+    changed = false
+    photo = Photo.where(source_url: photo_url, target: target).first_or_create
+    photo.photo_type = photo_type
+    photo.remote_file_url = photo_url if photo_url
+    photo.source_url = photo_url
+    photo.width = width
+    photo.height = height
+    photo.position = position
+    changed = true if photo.changed?
+    photo.save
+    changed
   end
 
   def set_filename
