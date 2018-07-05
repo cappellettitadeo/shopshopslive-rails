@@ -39,7 +39,6 @@ Rails.application.routes.draw do
       get :install
       get :unauthorized
       get :welcome
-      post :shopify_webhook
     end
   end
 

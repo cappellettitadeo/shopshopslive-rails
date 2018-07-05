@@ -38,7 +38,6 @@ class Product < ApplicationRecord
         #save all product photos to db
         if object.photos.present?
           object.photos.each do |photo|
-            #TODO shopify photo src
             Photo.compose(product, 'product', photo.src, photo.width, photo.height, photo.position)
           end
         end

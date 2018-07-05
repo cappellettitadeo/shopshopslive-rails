@@ -11,7 +11,6 @@ class ShopifyAppController < ApplicationController
   end
 
   def index
-    redirect_to action: 'install'
   end
 
   def install
