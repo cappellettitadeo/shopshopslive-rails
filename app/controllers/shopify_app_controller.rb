@@ -36,16 +36,16 @@ class ShopifyAppController < ApplicationController
         ShopifyApp::Utils.instantiate_session(shop, access_token)
         #create a store for this shopify user if it does not exists in db
         store = ShopifyApp::Utils.persist_if_not_exists(shop, access_token)
+        logger.debug store
         #call the Scraper worker to fetch all products from the store upon the creation of a new store for shopify user
         ShopifyStoresScraperWorker.new.perform(store.id) if store
         ShopifyApp::Utils.create_webhooks
 
         render 'welcome'
+        return
       end
-      render 'unauthorized'
-    else
-      render 'unauthorized'
     end
+    render 'unauthorized'
   end
 
   def unauthorized
