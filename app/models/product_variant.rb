@@ -12,39 +12,24 @@ class ProductVariant < ApplicationRecord
     end
   end
 
-  def self.create_from_shopify_variant(product, variant)
-    if ProductVariant.find_by_source_id(variant.source_id).nil?
-      product_variant = ProductVariant.new product: product, barcode: variant.barcode, color: variant.color,
-                                           currency: variant.currency, inventory: variant.inventory, name: variant.name,
-                                           original_price: variant.original_price, product_id: product.id,
-                                           price: variant.price, source_id: variant.source_id, source_sku: variant.source_sku,
-                                           size_id: variant.size_id, weight: variant.weight, weight_unit: variant.weight_unit
-      product_variant.save
-      product_variant
-    else
-      update_from_shopify_variant(product, variant)
-    end
-  end
+  def self.create_or_update_from_shopify_object(product, variant)
+    changed = false
 
-  def self.update_from_shopify_variant(product, variant)
-    product_variant = ProductVariant.find_by_source_id(variant.source_id)
-    if product_variant
-      product_variant.barcode = variant.barcode
-      product_variant.color = variant.color
-      product_variant.currency = variant.currency
-      product_variant.inventory = variant.inventory
-      product_variant.name = variant.name
-      product_variant.price = variant.price
-      product_variant.source_sku = variant.source_sku
-      product_variant.size_id = variant.size_id
-      product_variant.weight = variant.weight
-      product_variant.weight_unit = variant.weight_unit
-
-      product_variant.save
-      product_variant
-    else
-      create_from_shopify_variant(product, variant)
-    end
+    product_variant = ProductVariant.where(source_id: variant.source_id, product_id: product.id).first_or_create
+    product_variant.barcode = variant.barcode
+    product_variant.color = variant.color
+    product_variant.currency = variant.currency
+    product_variant.inventory = variant.inventory
+    product_variant.name = variant.name
+    product_variant.original_price = variant.original_price
+    product_variant.price = variant.price
+    product_variant.source_sku = variant.source_sku
+    product_variant.size_id = variant.size_id
+    product_variant.weight = variant.weight
+    product_variant.weight_unit = variant.weight_unit
+    changed = true if product_variant.changed?
+    product_variant.save
+    changed
   end
 
   def sizes

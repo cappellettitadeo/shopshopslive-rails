@@ -1,79 +1,68 @@
 class Product < ApplicationRecord
   has_many :photos, as: :target, dependent: :destroy
   has_many :product_variants, dependent: :destroy
+  has_many :sync_queues, as: :target, dependent: :destroy
+  has_many :sync_logs, as: :target, dependent: :destroy
   has_and_belongs_to_many :categories
   belongs_to :store
   belongs_to :vendor
   belongs_to :scraper
 
-  def self.create_from_shopify_object(store, object)
-    if Product.find_by_source_id(object.source_id).nil?
-      #save object to DB
-      product = Product.new description: object.description, keywords: object.keywords, material: object.material,
-                            name: object.name, store_id: object.store_id, source_id: object.source_id, scraper_id: object.scraper_id,
-                            vendor_id: object.vendor_id
-      if product.save
-        # save category to DB
-        category = nil
-        object.keywords.each do |keyword|
-          category = Category.where(name: keyword.downcase, level: 1).first
-          break if category
-        end
-        category.products << product if category
+  def self.create_or_update_from_shopify_object(object)
+    # changed is a flag to indicate whether the product or it's associations has been changed
+    # and need to be synced with the central system
+    changed = false
 
-        # save sub-category to DB
-        sub_category = nil
-        object.keywords.each do |keyword|
-          sub_category = Category.where(name: keyword.downcase, level: 2).first
-          break if sub_category
-        end
-        sub_category.products << product if sub_category
+    product = Product.where(source_id: object.source_id).first_or_create
+    # 1. Save product to DB
+    product.name = object.name
+    product.description = object.description
+    product.keywords = object.keywords
+    product.material = object.material
+    product.store_id = object.store_id
+    product.vendor_id = object.vendor_id
+    product.source_id = object.source_id
 
-        #save all product variants to db
-        if object.variants.present?
-          object.variants.each do |variant|
-            ProductVariant.create_from_shopify_variant(product, variant)
-          end
-        end
-        #save all product photos to db
-        if object.photos.present?
-          object.photos.each do |photo|
-            Photo.compose(product, 'product', photo.src, photo.width, photo.height, photo.position)
-          end
-        end
+    # 1.1 Check if any field has changed when product already exists in DB
+    changed = true if product.changed?
+
+    if product.save
+      # 2. Save category to DB
+      category = nil
+      object.keywords.each do |keyword|
+        category = Category.where(name: keyword.downcase, level: 1).first
+        break if category
       end
-      product
-    else
-      update_from_shopify_product(store, object)
-    end
-  end
+      category.products << product if category
 
+      # 2.1 Save sub-category to DB
+      sub_category = nil
+      object.keywords.each do |keyword|
+        sub_category = Category.where(name: keyword.downcase, level: 2).first
+        break if sub_category
+      end
+      sub_category.products << product if sub_category
 
-  def self.update_from_shopify_product(store, object)
-    product = Product.find_by_source_id(object.source_id)
-    if product
-      product.name = object.name
-      product.description = object.description
-      product.keywords = object.keywords
-      product.material = object.material
-      product.vendor_id = object.vendor_id
-      product.save
-
+      # 3. Save all product variants to DB
       if object.variants.present?
         object.variants.each do |variant|
-          ProductVariant.update_from_shopify_variant(product, variant)
+          variant_updated = ProductVariant.create_or_update_from_shopify_object(product, variant)
+          # 3.1 Set changed to true if any variant has been updated
+          changed = true if changed.nil? && variant_updated
         end
       end
 
+      # 4. Save all product photos to DB
       if object.photos.present?
         object.photos.each do |photo|
-          Photo.update(product, 'product', photo.src, photo.width, photo.height, photo.position)
+          #TODO shopify photo src
+          photo_updated = Photo.compose(product, 'product', photo.src, photo.width, photo.height, photo.position)
+          # 4.1 Set changed to true if any photo has been updated
+          changed = true if changed.nil? && photo_updated
         end
       end
-      product
-    else
-      create_from_shopify_object(store, object)
     end
+    [product, changed]
   end
 
   def brandName
