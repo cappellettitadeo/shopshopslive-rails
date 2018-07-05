@@ -8,8 +8,7 @@ class Scrapers::Shopify::Scraper < Scrapers::Scraper
     if store.source_type == "shopify"
       myshopify_domain = store.source_url
       access_token = store.source_token
-
-      unless myshopify_domain.nil? || access_token.nil?
+      if myshopify_domain && access_token
         ShopifyApp::Utils.instantiate_session(myshopify_domain, access_token)
         #Call shopify API to fetch all products
         products = ShopifyAPI::Product.find(:all)

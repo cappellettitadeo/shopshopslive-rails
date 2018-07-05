@@ -29,19 +29,23 @@ class Product < ApplicationRecord
     if product.save
       # 2. Save category to DB
       category = nil
-      object.keywords.each do |keyword|
-        category = Category.where(name: keyword.downcase, level: 1).first
-        break if category
+      if object.keywords.present?
+        object.keywords.each do |keyword|
+          category = Category.where(name: keyword.downcase, level: 1).first
+          break if category
+        end
+        category.products << product if category
       end
-      category.products << product if category
 
       # 2.1 Save sub-category to DB
       sub_category = nil
-      object.keywords.each do |keyword|
-        sub_category = Category.where(name: keyword.downcase, level: 2).first
-        break if sub_category
+      if object.keywords.present?
+        object.keywords.each do |keyword|
+          sub_category = Category.where(name: keyword.downcase, level: 2).first
+          break if sub_category
+        end
+        sub_category.products << product if sub_category
       end
-      sub_category.products << product if sub_category
 
       # 3. Save all product variants to DB
       if object.variants.present?
@@ -55,7 +59,6 @@ class Product < ApplicationRecord
       # 4. Save all product photos to DB
       if object.photos.present?
         object.photos.each do |photo|
-          #TODO shopify photo src
           photo_updated = Photo.compose(product, 'product', photo.src, photo.width, photo.height, photo.position)
           # 4.1 Set changed to true if any photo has been updated
           changed = true if changed.nil? && photo_updated

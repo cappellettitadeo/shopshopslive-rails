@@ -28,11 +28,8 @@ module ShopifyApp
             code: code}
 
         response = HTTParty.post(url, body: payload)
-        # if the response is successful, obtain the token and store it in a hash
         if response.code == 200
           response['access_token']
-        else
-          [500, "Something went wrong."]
         end
       end
 
