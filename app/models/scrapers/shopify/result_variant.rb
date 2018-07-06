@@ -17,14 +17,26 @@ class Scrapers::Shopify::ResultVariant < Scrapers::Result
   end
 
   def color
-    position = nil
-    product.options.each do |option|
-      if option.name.downcase == "color"
-        position = option.position
-        break
+    unless @color
+      if variant.option_values.present?
+        variant.option_values.each do |option|
+          if option.name.downcase == "color"
+            @color = option.value
+            break
+          end
+        end
+      else
+        position = nil
+        product.options.each do |option|
+          if option.name.downcase == "color"
+            position = option.position
+            break
+          end
+        end
+        @color = variant.send(:"option#{position}") if position
       end
     end
-    @color = variant.send(:"option#{position}") if position
+    @color
   end
 
   def created_at
@@ -71,7 +83,6 @@ class Scrapers::Shopify::ResultVariant < Scrapers::Result
     unless @size_id
       position = nil
       size = nil
-      Rails.logger.debug variant.option_values
       if variant.option_values.present?
         variant.option_values.each do |option|
           if option.name.downcase == "size"
