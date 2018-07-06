@@ -1,0 +1,35 @@
+{
+  "apiVersion": "1.0",
+  "swaggerVersion": "1.2",
+  "basePath": "https://shopshops-hub.herokuapp.com",
+  "resourcePath": "api_keys",
+  "apis": [
+    {
+      "path": "/api/login.json",
+      "operations": [
+        {
+          "summary": "Login to get authentication token",
+          "parameters": [
+            {
+              "paramType": "query",
+              "name": "name",
+              "type": "string",
+              "description": "Username: shopshops",
+              "required": true
+            },
+            {
+              "paramType": "query",
+              "name": "pwd",
+              "type": "string",
+              "description": "Password: Shopshops2018",
+              "required": true
+            }
+          ],
+          "nickname": "Api::ApiKeys#login",
+          "method": "get"
+        }
+      ]
+    }
+  ],
+  "authorizations": null
+}

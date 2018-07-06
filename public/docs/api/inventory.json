@@ -1,0 +1,106 @@
+{
+  "apiVersion": "1.0",
+  "swaggerVersion": "1.2",
+  "basePath": "https://shopshops-hub.herokuapp.com",
+  "resourcePath": "inventory",
+  "apis": [
+    {
+      "path": "/api/inventory/query.json",
+      "operations": [
+        {
+          "summary": "库存查询接口",
+          "parameters": [
+            {
+              "paramType": "header",
+              "name": "Authorization",
+              "type": "string",
+              "description": "当前用户Auth token",
+              "required": true
+            },
+            {
+              "paramType": "query",
+              "name": "prod_id",
+              "type": "string",
+              "description": "中心系统商品ID",
+              "required": true
+            },
+            {
+              "paramType": "query",
+              "name": "sku_id",
+              "type": "string",
+              "description": "中心系统商品sku id",
+              "required": true
+            }
+          ],
+          "responseMessages": [
+            {
+              "code": 200,
+              "responseModel": null,
+              "message": "Ok"
+            },
+            {
+              "code": 400,
+              "responseModel": null,
+              "message": "Bad Request"
+            }
+          ],
+          "nickname": "Api::Inventory#query",
+          "method": "get"
+        }
+      ]
+    },
+    {
+      "path": "/api/inventory/lock.json",
+      "operations": [
+        {
+          "summary": "库存锁定接口",
+          "parameters": [
+            {
+              "paramType": "header",
+              "name": "Authorization",
+              "type": "string",
+              "description": "当前用户Auth token",
+              "required": true
+            },
+            {
+              "paramType": "query",
+              "name": "prod_id",
+              "type": "string",
+              "description": "中心系统商品ID",
+              "required": true
+            },
+            {
+              "paramType": "query",
+              "name": "sku_id",
+              "type": "string",
+              "description": "中心系统商品sku id",
+              "required": true
+            },
+            {
+              "paramType": "query",
+              "name": "locked_count",
+              "type": "string",
+              "description": "锁定商品数量",
+              "required": true
+            }
+          ],
+          "responseMessages": [
+            {
+              "code": 200,
+              "responseModel": null,
+              "message": "Ok"
+            },
+            {
+              "code": 400,
+              "responseModel": null,
+              "message": "Bad Request"
+            }
+          ],
+          "nickname": "Api::Inventory#lock",
+          "method": "get"
+        }
+      ]
+    }
+  ],
+  "authorizations": null
+}
