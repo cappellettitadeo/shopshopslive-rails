@@ -9,6 +9,7 @@ class Store < ApplicationRecord
   scope :shopify, -> { where(source_type: 'shopify') }
 
   def self.create_store_from_shopify_shop(shopify_shop, myshopify_domain, access_token)
+    #TODO better merge create and update method
     store = Store.find_by_source_url(myshopify_domain)
     if store.nil?
       store = Store.new name: shopify_shop.name, description: '', country: shopify_shop.country_code,

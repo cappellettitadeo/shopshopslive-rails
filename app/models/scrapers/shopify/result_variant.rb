@@ -71,13 +71,24 @@ class Scrapers::Shopify::ResultVariant < Scrapers::Result
     unless @size_id
       position = nil
       size = nil
-      product.options.each do |option|
-        if option.name.downcase == "size"
-          position = option.position
-          break
+      Rails.logger.debug variant.option_values
+      if variant.option_values.present?
+        variant.option_values.each do |option|
+          if option.name.downcase == "size"
+            size = option.value
+            break
+          end
         end
+      else
+        product.options.each do |option|
+          if option.name.downcase == "size"
+            position = option.position
+            break
+          end
+        end
+        size = variant.send(:"option#{position}") if position
       end
-      size = variant.send(:"option#{position}") if position
+
       if size
         size_model = Size.where(size: size).first_or_create
         @size_id = size_model.id
