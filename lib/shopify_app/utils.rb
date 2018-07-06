@@ -41,12 +41,9 @@ module ShopifyApp
       end
 
       def persist_if_not_exists(myshopify_domain, access_token)
-        #TODO shall update if exists?
-        unless Store.find_by(source_url: myshopify_domain).present?
-          self.instantiate_session(myshopify_domain, access_token)
-          shopify_shop = ShopifyAPI::Shop.current
-          Store.create_store_from_shopify_shop(shopify_shop, myshopify_domain, access_token)
-        end
+        self.instantiate_session(myshopify_domain, access_token)
+        shopify_shop = ShopifyAPI::Shop.current
+        Store.create_store_from_shopify_shop(shopify_shop, myshopify_domain, access_token)
       end
 
       def create_webhooks

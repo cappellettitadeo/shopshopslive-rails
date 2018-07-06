@@ -32,6 +32,7 @@ class ShopifyAppController < ApplicationController
       shop = request.params['shop']
       code = request.params['code']
       access_token = ShopifyApp::Utils.get_shop_access_token(shop, code)
+      logger.debug access_token
       if access_token
         ShopifyApp::Utils.instantiate_session(shop, access_token)
         #create a store for this shopify user if it does not exists in db

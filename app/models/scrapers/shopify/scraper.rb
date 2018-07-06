@@ -11,7 +11,8 @@ class Scrapers::Shopify::Scraper < Scrapers::Scraper
       if myshopify_domain && access_token
         ShopifyApp::Utils.instantiate_session(myshopify_domain, access_token)
         #Call shopify API to fetch all products
-        products = ShopifyAPI::Product.find(:all)
+        products = ShopifyAPI::ProductListing.find(:all)
+        Rails.logger.debug products
         if products.any?
           #Call worker to create products
           products.each do |product|
