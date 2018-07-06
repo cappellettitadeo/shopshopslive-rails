@@ -1,6 +1,8 @@
 class Photo < ApplicationRecord
   mount_uploader :file, PhotoUploader
 
+  scope :logo, -> { where(photo_type: 'logo') }
+
   belongs_to :target, polymorphic: true
   before_create :set_filename
 

@@ -21,8 +21,9 @@ class ProductsSyncWorker
       vendors_hash[:action] = vendors_hash[:ctr_vendor_id] ? 'update' : 'create'
 
       # 1.3 POST to Central System
-      body = { vendors: vendors_hash }
+      body = { count: vendors.count, brands: vendors_hash }
       res = HTTParty.post(url, { body: body })
+      ## TODO Update ctr_vendor_id from the response
       return false if res.code != 200
 
       ## 2. Find all stores from these products
@@ -35,8 +36,9 @@ class ProductsSyncWorker
       vendors_hash[:action] = vendors_hash[:ctr_store_id] ? 'update' : 'create'
 
       # 2.3 POST to Central System
-      body = { vendors:stores_hash }
+      body = { count: stores.count, vendors: stores_hash }
       res = HTTParty.post(url, { body: body })
+      ## TODO Update ctr_store_id from the response
       return false if res.code != 200
 
       ## 3. Create/Update products to Central System

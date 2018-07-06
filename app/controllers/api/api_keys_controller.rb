@@ -11,7 +11,7 @@ class Api::ApiKeysController < ApiController
   def login
     key = ApiKey.find_by_name(params[:name])
     if key && key.valid_password?(params[:pwd])
-      render json: { token: key.auth_token }, status: :ok
+      render json: { data: { token: key.auth_token } }, status: :ok
     else
       render json: { ec: 401, em: 'Not Authorized' }, status: 401
     end

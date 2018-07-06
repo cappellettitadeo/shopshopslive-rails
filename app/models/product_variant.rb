@@ -44,7 +44,7 @@ class ProductVariant < ApplicationRecord
     {
       price: price,
       discounted: discounted,
-      originalPrice: original_price,
+      original_price: original_price,
       currency: currency
     }
   end

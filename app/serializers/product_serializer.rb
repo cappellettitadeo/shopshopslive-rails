@@ -1,7 +1,7 @@
 class ProductSerializer
   include FastJsonapi::ObjectSerializer
 
-  attributes :name, :brandName, :description, :keywords,
+  attributes :id, :ctr_product_id, :name, :brand_name, :description, :keywords,
              :category_1st_name, :category_1st_id, :category_2nd_name, :category_2nd_id,
              :material
 
@@ -10,7 +10,7 @@ class ProductSerializer
     ProductVariantSerializer.new(variants).serializable_hash
   end
 
-  attribute :images do |product|
+  attribute :photos do |product|
     images = product.photos
     PhotoSerializer.new(images).serializable_hash
   end
