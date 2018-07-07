@@ -15,6 +15,7 @@ Rails.application.routes.draw do
     get 'product/query', to: 'products#query'
     get 'inventory/query', to: 'inventory#query'
     get 'inventory/lock', to: 'inventory#lock'
+    get 'login', to: 'api_keys#login'
 
     # RESTful规范的routes定义如下
     resources :products do

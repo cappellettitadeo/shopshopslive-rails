@@ -1,10 +1,12 @@
 class ApiKey < ApplicationRecord
+  devise :database_authenticatable
+
   after_create :set_auth_token
 
-  def self.generate_key
+  def self.generate_key(name, password = '123456')
     hashid = Hashids.new(ENV["SLUG_SALT"], 25, "abcdefghijklmnopqrstuvwxyz1234567890")
     key = hashid.encode(Time.now)
-    create key: key
+    create key: key, name: name, password: password
   end
 
   def set_auth_token

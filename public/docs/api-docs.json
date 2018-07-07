@@ -5,7 +5,15 @@
   "apis": [
     {
       "path": "/docs/api/products.{format}",
-      "description": "Products"
+      "description": "商品管理"
+    },
+    {
+      "path": "/docs/api/inventory.{format}",
+      "description": "库存管理"
+    },
+    {
+      "path": "/docs/api/api_keys.{format}",
+      "description": "ApiKeys管理"
     }
   ],
   "authorizations": null

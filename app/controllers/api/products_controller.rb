@@ -2,10 +2,10 @@ require 'shopify_app/webhook'
 
 class Api::ProductsController < ApiController
   skip_before_action :authenticate_request, only: [:shopify_webhook]
-  swagger_controller :products, "Products"
+  swagger_controller :products, "商品管理"
 
   swagger_api :query do
-    summary "List all products"
+    summary "商品查询接口"
     param :header, 'Authorization', :string, :required, '当前用户Auth token'
     param :query, :ids, :string, :optional, "Return only certain products, specified by a comma-separated list of product IDs."
     param :query, :page, :integer, :optional, "Return a specific page of results. default: 1"

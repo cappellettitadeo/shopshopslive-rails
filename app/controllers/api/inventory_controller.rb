@@ -4,7 +4,7 @@ class Api::InventoryController < ApiController
   swagger_controller :inventory, "库存管理"
 
   swagger_api :query do
-    summary "查询商品库存信息"
+    summary "库存查询接口"
     param :header, 'Authorization', :string, :required, '当前用户Auth token'
     param :query, :prod_id, :string, :required, "中心系统商品ID"
     param :query, :sku_id, :string, :required, "中心系统商品sku id"
@@ -18,13 +18,13 @@ class Api::InventoryController < ApiController
       prod_id: params[:prod_id],
       sku_id: params[:sku_id],
       inventory: @variant.inventory,
-      vendor: @product.vendor_id
+      vendor_id: @product.vendor_id
     }
-    render json: hash, status: :ok
+    render json: { data: hash }, status: :ok
   end
 
   swagger_api :lock do
-    summary "查询商品库存信息"
+    summary "库存锁定接口"
     param :header, 'Authorization', :string, :required, '当前用户Auth token'
     param :query, :prod_id, :string, :required, "中心系统商品ID"
     param :query, :sku_id, :string, :required, "中心系统商品sku id"
@@ -43,9 +43,9 @@ class Api::InventoryController < ApiController
         sku_id: params[:sku_id],
         inventory: @variant.inventory,
         locked_inventory: lock_count,
-        vendor: @product.vendor_id
+        vendor_id: @product.vendor_id
       }
-      render json: hash, status: :ok
+      render json: { data: hash }, status: :ok
     else
       render json: { ec: 400, em: 'Not enough inventory' }, status: :bad_request
     end

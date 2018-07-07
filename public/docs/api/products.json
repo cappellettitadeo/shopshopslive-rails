@@ -8,7 +8,7 @@
       "path": "/api/product/query.json",
       "operations": [
         {
-          "summary": "List all products",
+          "summary": "商品查询接口",
           "parameters": [
             {
               "paramType": "header",
@@ -57,13 +57,6 @@
               "name": "category",
               "type": "string",
               "description": "Filter results by category.",
-              "required": false
-            },
-            {
-              "paramType": "query",
-              "name": "product_type",
-              "type": "string",
-              "description": "Filter results by product type.",
               "required": false
             },
             {

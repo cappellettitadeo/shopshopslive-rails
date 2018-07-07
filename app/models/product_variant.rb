@@ -89,10 +89,10 @@ class ProductVariant < ApplicationRecord
 
   def currency_info
     {
-        price: price,
-        discounted: discounted,
-        originalPrice: original_price,
-        currency: currency
+      price: price,
+      discounted: discounted,
+      original_price: original_price,
+      currency: currency
     }
   end
 end

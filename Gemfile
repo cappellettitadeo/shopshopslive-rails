@@ -60,6 +60,7 @@ gem 'bootstrap', '~> 4.0.0'
 gem 'jquery-rails'
 
 # Utility
+gem 'devise'
 gem 'jwt'
 gem 'swagger-docs'
 gem 'swagger-ui_rails'
