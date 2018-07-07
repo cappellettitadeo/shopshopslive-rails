@@ -6,7 +6,7 @@ class ProductsSyncWorker
   def perform
     product_setting = CallbackSetting.product.first
     vendor_setting = CallbackSetting.vendor.first
-    store_setting = CallbackSetting.store.first
+    store_setting = CallbackSetting.stores.first
     # 如果mode不是"bunch"，则直接返回
     return unless product_setting && product_setting.bunch_update?
 

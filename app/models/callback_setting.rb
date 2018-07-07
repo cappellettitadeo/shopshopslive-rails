@@ -1,6 +1,6 @@
 class CallbackSetting < ApplicationRecord
   scope :product, -> { where(callback_type: 'product') }
-  scope :store, -> { where(callback_type: 'store') }
+  scope :stores, -> { where(callback_type: 'store') }
   scope :vendor, -> { where(callback_type: 'vendor') }
 
   def bunch_update?
