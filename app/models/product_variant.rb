@@ -30,9 +30,10 @@ class ProductVariant < ApplicationRecord
           price: "10.00",
           title: "Standard"
       }
-      checkout = ShopifyAPI::Checkout.create(email: "customer@shopshops.com", line_items: [{requires_shipping: false, quantity: 1, variant_id: source_id}])
+      # TODO WIP for checkout
+      #checkout = ShopifyAPI::Checkout.create(email: "customer@shopshops.com", line_items: [{requires_shipping: false, quantity: 1, variant_id: source_id}])
       #checkout.complete
-      if complete?(checkout.token, shop_domain, access_token)
+      if true #complete?(checkout.token, shop_domain, access_token)
         self.inventory -= count
         self.save
       end
