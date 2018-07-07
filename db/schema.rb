@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180706172711) do
+ActiveRecord::Schema.define(version: 20180707191506) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -69,6 +69,17 @@ ActiveRecord::Schema.define(version: 20180706172711) do
     t.index ["target_type", "target_id"], name: "index_photos_on_target_type_and_target_id"
   end
 
+  create_table "product_scrapers", force: :cascade do |t|
+    t.string "source"
+    t.string "source_type"
+    t.string "status"
+    t.string "url"
+    t.text "error"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["source"], name: "index_product_scrapers_on_source"
+  end
+
   create_table "product_variants", force: :cascade do |t|
     t.string "name"
     t.integer "product_id"
@@ -113,17 +124,6 @@ ActiveRecord::Schema.define(version: 20180706172711) do
     t.index ["source_id"], name: "index_products_on_source_id"
     t.index ["store_id"], name: "index_products_on_store_id"
     t.index ["vendor_id"], name: "index_products_on_vendor_id"
-  end
-
-  create_table "scrapers", force: :cascade do |t|
-    t.string "source"
-    t.string "source_type"
-    t.string "status"
-    t.string "url"
-    t.text "error"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["source"], name: "index_scrapers_on_source"
   end
 
   create_table "sizes", force: :cascade do |t|

@@ -1,0 +1,2 @@
+class ProductScraper < ApplicationRecord
+end
