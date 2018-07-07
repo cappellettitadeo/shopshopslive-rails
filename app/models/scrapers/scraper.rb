@@ -1,0 +1,2 @@
+class Scrapers::Scraper
+end
