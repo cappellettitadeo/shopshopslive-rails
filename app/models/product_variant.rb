@@ -13,23 +13,7 @@ class ProductVariant < ApplicationRecord
       shop_domain = store.source_url
       access_token = store.source_token
       ShopifyApp::Utils.instantiate_session(shop_domain, access_token)
-      billing_address = {
-          address1: "Chestnut Street 92",
-          address2: "Suite 300",
-          city: "Louisville",
-          country: "US",
-          first_name: "shopshops",
-          last_name: "shopshops inc.",
-          phone: "555-625-1199",
-          province: "KY",
-          zip: "40202",
-      }
-      shipping_address = billing_address
-      shipping_line = {
-          handle: "shopify-Standard-10.00",
-          price: "10.00",
-          title: "Standard"
-      }
+      draf_order = ShopifyAPI::DraftOrder.create(email: "xinghe@blurdating.com", line_items: [{quantity: 1, variant_id: source_id}])
       # TODO WIP for checkout
       #checkout = ShopifyAPI::Checkout.create(email: "customer@shopshops.com", line_items: [{requires_shipping: false, quantity: 1, variant_id: source_id}])
       #checkout.complete
