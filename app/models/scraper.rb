@@ -1,2 +1,2 @@
-class Scraper < ApplicationRecord
+class Scrapers::Scraper < ApplicationRecord
 end
