@@ -68,7 +68,7 @@ class Product < ApplicationRecord
     [product, changed]
   end
 
-  def brandName
+  def brand_name
     vendor.name if vendor
   end
 
