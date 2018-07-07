@@ -25,7 +25,7 @@ class Api::ProductsController < ApiController
   end
 
   def query
-    products = Feed::Api.search(params)
+    products = Feed::Api.search(params.reject{|_, v| v.blank?})
     hash = ProductSerializer.new(products).serializable_hash
     fields = params[:fields] ? params[:fields].split(',').map(&:strip).map(&:downcase) : []
     if fields.present?
