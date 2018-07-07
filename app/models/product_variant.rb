@@ -1,4 +1,4 @@
-require 'shopify_app/utils'
+require 'shopify_app'
 require 'httparty'
 
 class ProductVariant < ApplicationRecord
@@ -14,30 +14,48 @@ class ProductVariant < ApplicationRecord
       access_token = store.source_token
       ShopifyApp::Utils.instantiate_session(shop_domain, access_token)
       binding.pry
-      checkout = ShopifyAPI::Checkout.create(line_items: [{quantity:1, variant_id: source_id}])
-      checkout.complete
-      if checkout
+      billing_address = {
+          address1: "Chestnut Street 92",
+          address2: "Suite 300",
+          city: "Louisville",
+          country: "US",
+          first_name: "shopshops",
+          last_name: "shopshops inc.",
+          phone: "555-625-1199",
+          province: "KY",
+          zip: "40202",
+      }
+      shipping_address = billing_address
+      shipping_line = {
+          handle: "shopify-Standard-10.00",
+          price: "10.00",
+          title: "Standard"
+      }
+      checkout = ShopifyAPI::Checkout.create(email: "customer@shopshops.com", line_items: [{requires_shipping: false, quantity: 1, variant_id: source_id}])
+      #checkout.complete
+      if complete?(checkout.token, shop_domain, access_token)
         self.inventory -= count
         self.save
       end
-
-    else
-      false
     end
   end
 
-  def complete(check_token, shop, access_token)
-    url = "https://#{shop}/admin/checkouts/#{check_token}/complete"
+  def complete?(check_token, shop, access_token)
+    url = "https://#{shop}/admin/checkouts/#{check_token}/complete.json"
+    puts check_token
+    puts url
+    puts access_token
     header = {
         "Content-type": "application/json",
-        "X-Shopify-Access-Token": access_token
+        "X-Shopify-Access-Token": access_token,
     }
 
-    response = HTTParty.post(url, header: header)
+    response = HTTParty.post(url, headers: header)
     binding.pry
     if response.code == 200
-      response['access_token']
+      true
     end
+    false
   end
 
   def self.create_or_update_from_shopify_object(product, variant)
@@ -71,10 +89,10 @@ class ProductVariant < ApplicationRecord
 
   def currency_info
     {
-      price: price,
-      discounted: discounted,
-      originalPrice: original_price,
-      currency: currency
+        price: price,
+        discounted: discounted,
+        originalPrice: original_price,
+        currency: currency
     }
   end
 end
