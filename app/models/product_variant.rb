@@ -13,7 +13,6 @@ class ProductVariant < ApplicationRecord
       shop_domain = store.source_url
       access_token = store.source_token
       ShopifyApp::Utils.instantiate_session(shop_domain, access_token)
-      binding.pry
       billing_address = {
           address1: "Chestnut Street 92",
           address2: "Suite 300",
@@ -51,7 +50,6 @@ class ProductVariant < ApplicationRecord
     }
 
     response = HTTParty.post(url, headers: header)
-    binding.pry
     if response.code == 200
       true
     end
@@ -79,7 +77,7 @@ class ProductVariant < ApplicationRecord
     changed
   end
 
-  def sizes
+  def size
     size.size if size
   end
 
