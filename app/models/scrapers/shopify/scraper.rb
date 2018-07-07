@@ -2,7 +2,7 @@ require 'shopify_app'
 
 class Scrapers::Shopify::Scraper < Scrapers::Scraper
   def parse(store)
-    scraper = Scraper.create(source_type: store.source_type, url: store.source_url)
+    scraper = ProductScraper.create(source_type: store.source_type, url: store.source_url)
     scraper.save
 
     if store.source_type == "shopify"
