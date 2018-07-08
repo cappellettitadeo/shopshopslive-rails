@@ -21,9 +21,13 @@ class ShopifyAppController < ApplicationController
   end
 
   def welcome
+=begin
     unless ShopifyApp::Utils.valid_request_from_shopify?(request)
       render 'unauthorized'
     end
+=end
+    @api_key = ShopifyApp::Const::API_KEY
+    @shop = params[:shop]
   end
 
   def auth
@@ -42,7 +46,7 @@ class ShopifyAppController < ApplicationController
         ShopifyStoresScraperWorker.new.perform(store.id) if store
         ShopifyApp::Utils.create_webhooks
 
-        render 'welcome'
+        redirect_to welcome_shopify_app_index_path(:shop => shop)
         return
       end
     end
