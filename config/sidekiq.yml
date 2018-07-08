@@ -3,7 +3,7 @@
     cron: '0 0 * * * Asia/Shanghai'   # Runs every hour
     description: "Update products in Central app"
     enabled: true
-  CategoriesSyncWorker:
+  CentralAppSyncWorker:
     cron: '0 0 * * * * Asia/Shanghai'   # Runs every 6 hours
     description: "Fetch all categories from Central app"
     enabled: true
