@@ -1,4 +1,4 @@
-class CategoriesSyncWorker
+class CentralAppSyncWorker
   include Sidekiq::Worker
 
   sidekiq_options unique: true

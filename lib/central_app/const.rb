@@ -14,15 +14,15 @@ module CentralApp
     }
 
     class << self
-      def category_list
+      def category_list_url
         API_BASE_URL + API_ENDPOINTS[:category][:list]
       end
 
-      def category_query
+      def category_query_url
         API_BASE_URL + API_ENDPOINTS[:category][:query]
       end
 
-      def inventory_update
+      def inventory_update_url
         API_BASE_URL + API_ENDPOINTS[:inventory][:update]
       end
     end
