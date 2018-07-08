@@ -61,7 +61,14 @@ class Scrapers::Shopify::Result < Scrapers::Result
   end
 
   def source_id
-    @source_id ||= product.id
+    unless @source_id
+      if product.product_id
+        @source_id = product.product_id
+      else
+        @source_id = product.id if product.id
+      end
+    end
+    @source_id
   end
 
   def scraper_id

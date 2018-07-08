@@ -30,6 +30,8 @@ test:
   database: shopshops_test
   username: shopsadmin
   password: shopspassword
+  host: localhost
+  pool: 5
 
 production:
   <<: *default

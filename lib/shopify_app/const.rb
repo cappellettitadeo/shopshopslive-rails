@@ -6,7 +6,7 @@ module ShopifyApp
     APP_URL = ENV['APP_URL']
     SCOPE = %w(read_product_listings write_checkouts write_draft_orders)
     EVENTS_TOPICS = {
-        :products => %w(create delete update),
+        :product_listings => %w(add remove update),
         :shop => %w(update),
         :app => %w(uninstalled)}
   end

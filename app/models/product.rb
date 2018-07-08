@@ -68,6 +68,15 @@ class Product < ApplicationRecord
     [product, changed]
   end
 
+  def sync_with_shopify
+    shop_domain = store.source_url
+    access_token = store.source_token
+    ShopifyApp::Utils.instantiate_session(shop_domain, access_token)
+    #update product and variant
+    product_listing = ShopifyAPI::ProductListing.find(source_id)
+    ShopifyCreateProductWorker.new.perform(store, product_listing, nil)
+  end
+
   def brand_name
     vendor.name if vendor
   end

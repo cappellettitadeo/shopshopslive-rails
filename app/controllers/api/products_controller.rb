@@ -59,12 +59,10 @@ class Api::ProductsController < ApiController
             ShopifyApp::Webhook.app_uninstalled(store, data_object)
           when "shop/update"
             ShopifyApp::Webhook.shop_update(store, data_object)
-          when "products/create"
-            ShopifyApp::Webhook.products_create(store, data_object)
-          when "products/delete"
-            ShopifyApp::Webhook.products_delete(data_object)
-          when "products/update"
-            ShopifyApp::Webhook.products_update(store, data_object)
+          when "product_listings/add", "product_listings/update"
+            ShopifyApp::Webhook.product_listings_add_or_update(store, data_object)
+          when "product_listings/remove"
+            ShopifyApp::Webhook.product_listings_remove(data_object)
           else
             logger.warn "topic handler not found"
           end

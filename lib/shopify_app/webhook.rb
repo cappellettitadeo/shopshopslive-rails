@@ -7,17 +7,17 @@ module ShopifyApp
         Rails.logger.debug data_obj
       end
 
-      def products_create(store, product)
-        product_result = Scrapers::Shopify::Result.new(store, product, nil)
-        Product.create_from_shopify_object(store, product_result)
+      def product_listings_add_or_update(store, object)
+        updated_product = object.product_listing
+        if updated_product
+          Rails.logger.debug updated_product
+          Rails.logger.debug updated_product.product_id
+          product_result = Scrapers::Shopify::Result.new(store, updated_product, nil)
+          Product.create_or_update_from_shopify_object(product_result)
+        end
       end
 
-      def products_update(store, updated_product)
-        product_result = Scrapers::Shopify::Result.new(store, updated_product, nil)
-        Product.update_from_shopify_product(store, product_result)
-      end
-
-      def products_delete(deleted_product)
+      def product_listings_remove(deleted_product)
         product = Product.find_by_source_id(deleted_product.id)
         product.destroy if product
       end
