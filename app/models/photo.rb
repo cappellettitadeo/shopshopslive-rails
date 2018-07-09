@@ -6,18 +6,20 @@ class Photo < ApplicationRecord
   belongs_to :target, polymorphic: true
   before_create :set_filename
 
-  def self.compose(target, photo_type, photo_url, width, height, position)
+  def self.compose(target, photo_type, photo_url, width = nil, height = nil, position = nil)
     changed = false
-    photo = Photo.where(source_url: photo_url, target: target).first_or_create
-    photo.photo_type = photo_type
-    photo.remote_file_url = photo_url if photo_url
-    photo.source_url = photo_url
-    photo.width = width
-    photo.height = height
-    photo.position = position
-    changed = true if photo.changed?
-    photo.save
-    changed
+    photo = Photo.where(source_url: photo_url, target: target).first_or_initialize
+    if photo.new_record?
+      photo.photo_type = photo_type
+      photo.remote_file_url = photo_url if photo_url
+      photo.source_url = photo_url
+      photo.width = width
+      photo.height = height
+      photo.position = position
+      changed = true if photo.changed?
+      photo.save
+      changed
+    end
   end
 
   def set_filename

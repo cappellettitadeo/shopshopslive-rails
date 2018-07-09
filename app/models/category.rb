@@ -4,7 +4,7 @@ class Category < ApplicationRecord
   scope :level_1, -> { where(level: 1) }
   scope :level_2, -> { where(level: 2) }
 
-  def sync_with_central_app
+  def self.sync_with_central_app
     categories = CentralApp::Utils::Category.list_all
     categories.each do |category|
       if category[:level] && category[:level].to_i == 1
