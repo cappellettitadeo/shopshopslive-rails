@@ -11,14 +11,22 @@
 
   <!-- Bootstrap core CSS -->
   <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
   <!-- Custom styles for this template -->
   <!--link href="signin.css" rel="stylesheet"-->
   <%= stylesheet_link_tag 'application' %>
+  <script type="text/javascript">
+      function showLoading() {
+          let icLoading = document.getElementById("ic-loading");
+          icLoading.style.display = "inline-block";
+      }
+  </script>
 </head>
 
 <body class="text-center">
-<form class="form-install" action="/shopify_app/install" accept-charset="UTF-8" method="get">
+<form class="form-install" action="/shopify_app/install" accept-charset="UTF-8" method="get" onsubmit="showLoading()">
   <img class="mb-4" src="http://res.cloudinary.com/hyyxofhbh/image/upload/v1531111696/production/shopshops/assets/icon.png" alt="" width="100" height="100">
   <h1 class="connect-txt">Connect with Shopshops today</h1>
   <div class="wrapper-url-input-btn">
@@ -26,7 +34,7 @@
       <h1 class="pls-enter-txt">Please enter your shopify domain</h1>
       <input type="text" id="inputUrl" class="form-control" placeholder="my-shop.myshopify.com" required autofocus name="shop">
     </div>
-    <button class="btn btn-lg btn-primary btn-block" type="submit">Install</button>
+    <button class="btn btn-lg btn-primary btn-block" type="submit"><i class="ic-loading fa fa-refresh fa-spin" id="ic-loading"></i>Install</button>
   </div>
   <p class="copyright-txt" style="color: white;">&copy; Shopshops Inc. 2018</p>
 </form>
