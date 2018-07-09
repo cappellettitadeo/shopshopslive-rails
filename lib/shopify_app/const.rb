@@ -1,9 +1,9 @@
 module ShopifyApp
   class Const
-    API_KEY = ENV['API_KEY']
-    API_SECRET = ENV['API_SECRET']
+    API_KEY = ENV['SHOPIFY_API_KEY']
+    API_SECRET = ENV['SHOPIFY_API_SECRET']
     BASE_URL = ENV['BASE_UTL']
-    APP_URL = ENV['APP_URL']
+    APP_URL = "#{BASE_URL}/shopify_app"
     SCOPE = %w(read_product_listings write_checkouts write_draft_orders)
     EVENTS_TOPICS = {
         :product_listings => %w(add remove update),
