@@ -21,11 +21,11 @@ class Store < ApplicationRecord
       store.save
       store
     else
-      update_store_from_shopify_shop(store, shopify_shop)
+      update_store_from_shopify_shop(store, shopify_shop, access_token)
     end
   end
 
-  def self.update_store_from_shopify_shop(store, shopify_shop)
+  def self.update_store_from_shopify_shop(store, shopify_shop, access_token = nil)
     if store && shopify_shop
       store.name = shopify_shop.name
       store.country = shopify_shop.country_code
@@ -39,6 +39,7 @@ class Store < ApplicationRecord
       store.zipcode = shopify_shop.zip
       store.latitude = shopify_shop.latitude
       store.longitude = shopify_shop.longitude
+      store.source_token = access_token if access_token
       store.save
       store
     end
