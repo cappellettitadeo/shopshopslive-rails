@@ -6,6 +6,6 @@ class StoreSerializer
 
   attribute :photos do |store|
     photos = store.photos
-    PhotoSerializer.new(photos).serializable_hash
+    PhotoSerializer.new(photos).serializable_hash[:data]
   end
 end

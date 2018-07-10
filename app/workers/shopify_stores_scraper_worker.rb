@@ -16,6 +16,5 @@ class ShopifyStoresScraperWorker
         scraper.parse(store)
       end
     end
-
   end
 end
