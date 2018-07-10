@@ -32,18 +32,21 @@ class ShopifyAppController < ApplicationController
 
   def auth
     if ShopifyApp::Utils.valid_request_from_shopify?(request)
-      #param shop is actually shop's myshopify.com domain, which is unique identifier for each shopify store
+      # params['shop'] is shop's myshopify.com domain, which is unique identifier for each shopify store
       shop = request.params['shop']
       code = request.params['code']
       access_token = ShopifyApp::Utils.get_shop_access_token(shop, code)
-      logger.debug access_token
       if access_token
         ShopifyApp::Utils.instantiate_session(shop, access_token)
-        #create a store for this shopify user if it does not exists in db
+        # Create a store for this shopify user if it does not exists in db
         store = ShopifyApp::Utils.persist_if_not_exists(shop, access_token)
-        logger.debug store
-        #call the Scraper worker to fetch all products from the store upon the creation of a new store for shopify user
-        ShopifyStoresScraperWorker.new.perform(store.id) if store
+        if store
+          # Call the Scraper worker to fetch all products from the store upon the creation of a new store for shopify user
+          ShopifyStoresScraperWorker.new.perform(store.id)
+          # Fire ProductsSyncWorker immediately after the scraping is done
+          ProductsSyncWorker.new.perform
+        end
+
         ShopifyApp::Utils.create_webhooks
 
         redirect_to welcome_shopify_app_index_path(:shop => shop)

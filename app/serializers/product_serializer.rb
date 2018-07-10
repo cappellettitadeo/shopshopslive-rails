@@ -7,11 +7,11 @@ class ProductSerializer
 
   attribute :skus do |product|
     variants = product.product_variants
-    ProductVariantSerializer.new(variants).serializable_hash
+    ProductVariantSerializer.new(variants).serializable_hash[:data]
   end
 
   attribute :photos do |product|
     images = product.photos
-    PhotoSerializer.new(images).serializable_hash
+    PhotoSerializer.new(images).serializable_hash[:data]
   end
 end

@@ -60,4 +60,12 @@ class Store < ApplicationRecord
       end
     end
   end
+
+  def lat
+    latitude
+  end
+
+  def lng
+    longitude
+  end
 end
