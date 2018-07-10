@@ -29,7 +29,11 @@ module CentralApp
         if headers
           res = HTTParty.get(url, headers: headers, query: { keyword: keyword })
           parsed_json = JSON.parse(res.body).with_indifferent_access
-          return parsed_json[:data] if parsed_json[:code] == 200
+          if parsed_json[:msg] == 'Expired token'
+            query(keyword, url) if Token.get_token
+          elsif parsed_json[:code] == 200
+            parsed_json[:data]
+          end
         end
       end
     end

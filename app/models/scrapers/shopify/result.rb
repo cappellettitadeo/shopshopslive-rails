@@ -26,12 +26,15 @@ class Scrapers::Shopify::Result < Scrapers::Result
 
   def keywords
     unless @keywords.present?
+      @keywords = []
+      @keywords.push(product.product_type) if product.product_type
       if product.tags.present?
         #convert a comma separated string into an array
-        @keywords = product.tags.split(/\s*,\s*/)
+        tags = product.tags.split(/\s*,\s*/)
+        @keywords.concat(tags)
       end
     end
-    @keywords
+    @keywords if @keywords.present?
   end
 
   def material
