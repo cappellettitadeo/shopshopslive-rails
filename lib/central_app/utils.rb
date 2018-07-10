@@ -7,13 +7,18 @@ module CentralApp
         headers = Const.default_headers
         if headers
           res = HTTParty.get(url, headers: headers)
+          binding.pry
           unless res.code == 500
             parsed_json = JSON.parse(res.body).with_indifferent_access
             if parsed_json
               if parsed_json[:msg] == 'Expired token'
                 list_all if Token.get_token
               elsif parsed_json[:code] == 200
-                parsed_json[:data][model.to_sym]
+                if model
+                  parsed_json[:data][model.to_sym]
+                else
+                  parsed_json[:data]
+                end
               end
             end
           end
@@ -67,7 +72,7 @@ module CentralApp
 
         def list_all
           url = Const.store_list_url
-          Utils.list_all('Stores', url)
+          Utils.list_all(nil, url)
         end
 
         def query(keyword)
