@@ -1,4 +1,6 @@
-class CallbackSettingssSyncWorker
+require 'central_app'
+
+class CallbackSettingsSyncWorker
   include Sidekiq::Worker
   include HTTParty
 
@@ -8,14 +10,14 @@ class CallbackSettingssSyncWorker
   SETTING_URL = ''
 
   def perform
-    res = HTTParty.get(SETTING_URL)
-    parsed_json = JSON.parse res
+    parsed_json = CentralApp::Utils::Callback.list_all
 
-    if res.code == 200
+    binding.pry
+    if parsed_json
       parsed_json.each do |key, value|
         url = value[:callback].strip rescue nil
         mode = value[:mode].strip
-        bunch_size = value[:bunchsize].strip
+        bunch_size = value[:bunchsize]
         return if url.empty?
 
         setting = CallbackSetting.where(callback_type: key.downcase).first_or_create

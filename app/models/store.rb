@@ -46,17 +46,20 @@ class Store < ApplicationRecord
 
   def self.sync_with_central_app
     stores = CentralApp::Utils::Store.list_all
-    stores.each do |str|
-      str = Category.where(ctr_store_id: str[:id], name: str[:name]).first_or_create
-      str.website = str[:website]
-      str.street = str[:address]
-      str.city = str[:cityName]
-      str.state = str[:state]
-      str.latitude = str[:lat]
-      str.longitude = str[:lng]
-      str.save
-      str[:photos].each do |url|
-        Photo.compose(str, nil, url)
+    if stores.present?
+      stores.each do |str|
+        str = Category.where(ctr_store_id: str[:id]).first_or_create
+        str.name = str[:name]
+        str.website = str[:website]
+        str.street = str[:address]
+        str.city = str[:cityName]
+        str.state = str[:state]
+        str.latitude = str[:lat]
+        str.longitude = str[:lng]
+        str.save
+        str[:photos].each do |url|
+          Photo.compose(str, nil, url)
+        end
       end
     end
   end

@@ -6,7 +6,7 @@ class Category < ApplicationRecord
 
   def self.sync_with_central_app
     categories = CentralApp::Utils::Category.list_all
-    if categories
+    if categories.present?
       categories.each do |category|
         if category[:level] && category[:level].to_i == 1
           # 1. Create/Update Top level category

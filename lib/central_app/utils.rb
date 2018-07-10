@@ -7,14 +7,35 @@ module CentralApp
         headers = Const.default_headers
         if headers
           res = HTTParty.get(url, headers: headers)
-          parsed_json = JSON.parse(res.body).with_indifferent_access
-          if parsed_json
-            if parsed_json[:msg] == 'Expired token'
-              list_all if Token.get_token
-            elsif parsed_json[:code] == 200
-              parsed_json[:data][model.to_sym]
+          unless res.code == 500
+            parsed_json = JSON.parse(res.body).with_indifferent_access
+            if parsed_json
+              if parsed_json[:msg] == 'Expired token'
+                list_all if Token.get_token
+              elsif parsed_json[:code] == 200
+                parsed_json[:data][model.to_sym]
+              end
             end
           end
+        end
+      end
+
+      def query(keyword, url)
+        headers = Const.default_headers
+        if headers
+          res = HTTParty.get(url, headers: headers, query: { keyword: keyword })
+          parsed_json = JSON.parse(res.body).with_indifferent_access
+          return parsed_json[:data] if parsed_json[:code] == 200
+        end
+      end
+    end
+
+    class Callback
+      class << self
+        def list_all
+          url = Const.callback_list_url
+          res = HTTParty.get(url)
+          JSON.parse(res.body).with_indifferent_access unless res.code == 500
         end
       end
     end
@@ -29,12 +50,7 @@ module CentralApp
 
         def query(keyword)
           url = Const.category_query_url
-          headers = Const.default_headers
-          if headers
-            res = HTTParty.get(url, headers: headers, query: { keyword: keyword })
-            parsed_json = JSON.parse(res.body).with_indifferent_access
-            return parsed_json[:data] if parsed_json[:code] == 200
-          end
+          Utils.query(keyword, url)
 
           ## Subcategroy
           # parsed_json[:data][:subItem]
@@ -51,11 +67,7 @@ module CentralApp
 
         def list_all
           url = Const.store_list_url
-          headers = Const.default_headers
-          if headers
-            res = HTTParty.get(url, headers: headers)
-            parsed_json = JSON.parse(res.body).with_indifferent_access
-          end
+          Utils.list_all('Stores', url)
         end
 
         def query(keyword)
@@ -94,11 +106,7 @@ module CentralApp
       class << self
         def list_all
           url = Const.vendor_list_url
-          headers = Const.default_headers
-          if headers
-            res = HTTParty.get(url, headers: headers)
-            parsed_json = JSON.parse(res.body).with_indifferent_access
-          end
+          Utils.list_all(nil, url)
         end
 
         def query

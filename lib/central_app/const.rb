@@ -16,10 +16,18 @@ module CentralApp
         vendor: {
             list: '/v1/intemodule/brand/lst',
             query: '/v1/intemodule/brand/query'
+        },
+        callback: {
+            list: '/setting/callback'
         }
     }
 
     class << self
+
+      def callback_list_url
+        Const::APP_BASE_URL + API_ENDPOINTS[:callback][:list]
+      end
+
       def category_list_url
         Const::APP_BASE_URL + API_ENDPOINTS[:category][:list]
       end
@@ -34,6 +42,10 @@ module CentralApp
 
       def store_list_url
         Const::APP_BASE_URL + API_ENDPOINTS[:store][:list]
+      end
+
+      def store_query_url
+        Const::APP_BASE_URL + API_ENDPOINTS[:store][:query]
       end
 
       def vendor_list_url
