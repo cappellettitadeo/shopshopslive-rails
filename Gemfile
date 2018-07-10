@@ -7,6 +7,7 @@ git_source(:github) do |repo_name|
   "https://github.com/#{repo_name}.git"
 end
 
+gem 'rubyfish'
 #respond_to has been extracted to the responders gem
 gem 'responders'
 #The Shopify API gem allows Ruby developers to programmatically access the admin section of Shopify stores.

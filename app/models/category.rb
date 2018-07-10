@@ -1,3 +1,5 @@
+require 'rubyfish'
+
 class Category < ApplicationRecord
   has_and_belongs_to_many :products
 
@@ -26,5 +28,22 @@ class Category < ApplicationRecord
         end
       end
     end
+  end
+
+  def self.most_alike_by_keyword_within(categories, keyword)
+    cat = nil
+    if categories.present?
+      max_dist = -1
+      categories.each do |category|
+        dist = RubyFish::JaroWinkler.distance(category.name_en.downcase, keyword)
+        puts dist
+        binding.pry
+        if dist > max_dist && dist > 0
+          cat = category
+          max_dist = dist
+        end
+      end
+    end
+    cat
   end
 end

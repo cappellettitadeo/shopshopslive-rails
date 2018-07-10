@@ -29,21 +29,20 @@ class Product < ApplicationRecord
     if product.save
       # 2. Save category to DB
       category = nil
-      if object.keywords.present?
+      if product.categories.level_1.blank? && object.keywords.present?
         object.keywords.each do |keyword|
-          category = Category.where(name: keyword.downcase, level: 1).first
+          categories = Category.where("name_en LIKE ? AND level = 1", "%#{keyword.downcase}%")
+          category = Category.most_alike_by_keyword_within(categories, keyword)
           break if category
         end
         category.products << product if category
       end
 
       # 2.1 Save sub-category to DB
-      sub_category = nil
-      if object.keywords.present?
-        object.keywords.each do |keyword|
-          sub_category = Category.where(name: keyword.downcase, level: 2).first
-          break if sub_category
-        end
+      if product.categories.level_2.blank? && product.categories.level_1.present? && object.keywords.present?
+        level_1_category =  product.categories.level_1.first
+        categories = Category.where(parent_id: level_1_category.id)
+        sub_category = Category.most_alike_by_keyword_within(categories, object.keywords.join(',').downcase)
         sub_category.products << product if sub_category
       end
 
