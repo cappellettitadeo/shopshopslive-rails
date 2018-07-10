@@ -62,6 +62,13 @@ class Api::CallbackSettingsController < ApiController
     render json: { ec: 400, em: 'Invalid Callback URL' }, status: :bad_request
   end
 
+  def delete_customer
+    render json: {}, status: :ok
+  end
+
+  def delete_store
+    render json: {}, status: :ok
+  end
 
   private
   def setting_params
