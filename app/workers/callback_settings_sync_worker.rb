@@ -12,7 +12,6 @@ class CallbackSettingsSyncWorker
   def perform
     parsed_json = CentralApp::Utils::Callback.list_all
 
-    binding.pry
     if parsed_json
       parsed_json.each do |key, value|
         url = value[:callback].strip rescue nil

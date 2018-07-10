@@ -7,7 +7,6 @@ module CentralApp
         headers = Const.default_headers
         if headers
           res = HTTParty.get(url, headers: headers)
-          binding.pry
           unless res.code == 500
             parsed_json = JSON.parse(res.body).with_indifferent_access
             if parsed_json
