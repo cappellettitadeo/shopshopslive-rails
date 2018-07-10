@@ -1,29 +1,61 @@
 module CentralApp
   class Const
-    API_KEY = ENV['CTR_API_KEY']
-    API_SECRET = ENV['CTR_API_SECRET']
-    APP_BASE_URL = ENV['CTR_APP_URL']
+    APP_BASE_URL = ENV['CTR_BASE_URL']
     API_ENDPOINTS = {
-      category: {
-        list: '/intemodule/category/lst',
-        query: '/intemodule/category/query'
-      },
-      inventory: {
-        update: '/intemodule/inventory/update'
-      }
+        category: {
+            list: '/v1/intemodule/category/lst',
+            query: '/v1/intemodule/category/query'
+        },
+        inventory: {
+            update: '/v1/intemodule/inventory/update'
+        },
+        store: {
+            list: '/v1/intemodule/store/lst',
+            query: '/v1/intemodule/store/query'
+        },
+        vendor: {
+            list: '/v1/intemodule/brand/lst',
+            query: '/v1/intemodule/brand/query'
+        }
     }
 
     class << self
       def category_list_url
-        API_BASE_URL + API_ENDPOINTS[:category][:list]
+        Const::APP_BASE_URL + API_ENDPOINTS[:category][:list]
       end
 
       def category_query_url
-        API_BASE_URL + API_ENDPOINTS[:category][:query]
+        Const::APP_BASE_URL + API_ENDPOINTS[:category][:query]
       end
 
       def inventory_update_url
-        API_BASE_URL + API_ENDPOINTS[:inventory][:update]
+        Const::APP_BASE_URL + API_ENDPOINTS[:inventory][:update]
+      end
+
+      def store_list_url
+        Const::APP_BASE_URL + API_ENDPOINTS[:store][:list]
+      end
+
+      def vendor_list_url
+        Const::APP_BASE_URL + API_ENDPOINTS[:vendor][:list]
+      end
+
+      def vendor_query_url
+        Const::APP_BASE_URL + API_ENDPOINTS[:vendor][:query]
+      end
+
+      def default_headers
+        api_key = ApiKey.find_by_name("shopshops")
+        if api_key&.auth_token && api_key.key
+          {
+              "Content-type": "application/json",
+              token: api_key.auth_token,
+              uid: api_key.key,
+              typ:  "JWT"
+          }
+        else
+          return default_headers if Token.get_token
+        end
       end
     end
   end
