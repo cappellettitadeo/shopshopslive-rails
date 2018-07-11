@@ -31,8 +31,7 @@ class Product < ApplicationRecord
       category = nil
       if product.categories.level_1.blank? && object.keywords.present?
         object.keywords.each do |keyword|
-          categories = Category.where("name_en LIKE ? AND level = 1", "%#{keyword.downcase}%")
-          category = Category.most_alike_by_keyword_within(categories, keyword)
+          category = Category.most_alike_by_name_en(keyword)
           break if category
         end
         category.products << product if category
@@ -41,8 +40,7 @@ class Product < ApplicationRecord
       # 2.1 Save sub-category to DB
       if product.categories.level_2.blank? && product.categories.level_1.present? && object.keywords.present?
         level_1_category =  product.categories.level_1.first
-        categories = Category.where(parent_id: level_1_category.id)
-        sub_category = Category.most_alike_by_keyword_within(categories, object.keywords.join(',').downcase)
+        sub_category = Category.most_alike_by_name_en(object.keywords.join(',').downcase, 2, level_1_category.id)
         sub_category.products << product if sub_category
       end
 

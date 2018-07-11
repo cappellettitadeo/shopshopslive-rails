@@ -30,20 +30,24 @@ class Category < ApplicationRecord
     end
   end
 
-  def self.most_alike_by_keyword_within(categories, keyword)
-    cat = nil
+  def self.most_alike_by_name_en(name_en, level = 1, level_1_id = nil)
+    most_alike_category = nil
+    categories = []
+    if level == 2 && level_1_id
+      categories = Category.where(parent_id: level_1_id)
+    elsif level == 1
+      categories = Category.where("name_en LIKE ? AND level = 1", "%#{name_en.downcase}%")
+    end
     if categories.present?
       max_dist = -1
       categories.each do |category|
-        dist = RubyFish::JaroWinkler.distance(category.name_en.downcase, keyword)
-        puts dist
-        binding.pry
+        dist = RubyFish::JaroWinkler.distance(category.name_en.downcase, name_en)
         if dist > max_dist && dist > 0
-          cat = category
+          most_alike_category = category
           max_dist = dist
         end
       end
     end
-    cat
+    most_alike_category
   end
 end
