@@ -22,6 +22,13 @@ module CentralApp
         }
     }
 
+    class StatusCode
+      class ErrorCode
+        TOKEN_EXPIRED = 6014
+        WRONG_NUM_SEGMENTS = 6002
+      end
+    end
+
     class << self
 
       def callback_list_url
@@ -66,7 +73,7 @@ module CentralApp
               typ:  "JWT"
           }
         else
-          return default_headers if Token.get_token
+          return default_headers if Utils::Token.get_token
         end
       end
     end

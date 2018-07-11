@@ -4,23 +4,29 @@ module CentralApp
   class Utils
     class << self
       def list_all(model, url)
-        headers = Const.default_headers
-        if headers
-          res = HTTParty.get(url, headers: headers)
-          unless res.code == 500
+        retries = 3
+        begin
+          headers = Const.default_headers
+          if headers
+            res = HTTParty.get(url, headers: headers)
             parsed_json = JSON.parse(res.body).with_indifferent_access
             if parsed_json
-              if parsed_json[:msg] == 'Expired token'
-                list_all if Token.get_token
-              elsif parsed_json[:code] == 200
-                if model
-                  parsed_json[:data][model.to_sym]
-                else
+              status_code = parsed_json[:code]
+              case status_code
+              when 200
+                if parsed_json[:data].is_a? Array
                   parsed_json[:data]
+                else
+                  parsed_json[:data][model.to_sym]
                 end
+              else
+                raise res
               end
             end
           end
+        rescue
+          retries -= 1
+          retry if retries >0 && Token.get_token
         end
       end
 
@@ -75,7 +81,7 @@ module CentralApp
 
         def list_all
           url = Const.store_list_url
-          Utils.list_all(nil, url)
+          Utils.list_all('stores', url)
         end
 
         def query(keyword)
@@ -96,15 +102,23 @@ module CentralApp
     class Token
       class << self
         def get_token
-          url = "#{ENV['CTR_BASE_URL']}/getToken"
-          res = HTTParty.get(url, query: {name: "shopshops", pwd: "Shopshops2018"})
-          parsed_json = JSON.parse res.body
-          if parsed_json['code'] == 200
-            api_key = ApiKey.where(name: "shopshops").first_or_create
-            api_key.auth_token = parsed_json['data']['token']
-            api_key.key = parsed_json['data']['uid']
-            api_key.save
-            api_key
+          retries = 3
+          begin
+            url = "#{ENV['CTR_BASE_URL']}/getToken"
+            res = HTTParty.get(url, query: {name: ENV['CTR_USERNAME'], pwd: ENV['CTR_PASSWORD']})
+            parsed_json = JSON.parse res.body
+            if parsed_json['code'] == 200
+              api_key = ApiKey.where(name: "shopshops").first_or_create
+              api_key.auth_token = parsed_json['data']['token']
+              api_key.key = parsed_json['data']['uid']
+              api_key.save
+              api_key
+            else
+              raise res
+            end
+          rescue
+            retries -= 1
+            retry if retries > 0
           end
         end
       end
@@ -114,7 +128,7 @@ module CentralApp
       class << self
         def list_all
           url = Const.vendor_list_url
-          Utils.list_all(nil, url)
+          Utils.list_all('brands', url)
         end
 
         def query
