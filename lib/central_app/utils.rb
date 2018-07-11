@@ -31,16 +31,25 @@ module CentralApp
       end
 
       def query(keyword, url)
-        headers = Const.default_headers
-        if headers
-          res = HTTParty.get(url, headers: headers, query: { keyword: keyword })
-          parsed_json = JSON.parse(res.body).with_indifferent_access
-          if parsed_json[:msg] == 'Expired token'
-            query(keyword, url) if Token.get_token
-          elsif parsed_json[:code] == 200
-            parsed_json[:data]
+        retries = 3
+        begin
+          headers = Const.default_headers
+          if headers
+            res = HTTParty.get(url, headers: headers, query: { keyword: keyword })
+            parsed_json = JSON.parse(res.body).with_indifferent_access
+            status_code = parsed_json[:code]
+            case status_code
+            when 200
+              parsed_json[:data]
+            else
+              raise res
+            end
           end
+        rescue
+          retries -= 1
+          retry if retries > 0 && Token.get_token
         end
+
       end
     end
 
@@ -86,9 +95,7 @@ module CentralApp
 
         def query(keyword)
           url = Const.store_query_url
-          res = HTTParty.get(url, query: { keyword: keyword })
-          parsed_json = JSON.parse res
-          parsed_json[:data]
+          Utils.query(keyword, url)
           ## Subcategroy
           # parsed_json[:data][:subItem]
           # cat_1st_name = parsed_json[:category_1st_name]
@@ -131,8 +138,9 @@ module CentralApp
           Utils.list_all('brands', url)
         end
 
-        def query
-
+        def query(keyword)
+          url = Const.vendor_query_url
+          Utils.query(keyword, url)
         end
       end
     end
