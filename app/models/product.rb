@@ -8,6 +8,8 @@ class Product < ApplicationRecord
   belongs_to :vendor
   belongs_to :scraper
 
+  audited
+
   def self.create_or_update_from_shopify_object(object)
     # changed is a flag to indicate whether the product or it's associations has been changed
     # and need to be synced with the central system

@@ -6,6 +6,8 @@ class Photo < ApplicationRecord
   belongs_to :target, polymorphic: true
   before_create :set_filename
 
+  audited
+
   def self.compose(target, photo_type, photo_url, width = nil, height = nil, position = nil)
     changed = false
     photo = Photo.where(source_url: photo_url, target: target).first_or_initialize

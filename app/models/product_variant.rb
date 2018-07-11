@@ -6,6 +6,8 @@ class ProductVariant < ApplicationRecord
   belongs_to :size
   has_many :photos, as: :target, dependent: :destroy
 
+  audited
+
   def lock_inventory(count)
     product.sync_with_shopify
     self.reload

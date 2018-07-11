@@ -7,6 +7,9 @@ git_source(:github) do |repo_name|
   "https://github.com/#{repo_name}.git"
 end
 
+#change logging
+gem "audited", "~> 4.7"
+#similarity comparison algorithm
 gem 'rubyfish'
 #respond_to has been extracted to the responders gem
 gem 'responders'

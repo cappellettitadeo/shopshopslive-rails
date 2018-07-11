@@ -8,6 +8,8 @@ class Store < ApplicationRecord
   scope :active, -> { where(status: 'active') }
   scope :shopify, -> { where(source_type: 'shopify') }
 
+  audited
+
   def self.create_store_from_shopify_shop(shopify_shop, myshopify_domain, access_token)
     #TODO better merge create and update method
     store = Store.find_by_source_url(myshopify_domain)
