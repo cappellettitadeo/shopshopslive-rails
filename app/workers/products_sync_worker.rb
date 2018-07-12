@@ -3,7 +3,7 @@ require 'central_app'
 class ProductsSyncWorker
   include Sidekiq::Worker
 
-  sidekiq_options unique: true
+  sidekiq_options unique: true, retry: 3
 
   def perform
     product_setting = CallbackSetting.product.first
@@ -40,6 +40,7 @@ class ProductsSyncWorker
               body: body,
               response: res
           }})
+          return false
         end
         retry if retries > 0 && CentralApp::Utils::Token.get_token
       end
@@ -71,6 +72,7 @@ class ProductsSyncWorker
               body: body,
               response: res
           }})
+          return false
         end
         retry if retries > 0 && CentralApp::Utils::Token.get_token
       end
@@ -98,6 +100,7 @@ class ProductsSyncWorker
               body: body,
               response: res
           }})
+          return false
         end
         retry if retries > 0 && CentralApp::Utils::Token.get_token
       end

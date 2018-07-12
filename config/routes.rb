@@ -23,6 +23,7 @@ Rails.application.routes.draw do
     get 'inventory/query', to: 'inventory#query'
     get 'inventory/lock', to: 'inventory#lock'
     get 'login', to: 'api_keys#login'
+    get 'trigger_callback', to: 'api_keys#trigger_callback'
     get 'delete_customer', to: 'callback_settings#delete_customer'
     get 'delete_store', to: 'callback_settings#delete_store'
 
