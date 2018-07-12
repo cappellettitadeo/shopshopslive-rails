@@ -1,5 +1,6 @@
 module CentralApp
   class Const
+    MAX_NUM_OF_ATTEMPTS = 3
     APP_BASE_URL = ENV['CTR_BASE_URL']
     API_ENDPOINTS = {
         category: {

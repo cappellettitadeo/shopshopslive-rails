@@ -1,3 +1,5 @@
+require 'central_app'
+
 class Scrapers::Shopify::Result < Scrapers::Result
   def initialize(store, product, scraper)
     @store = store
@@ -97,8 +99,32 @@ class Scrapers::Shopify::Result < Scrapers::Result
   def vendor_id
     unless @vendor_id
       if product.vendor
-        vendor = Vendor.where(name: product.vendor).first_or_create
-        @vendor_id = vendor.id
+        vendor = Vendor.where(name_en: product.vendor).first
+        if vendor
+          unless vendor.ctr_vendor_id
+            ctr_vendors = CentralApp::Utils::Vendor.query(vendor.name_en)
+            if ctr_vendors.present?
+              ctr_vendors.each do |ctr_vendor|
+                if ctr_vendor[:name_en] == vendor.name_en
+                  vendor.update_from_ctr_vendor(ctr_vendor)
+                  break
+                end
+              end
+            end
+          end
+        else
+          ctr_vendors = CentralApp::Utils::Vendor.query(product.vendor)
+          if ctr_vendors.present?
+            ctr_vendors.each do |ctr_vendor|
+              if ctr_vendor[:name_en] == product.vendor
+                vendor = Vendor.create_or_update_from_ctr_vendor(ctr_vendor)
+                break
+              end
+            end
+          end
+          vendor = Vendor.create(name_en: product.vendor) unless vendor
+        end
+        @vendor_id = vendor.id if vendor
       end
     end
     @vendor_id
