@@ -4,7 +4,7 @@ module CentralApp
   class Utils
     class << self
       def list_all(model, url)
-        retries = 3
+        retries = Const::MAX_NUM_OF_ATTEMPTS
         begin
           headers = Const.default_headers
           if headers
@@ -31,7 +31,7 @@ module CentralApp
       end
 
       def query(keyword, url)
-        retries = 3
+        retries = Const::MAX_NUM_OF_ATTEMPTS
         begin
           headers = Const.default_headers
           if headers
@@ -49,7 +49,6 @@ module CentralApp
           retries -= 1
           retry if retries > 0 && Token.get_token
         end
-
       end
     end
 
@@ -109,7 +108,7 @@ module CentralApp
     class Token
       class << self
         def get_token
-          retries = 3
+          retries = Const::MAX_NUM_OF_ATTEMPTS
           begin
             url = "#{ENV['CTR_BASE_URL']}/getToken"
             res = HTTParty.get(url, query: {name: ENV['CTR_USERNAME'], pwd: ENV['CTR_PASSWORD']})
