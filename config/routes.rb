@@ -4,6 +4,13 @@ include Swagger::Docs::ImpotentMethods
 
 Rails.application.routes.draw do
   # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
+  require 'sidekiq/web'
+  require 'sidekiq-scheduler/web'
+
+  Sidekiq::Web.use Rack::Auth::Basic do |username, password|
+    username == 'shopshops' && password == 'Shopshops2018'
+  end if Rails.env.production?
+  mount Sidekiq::Web => '/sidekiq'
 
   # API交互文档
   get 'docs' => 'docs#index'
