@@ -1,7 +1,7 @@
 class CallbackSetting < ApplicationRecord
   scope :product, -> { where(callback_type: 'product') }
   scope :stores, -> { where(callback_type: 'store') }
-  scope :vendor, -> { where(callback_type: 'vendor') }
+  scope :vendor, -> { where(callback_type: 'brand') }
 
   def self.sync_with_central_app
     parsed_json = CentralApp::Utils::Callback.list_all
