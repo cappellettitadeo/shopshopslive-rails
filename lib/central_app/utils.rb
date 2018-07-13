@@ -135,7 +135,6 @@ module CentralApp
           rescue
             retry_count += 1
             if retry_count < Const::MAX_NUM_OF_ATTEMPTS
-              binding.pry
               #sleep(Utils.sec_till_next_try(retry_count))
               retry
             end
