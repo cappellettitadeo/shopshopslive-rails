@@ -21,7 +21,7 @@ class ProductsSyncWorker
       vendors_hash = VendorSerializer.new(vendors).serializable_hash
 
       # 1.2 POST to Central System
-      body = { count: vendors.count, brands: vendors_hash[:data] }
+      body = { count: vendors.count, brands: vendors_hash[:data] }.to_json
       retries = CentralApp::Const::MAX_NUM_OF_ATTEMPTS
       begin
         headers = CentralApp::Const.default_headers
@@ -53,7 +53,7 @@ class ProductsSyncWorker
       stores_hash = StoreSerializer.new(stores).serializable_hash
 
       # 2.2 POST to Central System
-      body = { count: stores.count, stores: stores_hash[:data] }
+      body = { count: stores.count, stores: stores_hash[:data] }.to_json
       retries = CentralApp::Const::MAX_NUM_OF_ATTEMPTS
       begin
         headers = CentralApp::Const.default_headers
@@ -81,7 +81,7 @@ class ProductsSyncWorker
       ## 3. Create/Update products to Central System
       url = product_setting.url
       products_hash = ProductSerializer.new(products).serializable_hash
-      body = { count: products.count, products: products_hash[:data] }
+      body = { count: products.count, products: products_hash[:data] }.to_json
       retries = CentralApp::Const::MAX_NUM_OF_ATTEMPTS
       begin
         headers = CentralApp::Const.default_headers
