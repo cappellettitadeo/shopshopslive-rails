@@ -12,7 +12,7 @@ class ProductVariant < ApplicationRecord
 
   def sync_with_ctr_app
     if inventory_changed?
-
+      InventorySyncWorker.new.perform(id)
     end
   end
 

@@ -5,23 +5,29 @@ class InventorySyncWorker
 
   sidekiq_options unique: true
 
-  def perform
-    product_setting = CallbackSetting.product.first
-    vendor_setting = CallbackSetting.vendor.first
-    store_setting = CallbackSetting.stores.first
+  def perform(variant_id)
+    inventory_setting = CallbackSetting.inventory.first
     # 如果mode不是"bunch"，则直接返回
-    return unless product_setting &.bunch_update?
+    return unless inventory_setting &.bunch_update?
 
-    SyncQueue.products.find_in_batches(batch_size: product_setting.bunch_size) do |items|
-      products = items.collect(&:target)
-      ## 1. Find all unique vendors from these products
-      vendors = products.collect(&:vendor).uniq
-      # 1.1 Create/Update vendors to Central System
-      url = vendor_setting.url
-      vendors_hash = VendorSerializer.new(vendors).serializable_hash
+    variant = ProductVariant.find variant_id
+    product = variant.product
+    if variant&.ctr_sku_id && product&.ctr_product_id && product.vendor.ctr_vendor_id
+      url = inventory_setting.url
+      variant_hash = {
+          count: 1,
+          inventories: [
+              {
+                  prod_id: product.ctr_product_id,
+                  sku_id: variant.ctr_sku_id,
+                  inventory: variant.inventory,
+                  vendor: product.vendor.ctr_vendor_id
+              }
+          ]
+      }
 
       # 1.2 POST to Central System
-      body = { count: vendors.count, brands: vendors_hash[:data] }
+      body = variant_hash.to_json
       retries = CentralApp::Const::MAX_NUM_OF_ATTEMPTS
       begin
         headers = CentralApp::Const.default_headers
