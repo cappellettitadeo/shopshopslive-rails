@@ -28,7 +28,7 @@ class InventorySyncWorker
 
       # 1.2 POST to Central System
       body = variant_hash.to_json
-      retries = CentralApp::Const::MAX_NUM_OF_ATTEMPTS
+      retry_count = 0
       begin
         headers = CentralApp::Const.default_headers
         res = HTTParty.post(url, { headers: headers, body: body })
@@ -39,15 +39,18 @@ class InventorySyncWorker
           ## TODO Update ctr_vendor_id from the response
         end
       rescue
-        retries -= 1
-        if retries == 0
+        retry_count += 1
+        if retry_count == 0
           Airbrake.notify({ error_message: "Failed to post to #{url}", parameters: {
               callback_setting_id: vendor_setting.id,
               body: body,
               response: res
           }})
         end
-        retry if retries > 0 && CentralApp::Utils::Token.get_token
+        if retry_count < CentralApp::Const::MAX_NUM_OF_ATTEMPTS && CentralApp::Utils::Token.get_token
+          #sleep(CentralApp::Utils.sec_till_next_try(retry_count))
+          retry
+        end
       end
     end
   end

@@ -4,7 +4,7 @@ module CentralApp
   class Utils
     class << self
       def list_all(model, url)
-        retries = Const::MAX_NUM_OF_ATTEMPTS
+        retry_count = 0
         begin
           headers = Const.default_headers
           if headers
@@ -25,13 +25,16 @@ module CentralApp
             end
           end
         rescue
-          retries -= 1
-          retry if retries >0 && Token.get_token
+          retry_count += 1
+          if retry_count < Const::MAX_NUM_OF_ATTEMPTS && CentralApp::Utils::Token.get_token
+            #sleep(sec_till_next_try(retry_count))
+            retry
+          end
         end
       end
 
       def query(keyword, url)
-        retries = Const::MAX_NUM_OF_ATTEMPTS
+        retry_count = 0
         begin
           headers = Const.default_headers
           if headers
@@ -46,9 +49,16 @@ module CentralApp
             end
           end
         rescue
-          retries -= 1
-          retry if retries > 0 && Token.get_token
+          retry_count += 1
+          if retry_count < Const::MAX_NUM_OF_ATTEMPTS && CentralApp::Utils::Token.get_token
+            #sleep(sec_till_next_try(retry_count))
+            retry
+          end
         end
+      end
+
+      def sec_till_next_try(retry_count)
+        (retry_count ** 4) + 15 + (rand(30) * (retry_count + 1))
       end
     end
 
@@ -108,7 +118,7 @@ module CentralApp
     class Token
       class << self
         def get_token
-          retries = Const::MAX_NUM_OF_ATTEMPTS
+          retry_count = 0
           begin
             url = "#{ENV['CTR_BASE_URL']}/getToken"
             res = HTTParty.get(url, query: {name: ENV['CTR_USERNAME'], pwd: ENV['CTR_PASSWORD']})
@@ -123,8 +133,12 @@ module CentralApp
               raise res
             end
           rescue
-            retries -= 1
-            retry if retries > 0
+            retry_count += 1
+            if retry_count < Const::MAX_NUM_OF_ATTEMPTS
+              binding.pry
+              #sleep(Utils.sec_till_next_try(retry_count))
+              retry
+            end
           end
         end
       end
