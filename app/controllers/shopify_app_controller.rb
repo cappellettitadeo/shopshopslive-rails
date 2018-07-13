@@ -21,13 +21,14 @@ class ShopifyAppController < ApplicationController
   end
 
   def welcome
-=begin
-    unless ShopifyApp::Utils.valid_request_from_shopify?(request)
+    if ShopifyApp::Utils.valid_request_from_shopify?(request)
+      @api_key = ShopifyApp::Const::API_KEY
+      @shop = params[:shop]
+      @products = Product.where(source_url: @shop) if @shop
+    else
       render 'unauthorized'
     end
-=end
-    @api_key = ShopifyApp::Const::API_KEY
-    @shop = params[:shop]
+
   end
 
   def auth
@@ -35,6 +36,8 @@ class ShopifyAppController < ApplicationController
       # params['shop'] is shop's myshopify.com domain, which is unique identifier for each shopify store
       shop = request.params['shop']
       code = request.params['code']
+      timestamp =request.params['timestamp']
+      hmac = request.params['hmac']
       access_token = ShopifyApp::Utils.get_shop_access_token(shop, code)
       if access_token
         ShopifyApp::Utils.instantiate_session(shop, access_token)
@@ -49,7 +52,7 @@ class ShopifyAppController < ApplicationController
 
         ShopifyApp::Utils.create_webhooks
 
-        redirect_to welcome_shopify_app_index_path(:shop => shop)
+        redirect_to welcome_shopify_app_index_path(code: code, shop: shop, hmac: hmac, timestamp: timestamp)
         return
       end
     end

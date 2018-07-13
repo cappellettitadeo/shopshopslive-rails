@@ -8,11 +8,10 @@ module ShopifyApp
       def valid_request_from_shopify?(request)
         hmac = request.params['hmac']
 
-        if not hmac.nil?
-          hash = request.params.reject {|k, _| k == 'hmac' || k == 'controller' || k == 'action'}
+        if hmac
+          hash = request.params.slice(:code, :shop, :timestamp)
           query = URI.escape(hash.sort.collect {|k, v| "#{k}=#{v}"}.join('&'))
           digest = OpenSSL::HMAC.hexdigest(OpenSSL::Digest.new('sha256'), ShopifyApp::Const::API_SECRET, query)
-
           ActiveSupport::SecurityUtils.secure_compare(hmac, digest)
         else
           false
