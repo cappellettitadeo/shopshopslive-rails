@@ -40,12 +40,13 @@ class InventorySyncWorker
         end
       rescue
         retry_count += 1
-        if retry_count == 0
+        if retry_count == CentralApp::Const::MAX_NUM_OF_ATTEMPTS
           Airbrake.notify({ error_message: "Failed to post to #{url}", parameters: {
               callback_setting_id: vendor_setting.id,
               body: body,
               response: res
           }})
+          return false
         end
         if retry_count < CentralApp::Const::MAX_NUM_OF_ATTEMPTS && CentralApp::Utils::Token.get_token
           #sleep(CentralApp::Utils.sec_till_next_try(retry_count))

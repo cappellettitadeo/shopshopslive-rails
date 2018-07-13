@@ -4,6 +4,13 @@ include Swagger::Docs::ImpotentMethods
 
 Rails.application.routes.draw do
   # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
+  require 'sidekiq/web'
+  require 'sidekiq-scheduler/web'
+
+  Sidekiq::Web.use Rack::Auth::Basic do |username, password|
+    username == 'shopshops' && password == 'Shopshops2018'
+  end if Rails.env.production?
+  mount Sidekiq::Web => '/sidekiq'
 
   # API交互文档
   get 'docs' => 'docs#index'
@@ -16,6 +23,7 @@ Rails.application.routes.draw do
     get 'inventory/query', to: 'inventory#query'
     get 'inventory/lock', to: 'inventory#lock'
     get 'login', to: 'api_keys#login'
+    get 'trigger_callback', to: 'api_keys#trigger_callback'
     get 'delete_customer', to: 'callback_settings#delete_customer'
     get 'delete_store', to: 'callback_settings#delete_store'
 

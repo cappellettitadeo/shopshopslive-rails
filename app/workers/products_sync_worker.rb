@@ -3,7 +3,7 @@ require 'central_app'
 class ProductsSyncWorker
   include Sidekiq::Worker
 
-  sidekiq_options unique: true
+  sidekiq_options unique: true, retry: 3
 
   def perform
     product_setting = CallbackSetting.product.first
@@ -21,7 +21,7 @@ class ProductsSyncWorker
       vendors_hash = VendorSerializer.new(vendors).serializable_hash
 
       # 1.2 POST to Central System
-      body = { count: vendors.count, brands: vendors_hash[:data] }
+      body = { count: vendors.count, brands: vendors_hash[:data] }.to_json
       retry_count = 0
       begin
         headers = CentralApp::Const.default_headers
@@ -34,12 +34,13 @@ class ProductsSyncWorker
         end
       rescue
         retry_count += 1
-        if retry_count == 0
+        if retry_count == CentralApp::Const::MAX_NUM_OF_ATTEMPTS
           Airbrake.notify({ error_message: "Failed to post to #{url}", parameters: {
               callback_setting_id: vendor_setting.id,
               body: body,
               response: res
           }})
+          return false
         end
          if retry_count < CentralApp::Const::MAX_NUM_OF_ATTEMPTS && CentralApp::Utils::Token.get_token
            #sleep(CentralApp::Utils.sec_till_next_try(retry_count))
@@ -55,7 +56,7 @@ class ProductsSyncWorker
       stores_hash = StoreSerializer.new(stores).serializable_hash
 
       # 2.2 POST to Central System
-      body = { count: stores.count, stores: stores_hash[:data] }
+      body = { count: stores.count, stores: stores_hash[:data] }.to_json
       retry_count = 0
       begin
         headers = CentralApp::Const.default_headers
@@ -68,12 +69,13 @@ class ProductsSyncWorker
         end
       rescue
         retry_count += 1
-        if retry_count == 0
+        if retry_count == CentralApp::Const::MAX_NUM_OF_ATTEMPTS
           Airbrake.notify({ error_message: "Failed to post to #{url}", parameters: {
               callback_setting_id: store_setting.id,
               body: body,
               response: res
           }})
+          return false
         end
         if retry_count < CentralApp::Const::MAX_NUM_OF_ATTEMPTS && CentralApp::Utils::Token.get_token
           #sleep(CentralApp::Utils.sec_till_next_try(retry_count))
@@ -85,7 +87,7 @@ class ProductsSyncWorker
       ## 3. Create/Update products to Central System
       url = product_setting.url
       products_hash = ProductSerializer.new(products).serializable_hash
-      body = { count: products.count, products: products_hash[:data] }
+      body = { count: products.count, products: products_hash[:data] }.to_json
       retry_count = 0
       begin
         headers = CentralApp::Const.default_headers
@@ -98,12 +100,13 @@ class ProductsSyncWorker
         end
       rescue
         retry_count += 1
-        if retry_count == 0
+        if retry_count == CentralApp::Const::MAX_NUM_OF_ATTEMPTS
           Airbrake.notify({ error_message: "Failed to post to #{url}", parameters: {
               callback_setting_id: product_setting.id,
               body: body,
               response: res
           }})
+          return false
         end
         if retry_count < CentralApp::Const::MAX_NUM_OF_ATTEMPTS && CentralApp::Utils::Token.get_token
           #sleep(CentralApp::Utils.sec_till_next_try(retry_count))

@@ -16,5 +16,11 @@ class Api::ApiKeysController < ApiController
       render json: { ec: 401, em: 'Not Authorized' }, status: 401
     end
   end
+
+  # For testing purposes only
+  def trigger_callback
+    ProductsSyncWorker.perform_async
+    render json: { msg: 'success' }, status: :ok
+  end
 end
 
