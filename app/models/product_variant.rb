@@ -8,6 +8,14 @@ class ProductVariant < ApplicationRecord
 
   audited
 
+  after_update :sync_with_ctr_app
+
+  def sync_with_ctr_app
+    if inventory_changed?
+
+    end
+  end
+
   def lock_inventory(count)
     product.sync_with_shopify
     self.reload

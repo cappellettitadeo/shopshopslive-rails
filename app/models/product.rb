@@ -51,7 +51,7 @@ class Product < ApplicationRecord
         object.variants.each do |variant|
           variant_updated = ProductVariant.create_or_update_from_shopify_object(product, variant)
           # 3.1 Set changed to true if any variant has been updated
-          changed = true if changed.nil? && variant_updated
+          changed = true if variant_updated
         end
       end
 
@@ -60,7 +60,7 @@ class Product < ApplicationRecord
         object.photos.each do |photo|
           photo_updated = Photo.compose(product, 'product', photo.src, photo.width, photo.height, photo.position)
           # 4.1 Set changed to true if any photo has been updated
-          changed = true if changed.nil? && photo_updated
+          changed = true if photo_updated
         end
       end
     end

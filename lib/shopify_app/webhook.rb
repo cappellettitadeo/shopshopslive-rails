@@ -13,16 +13,19 @@ module ShopifyApp
           Rails.logger.debug updated_product
           Rails.logger.debug updated_product.product_id
           product_result = Scrapers::Shopify::Result.new(store, updated_product, nil)
-          Product.create_or_update_from_shopify_object(product_result)
+          product, changed = Product.create_or_update_from_shopify_object(product_result)
+          SyncQueue.where(target: product).first_or_create if changed
         end
       end
 
       def product_listings_remove(deleted_product)
+        #TODO do something after user delete a product
         product = Product.find_by_source_id(deleted_product.id)
         product.destroy if product
       end
 
       def shop_update(store, shopify_shop)
+        #TODO do something after user updated shop
         Store.update_store_from_shopify_shop(store, shopify_shop)
       end
 

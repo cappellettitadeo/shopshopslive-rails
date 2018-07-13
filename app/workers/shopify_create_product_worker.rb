@@ -6,7 +6,7 @@ class ShopifyCreateProductWorker
     product, changed = Product.create_or_update_from_shopify_object(product_result)
     # Add product to SyncQueue if either product, product_variant, product_photo
     # vendor or store has changed
-    SyncQueue.create(target: product) if changed
+    SyncQueue.where(target: target).first_or_create if changed
   rescue => err
     Rails.logger.warn "LISTING ERROR: #{err.inspect}"
     Rails.logger.warn err.backtrace.join("\n")
