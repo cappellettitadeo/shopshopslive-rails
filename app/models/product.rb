@@ -19,7 +19,7 @@ class Product < ApplicationRecord
     # and need to be synced with the central system
     changed = false
 
-    product = Product.where(source_id: object.source_id).first_or_create
+    product = Product.where(source_id: object.source_id).first_or_initialize
     # 1. Save product to DB
     product.name = object.name
     product.description = object.description
