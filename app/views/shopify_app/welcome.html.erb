@@ -15,14 +15,35 @@
 <body>
 <h1>Welcome, shopify-er!</h1>
 <div>
-  <table>
-    <% @products.each do |product| %>
+  <table class="table table-striped">
+    <thead>
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col"></th>
+      <th scope="col">Product</th>
+      <th scope="col">Inventory</th>
+      <th scope="col">Vendor</th>
+    </tr>
+    </thead>
+    <tbody>
+    <% @products.each_with_index do |product, index| %>
       <tr>
-        <td><%= product.name%></td>
-        <td><%= product.product_variants.first.inventory %></td>
-        <td><%= product.vendor.name_en %></td>
+        <th class="align-middle" scope="row"><%= index + 1 %></th>
+        <td >
+          <% if product.photos.present? %>
+            <%= image_tag(product.photos.first.thumb_url, size: "50x50") %>
+          <%else%>
+            <%= image_tag("img_placeholder.png", size: "50x50")%>
+          <%end%>
+        </td>
+        <td class="align-middle">
+          <%= product.name%>
+        </td>
+        <td class="align-middle"><%= product.product_variants.sum(&:inventory) %></td>
+        <td class="align-middle"><%= product.vendor.name_en %></td>
       </tr>
     <% end %>
+    </tbody>
   </table>
 </div>
 </body>
