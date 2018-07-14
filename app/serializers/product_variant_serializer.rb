@@ -1,5 +1,5 @@
 class ProductVariantSerializer
   include FastJsonapi::ObjectSerializer
 
-  attributes :id, :ctr_sku_id, :name, :color, :currency_info, :sizes, :count, :barcode
+  attributes :id, :ctr_sku_id, :source_sku, :name, :color, :currency_info, :sizes, :count, :barcode, :source_id
 end

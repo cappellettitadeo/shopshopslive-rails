@@ -140,4 +140,12 @@ class Product < ApplicationRecord
   def ctr_vendor_id
     vendor.ctr_vendor_id if vendor
   end
+
+  def store_name
+    store.name if store
+  end
+
+  def store_domain
+    store.source_url if store
+  end
 end
