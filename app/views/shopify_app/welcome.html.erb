@@ -15,13 +15,15 @@
 <body>
 <h1>Welcome, shopify-er!</h1>
 <div>
-  <% @products.each do |product| %>
-  <tr>
-    <td><%= product.name%></td>
-    <td><%= product.product_variants.first.inventory %></td>
-    <td><%= product.vendor.name_en %></td>
-  </tr>
-  <% end %>
+  <table>
+    <% @products.each do |product| %>
+      <tr>
+        <td><%= product.name%></td>
+        <td><%= product.product_variants.first.inventory %></td>
+        <td><%= product.vendor.name_en %></td>
+      </tr>
+    <% end %>
+  </table>
 </div>
 </body>
 </html>

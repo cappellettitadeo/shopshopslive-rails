@@ -48,10 +48,19 @@ class Product < ApplicationRecord
 
       # 3. Save all product variants to DB
       if object.variants.present?
+        variant_ids = product.product_variants.collect(&:source_id)
         object.variants.each do |variant|
+          variant_ids.delete(variant.source_id.to_s) if variant_ids.present?
           variant_updated = ProductVariant.create_or_update_from_shopify_object(product, variant)
           # 3.1 Set changed to true if any variant has been updated
           changed = true if variant_updated
+        end
+        if variant_ids.present?
+          # 3.2 to make sure a variant is still available on Shopify, if the given product does not contain a variant
+          # we have in db, then it was already been removed. Marked it as unavailable
+          variant_ids.each do |variant_id|
+            ProductVariant.find_by_source_id(variant_id).update(available: false)
+          end
         end
       end
 

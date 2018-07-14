@@ -19,13 +19,20 @@ module ShopifyApp
       end
 
       def product_listings_remove(deleted_product)
-        #TODO do something after user delete a product
-        product = Product.find_by_source_id(deleted_product.id)
-        product.destroy if product
+        product = Product.find_by_source_id(deleted_product.product_listing.product_id)
+        if product
+          product.available = false
+          product.save
+          if product.product_variants.present?
+            product.product_variants.each do |variant|
+              variant.update(available: false)
+            end
+          end
+          SyncQueue.where(target: product).first_or_create
+        end
       end
 
       def shop_update(store, shopify_shop)
-        #TODO do something after user updated shop
         Store.update_store_from_shopify_shop(store, shopify_shop)
       end
 

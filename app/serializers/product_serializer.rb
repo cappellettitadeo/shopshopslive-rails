@@ -3,7 +3,7 @@ class ProductSerializer
 
   attributes :id, :ctr_product_id, :name, :brand_name, :description, :keywords,
              :category_1st_name, :category_1st_id, :category_2nd_name, :category_2nd_id,
-             :material
+             :material, :available
 
   attribute :skus do |product|
     variants = product.product_variants
