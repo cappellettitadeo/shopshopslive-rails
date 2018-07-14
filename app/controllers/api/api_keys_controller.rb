@@ -22,5 +22,11 @@ class Api::ApiKeysController < ApiController
     ProductsSyncWorker.perform_async
     render json: { msg: 'success' }, status: :ok
   end
-end
 
+  # For testing purposes only
+  def trigger_inventory_callback
+    # id 47 is the Blur-Dating store product variant
+    InventorySyncWorker.perform_async(47)
+    render json: { msg: 'success' }, status: :ok
+  end
+end

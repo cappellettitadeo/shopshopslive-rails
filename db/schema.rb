@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180711005011) do
+ActiveRecord::Schema.define(version: 20180714014827) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -125,6 +125,7 @@ ActiveRecord::Schema.define(version: 20180711005011) do
     t.datetime "deleted_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["available"], name: "index_product_variants_on_available"
     t.index ["ctr_sku_id"], name: "index_product_variants_on_ctr_sku_id"
     t.index ["product_id"], name: "index_product_variants_on_product_id"
     t.index ["source_id"], name: "index_product_variants_on_source_id"
@@ -144,8 +145,12 @@ ActiveRecord::Schema.define(version: 20180711005011) do
     t.datetime "deleted_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.datetime "expires_at"
+    t.datetime "delisted_at"
+    t.datetime "relisted_at"
     t.index ["available"], name: "index_products_on_available"
     t.index ["ctr_product_id"], name: "index_products_on_ctr_product_id"
+    t.index ["expires_at"], name: "index_products_on_expires_at"
     t.index ["source_id"], name: "index_products_on_source_id"
     t.index ["store_id"], name: "index_products_on_store_id"
     t.index ["vendor_id"], name: "index_products_on_vendor_id"
@@ -218,7 +223,7 @@ ActiveRecord::Schema.define(version: 20180711005011) do
 
   create_table "vendors", force: :cascade do |t|
     t.string "name"
-    t.integer "ctr_vendor_id"
+    t.string "ctr_vendor_id"
     t.text "description"
     t.string "phone"
     t.string "street"

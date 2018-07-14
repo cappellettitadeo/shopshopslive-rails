@@ -8,7 +8,11 @@ class Product < ApplicationRecord
   belongs_to :vendor
   belongs_to :scraper
 
+  scope :active, -> { where('expires_at > ? AND available IS TRUE', Time.now) }
+
   audited
+
+  SCRAPED_PRODUCT_EXPIRATION = 3.days
 
   def self.create_or_update_from_shopify_object(object)
     # changed is a flag to indicate whether the product or it's associations has been changed
@@ -27,6 +31,16 @@ class Product < ApplicationRecord
 
     # 1.1 Check if any field has changed when product already exists in DB
     changed = true if product.changed?
+
+    if product.new_record?
+      # 1.2 If it's new record, setup expires_at
+      product.expires_at = DateTime.now + SCRAPED_PRODUCT_EXPIRATION
+      product.relisted_at = DateTime.now
+    elsif (DateTime.now + 1.day) > product.expires_at
+      # if it's an existing record, renew the product if it's set to expire in the next day
+      product.renew
+    end
+
 
     if product.save
       # 2. Save category to DB
@@ -75,6 +89,12 @@ class Product < ApplicationRecord
     end
     [product, changed]
   end
+
+	def renew
+    self.expires_at = DateTime.now + SCRAPED_PRODUCT_EXPIRATION
+    self.relisted_at = DateTime.now
+    self.delisted_at = nil
+	end
 
   def sync_with_shopify
     shop_domain = store.source_url

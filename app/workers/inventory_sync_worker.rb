@@ -7,23 +7,20 @@ class InventorySyncWorker
 
   def perform(variant_id)
     inventory_setting = CallbackSetting.inventory.first
-    # 如果mode不是"bunch"，则直接返回
-    return unless inventory_setting &.bunch_update?
-
     variant = ProductVariant.find variant_id
     product = variant.product
-    if variant&.ctr_sku_id && product&.ctr_product_id && product.vendor.ctr_vendor_id
+    if inventory_setting && variant&.ctr_sku_id && product&.ctr_product_id && product.vendor.ctr_vendor_id
       url = inventory_setting.url
       variant_hash = {
-          count: 1,
-          inventories: [
-              {
-                  prod_id: product.ctr_product_id,
-                  sku_id: variant.ctr_sku_id,
-                  inventory: variant.inventory,
-                  vendor: product.vendor.ctr_vendor_id
-              }
-          ]
+        count: 1,
+        inventories: [
+          {
+            prod_id: product.ctr_product_id,
+            sku_id: variant.ctr_sku_id,
+            inventory: variant.inventory,
+            vendor: product.vendor.ctr_vendor_id
+          }
+        ]
       }
 
       # 1.2 POST to Central System
@@ -42,7 +39,7 @@ class InventorySyncWorker
         retry_count += 1
         if retry_count == CentralApp::Const::MAX_NUM_OF_ATTEMPTS
           Airbrake.notify({ error_message: "Failed to post to #{url}", parameters: {
-              callback_setting_id: vendor_setting.id,
+              callback_setting_id: inventory_setting.id,
               body: body,
               response: res
           }})
