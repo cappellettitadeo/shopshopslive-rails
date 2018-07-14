@@ -55,7 +55,8 @@ class ProductVariant < ApplicationRecord
   def self.create_or_update_from_shopify_object(product, variant)
     changed = false
 
-    product_variant = ProductVariant.where(source_id: variant.source_id, product_id: product.id).first_or_create
+    product_variant = ProductVariant.where(source_id: variant.source_id).first_or_create
+    product_variant.product_id = product.id
     product_variant.available = variant.available
     product_variant.barcode = variant.barcode
     product_variant.color = variant.color
