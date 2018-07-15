@@ -4,7 +4,7 @@
     description: "Update products in Central app"
     enabled: true
   CentralAppSyncWorker:
-    cron: '0 0 * * * * Asia/Shanghai'   # Runs every 6 hours
+    cron: '0 */6 * * * Asia/Shanghai'   # Runs every 6 hours
     description: "Fetch all categories from Central app"
     enabled: true
   ShopifyStoresScraperWorker:
