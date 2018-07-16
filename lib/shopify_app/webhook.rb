@@ -2,9 +2,23 @@ module ShopifyApp
   class Webhook
     class << self
 
-      def app_uninstalled(store, data_obj)
-        #TODO do something after user uninstall our shopify app
-        Rails.logger.debug data_obj
+      def app_uninstalled(store)
+        #update store's status and its products (along with product's variants) availability if user uninstall our app
+        if store
+          store.update(status: 'inactive')
+          SyncQueue.where(target: store)
+          if store.products.present?
+            store.products.each do |product|
+              product.update(available: false)
+              SyncQueue.where(target: product)
+              if product.product_variants.present?
+                product.product_variants.each do |product_variant|
+                  product_variant.update(available: false)
+                end
+              end
+            end
+          end
+        end
       end
 
       def product_listings_add_or_update(store, object)

@@ -49,14 +49,14 @@ class Api::ProductsController < ApiController
       shop = request.env['HTTP_X_SHOPIFY_SHOP_DOMAIN']
       store = Store.find_by(source_url: shop)
 
-      if store.present? && store.source_token
+      if store&.source_token
         topic = request.env['HTTP_X_SHOPIFY_TOPIC']
         if topic
           ShopifyApp::Utils.instantiate_session(shop, store.source_token)
           data_object = JSON.parse(data, object_class: OpenStruct)
           case topic
           when "app/uninstalled"
-            ShopifyApp::Webhook.app_uninstalled(store, data_object)
+            ShopifyApp::Webhook.app_uninstalled(store)
           when "shop/update"
             ShopifyApp::Webhook.shop_update(store, data_object)
           when "product_listings/add", "product_listings/update"

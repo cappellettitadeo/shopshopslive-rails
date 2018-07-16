@@ -30,6 +30,7 @@ class Store < ApplicationRecord
   def self.update_store_from_shopify_shop(store, shopify_shop, access_token = nil)
     if store && shopify_shop
       store.name = shopify_shop.name
+
       store.country = shopify_shop.country_code
       store.website = shopify_shop.domain
       store.phone = shopify_shop.phone
@@ -41,6 +42,7 @@ class Store < ApplicationRecord
       store.zipcode = shopify_shop.zip
       store.latitude = shopify_shop.latitude
       store.longitude = shopify_shop.longitude
+      store.status = 'active'
       store.source_token = access_token if access_token
       store.save
       store

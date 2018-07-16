@@ -27,6 +27,7 @@ class Product < ApplicationRecord
     product.store_id = object.store_id
     product.vendor_id = object.vendor_id
     product.source_id = object.source_id
+    product.available = true
 
     # 1.1 Check if any field has changed when product already exists in DB
     changed = true if product.changed?
