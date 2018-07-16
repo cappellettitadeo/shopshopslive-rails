@@ -49,7 +49,7 @@
         <td class="align-middle">
           <%= product.name%>
         </td>
-        <td class="align-middle"><%= product.product_variants.sum(&:inventory) %></td>
+        <td class="align-middle"><%= product.product_variants.where(available: true).sum(&:inventory) %></td>
         <td class="align-middle"><%= product.vendor.name_en %></td>
       </tr>
     <% end %>
