@@ -21,18 +21,14 @@ class ShopifyAppController < ApplicationController
   end
 
   def welcome
-=begin
-    if ShopifyApp::Utils.valid_request_from_shopify?(request)
-
+    @shop = params[:shop]
+    if @shop
+      @api_key = ShopifyApp::Const::API_KEY
+      @store = Store.find_by(source_url: @shop)
+      @products = @store.products.where(available: true) if @store
     else
       render 'unauthorized'
     end
-=end
-    @api_key = ShopifyApp::Const::API_KEY
-    @shop = params[:shop]
-    @store = Store.find_by(source_url: @shop)
-    @products = @store.products.where(available: true) if @store
-
   end
 
   def auth
