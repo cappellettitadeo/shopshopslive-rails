@@ -48,7 +48,7 @@ class Scrapers::Shopify::ResultVariant < Scrapers::Result
   end
 
   def discounted
-    @discounted = false
+    @discounted = variant.price > variant.compare_at_price.to_f ? true : false
   end
 
   def inventory

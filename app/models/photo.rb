@@ -29,10 +29,10 @@ class Photo < ApplicationRecord
   end
 
   def url
-    file.url
+    source_url
   end
 
   def thumb_url
-    file.thumb.url
+    source_url
   end
 end
