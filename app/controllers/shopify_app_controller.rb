@@ -51,7 +51,7 @@ class ShopifyAppController < ApplicationController
           # Call the Scraper worker to fetch all products from the store upon the creation of a new store for shopify user
           ShopifyStoresScraperWorker.new.perform(store.id)
           # Fire ProductsSyncWorker immediately after the scraping is done
-          #ProductsSyncWorker.new.perform
+          ProductsSyncWorker.new.perform
         end
 
         ShopifyApp::Utils.create_webhooks
