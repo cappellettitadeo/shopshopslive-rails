@@ -10,43 +10,35 @@ class Store < ApplicationRecord
 
   audited
 
-  def self.create_store_from_shopify_shop(shopify_shop, myshopify_domain, access_token)
-    #TODO better merge create and update method
-    store = Store.find_by_source_url(myshopify_domain)
-    if store.nil?
-      store = Store.new name: shopify_shop.name, description: '', country: shopify_shop.country_code,
-                        website: shopify_shop.domain, phone: shopify_shop.phone, currency: shopify_shop.currency,
-                        street: shopify_shop.address1, city: shopify_shop.city, state: shopify_shop.province,
-                        unit_no: shopify_shop.address2, zipcode: shopify_shop.zip,
-                        latitude: shopify_shop.latitude, longitude: shopify_shop.longitude, local_rate: nil,
-                        source_url: myshopify_domain, source_token: access_token, source_id: shopify_shop.id, source_type: 'shopify'
-      store.save
-      store
-    else
-      update_store_from_shopify_shop(store, shopify_shop, access_token)
-    end
-  end
+  def self.create_or_update_from_shopify_shop(shopify_shop, access_token = nil)
+    # changed is a flag to indicate whether the product or it's associations has been changed
+    # and need to be synced with the central system
+    changed = false
+    store = Store.where(source_url: shopify_shop.myshopify_domain).first_or_initialize
+    store.name = shopify_shop.name
+    store.description = ''
+    store.country = shopify_shop.country_code
+    store.website = shopify_shop.domain
+    store.phone = shopify_shop.phone
+    store.currency = shopify_shop.currency
+    store.street = shopify_shop.address1
+    store.city = shopify_shop.city
+    store.state = shopify_shop.province
+    store.unit_no = shopify_shop.address2
+    store.zipcode = shopify_shop.zip
+    store.latitude = shopify_shop.latitude
+    store.longitude = shopify_shop.longitude
+    store.source_url = shopify_shop.myshopify_domain
+    store.source_id = shopify_shop.id
+    store.source_type = 'shopify'
+    store.status = 'active'
+    store.source_token = access_token if access_token
 
-  def self.update_store_from_shopify_shop(store, shopify_shop, access_token = nil)
-    if store && shopify_shop
-      store.name = shopify_shop.name
+    # 1.1 Check if any field has changed when store already exists in DB
+    changed = true if store.changed?
+    store.save
 
-      store.country = shopify_shop.country_code
-      store.website = shopify_shop.domain
-      store.phone = shopify_shop.phone
-      store.currency = shopify_shop.currency
-      store.street = shopify_shop.address1
-      store.city = shopify_shop.city
-      store.state = shopify_shop.province
-      store.unit_no = shopify_shop.address2
-      store.zipcode = shopify_shop.zip
-      store.latitude = shopify_shop.latitude
-      store.longitude = shopify_shop.longitude
-      store.status = 'active'
-      store.source_token = access_token if access_token
-      store.save
-      store
-    end
+    [store, changed]
   end
 
   def self.sync_with_central_app

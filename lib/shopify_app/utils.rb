@@ -42,7 +42,11 @@ module ShopifyApp
       def persist_if_not_exists(myshopify_domain, access_token)
         self.instantiate_session(myshopify_domain, access_token)
         shopify_shop = ShopifyAPI::Shop.current
-        Store.create_store_from_shopify_shop(shopify_shop, myshopify_domain, access_token)
+        if shopify_shop.present?
+          store, changed = Store.create_or_update_from_shopify_shop(shopify_shop, access_token)
+          SyncQueue.where(target: store).first_or_create if changed
+          store
+        end
       end
 
       def create_webhooks

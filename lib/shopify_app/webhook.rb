@@ -46,8 +46,9 @@ module ShopifyApp
         end
       end
 
-      def shop_update(store, shopify_shop)
-        Store.update_store_from_shopify_shop(store, shopify_shop)
+      def shop_update(shopify_shop)
+        store, changed = Store.create_or_update_from_shopify_shop(shopify_shop)
+        SyncQueue.where(target: store).first_or_create if changed
       end
 
     end

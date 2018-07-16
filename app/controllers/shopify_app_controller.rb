@@ -31,7 +31,7 @@ class ShopifyAppController < ApplicationController
     @api_key = ShopifyApp::Const::API_KEY
     @shop = params[:shop]
     @store = Store.find_by(source_url: @shop)
-    @products = @store.products if @store
+    @products = Product.where(store_id: @store.id, available: true) if @store
 
   end
 
