@@ -82,8 +82,6 @@ class ProductsSyncWorker
           retry
         end
       end
-
-
       ## 3. Create/Update products to Central System
       url = product_setting.url
       products_hash = ProductSerializer.new(products).serializable_hash
@@ -95,8 +93,19 @@ class ProductsSyncWorker
         if res.code != 200
           raise res
           #return false
-        else
-          ## TODO Update ctr_product_id from the response
+        elsif res['data'] && res['data']['insert']
+          ## Update ctr_product_id from the response
+          res['data']['insert'].each do |row|
+            product = Product.where(id: row['id']).first
+            product.update_attributes(ctr_product_id: row['oid'])
+            ## Update variants from skus
+            if row['skus']
+              row['skus'].each do |sku|
+                pv = ProductVariant.where(id: sku['id']).first
+                pv.update_attributes(ctr_sku_id: sku['oid'])
+              end
+            end
+          end
         end
       rescue
         retry_count += 1

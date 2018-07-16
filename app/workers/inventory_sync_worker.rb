@@ -31,9 +31,6 @@ class InventorySyncWorker
         res = HTTParty.post(url, { headers: headers, body: body })
         if res.code != 200
           raise res
-          #return false
-        else
-          ## TODO Update ctr_vendor_id from the response
         end
       rescue
         retry_count += 1

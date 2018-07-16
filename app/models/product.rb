@@ -106,7 +106,7 @@ class Product < ApplicationRecord
   end
 
   def brand_name
-    vendor.name if vendor
+    vendor.name_en if vendor
   end
 
   def category_1st
@@ -115,7 +115,7 @@ class Product < ApplicationRecord
 
   def category_1st_name
     cat_1 = category_1st
-    cat_1.name if cat_1
+    cat_1.name_en if cat_1
   end
 
   def category_1st_id
@@ -129,7 +129,7 @@ class Product < ApplicationRecord
 
   def category_2nd_name
     cat_2 = category_2nd
-    cat_2.name if cat_2
+    cat_2.name_en if cat_2
   end
 
   def category_2nd_id
