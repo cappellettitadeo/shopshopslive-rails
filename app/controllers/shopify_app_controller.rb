@@ -31,8 +31,6 @@ class ShopifyAppController < ApplicationController
     end
   end
 
-
-
   def auth
     if ShopifyApp::Utils.valid_request_from_shopify?(request)
       # params['shop'] is shop's myshopify.com domain, which is unique identifier for each shopify store
