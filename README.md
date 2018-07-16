@@ -1,6 +1,6 @@
 # US hub of Shopshops
 
-##Things you may want to cover:
+## Things you may want to cover:
 
 * Ruby version
 2.3.1
@@ -23,7 +23,7 @@ rspec spec/
 
 * ...
 
-##How to set up local environment (tutorial for Ubuntu & Mac OS):
+## How to set up local environment (tutorial for Ubuntu & Mac OS):
 * install RVM:
     * i.e. Ruby version manager (Strongly recommended) 
     [Follow this tutorial to install it](https://github.com/rvm/rvm)
@@ -59,6 +59,11 @@ rspec spec/
     bundle install
     ```
  * install Redis
+    * run the following commands:
+    ```
+    sudo apt-get update
+    sudo apt-get install redis-server
+    ```
  
  * create your local databases:
    * run `sudo -i -u postgres` to open psql console
@@ -83,4 +88,5 @@ rspec spec/
     * you are now running your local server, you have to modify the base url
     * go to .env file, change the field `BASE_URL=https://shopsshops.ngrok.io` to `BASE_URL=<LOCAL_URL_GIVEN_BY_NGROK>`
     * restart server if necessary
+ 
     
