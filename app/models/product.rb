@@ -148,4 +148,8 @@ class Product < ApplicationRecord
   def store_domain
     store.source_url if store
   end
+
+  def ctr_store_id
+    store.ctr_store_id if store
+  end
 end
