@@ -2,12 +2,15 @@ require 'rails_helper'
 
 describe Api::InventoryController, :vcr, type: :controller do
   before do
-    @api_key = ApiKey.generate_key("shopshops")
+    # ApiKey name shall not be duplicate with the one for central app's ApiKey
+    @api_key = ApiKey.generate_key("shopshops_us")
     request.headers["Authorization"] = @api_key.auth_token
     @ctr_prod_id = '234442'
     @ctr_sku_id = '11333'
-    @store = create(:store, source_url: "shopsshopsla.myshopify.com",  source_token: "4d3f074be79beeda98d5e4b8fb256a83")
-    @product = create(:product, store: @store, ctr_product_id: @ctr_prod_id, source_id: "1087668256825")
+    #make sure source_token is valid
+    @store = create(:store, source_url: "shopsshopsla.myshopify.com",  source_token: "b5475fc53972f6939e9cb4d533d23546")
+    #make sure source_id is valid
+    @product = create(:product, store: @store, ctr_product_id: @ctr_prod_id, source_id: "1254271516729")
     @product.sync_with_shopify
     @variant = @product.product_variants.first
     @variant.update(ctr_sku_id: @ctr_sku_id)
@@ -20,12 +23,12 @@ describe Api::InventoryController, :vcr, type: :controller do
   describe 'GET #query' do
     it 'should return the product if it exists' do
       get 'query', params: @params
-
       res = JSON.parse response.body
-      expect(res['prod_id']).to eq(@ctr_prod_id)
-      expect(res['sku_id']).to eq(@ctr_sku_id)
-      expect(res['inventory']).to eq(@variant.inventory)
-      expect(res['vendor']).to eq(@product.vendor_id)
+      @product.reload
+      expect(res['data']['prod_id']).to eq(@ctr_prod_id)
+      expect(res['data']['sku_id']).to eq(@ctr_sku_id)
+      expect(res['data']['inventory']).to eq(@variant.inventory)
+      expect(res['data']['vendor_id']).to eq(@product.vendor_id)
     end
 
     it 'should return 400 if product can not be found' do

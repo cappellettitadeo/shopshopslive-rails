@@ -9,6 +9,7 @@ FactoryBot.define do
     keywords ['prada', 'shoe']
     available true
     material 'Cotton'
+    expires_at DateTime.now + 3
 
     factory :product_with_variants do
       transient do
