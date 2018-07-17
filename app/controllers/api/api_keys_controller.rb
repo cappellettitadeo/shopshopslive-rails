@@ -23,6 +23,16 @@ class Api::ApiKeysController < ApiController
     render json: { msg: 'success' }, status: :ok
   end
 
+  ### !!!!!!!!!!!!!!!
+  # TODO Need to remove as soon as testing is done
+  ### !!!!!!!!!!!!!!!
+  def destroy_all
+    Product.destroy_all
+    Store.destroy_all
+    Vendor.destroy_all
+    render json: { msg: 'success' }, status: :ok
+  end
+
   # For testing purposes only
   def trigger_inventory_callback
     # id 47 is the Blur-Dating store product variant
