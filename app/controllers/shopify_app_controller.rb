@@ -26,7 +26,7 @@ class ShopifyAppController < ApplicationController
       @store = Store.find_by(source_url: @shop)
       @products = @store.products.where(available: true) if @store
     else
-      render 'unauthorized'
+      redirect_to err_page_shopify_app_index_path(msg: 'unauthorized')
     end
   end
 
@@ -45,18 +45,23 @@ class ShopifyAppController < ApplicationController
           ShopifyStoresScraperWorker.new.perform(store.id)
           # Fire ProductsSyncWorker immediately after the scraping is done
           ProductsSyncWorker.new.perform
+
+          ShopifyApp::Utils.create_webhooks
+
+          redirect_to welcome_shopify_app_index_path(shop: shop)
+        else
+          redirect_to err_page_shopify_app_index_path(msg: 'Internal error: failed to persist store')
         end
-
-        ShopifyApp::Utils.create_webhooks
-
-        redirect_to welcome_shopify_app_index_path(shop: shopp)
-        return
+      else
+        redirect_to err_page_shopify_app_index_path(msg: 'Failed to get token from Shopify')
       end
     end
-    render 'unauthorized'
+    redirect_to err_page_shopify_app_index_path(msg: 'unauthorized')
   end
 
-  def unauthorized
+  def err_page
+    @err_msg = params[:msg]
+    @err_msg = 'unknown error' unless @err_msg.present?
   end
 
 end

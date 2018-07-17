@@ -50,7 +50,7 @@ Rails.application.routes.draw do
     collection do
       get :auth
       get :install
-      get :unauthorized
+      get :err_page
       get :welcome
     end
   end

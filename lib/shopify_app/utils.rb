@@ -29,6 +29,8 @@ module ShopifyApp
         response = HTTParty.post(url, body: payload)
         if response.code == 200
           response['access_token']
+        else
+          Rails.logger.warn response
         end
       end
 
