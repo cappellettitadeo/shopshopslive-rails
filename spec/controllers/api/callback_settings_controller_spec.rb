@@ -2,7 +2,9 @@ require 'rails_helper'
 
 describe Api::CallbackSettingsController, :vcr, type: :controller do
   before do
-    @api_key = ApiKey.generate_key
+    @username = 'shopshops'
+    @password = 'shopshops2018'
+    @api_key = ApiKey.generate_key(@username, @password)
     request.headers["Authorization"] = @api_key.auth_token
     @product_setting = {
       callback: 'http://intermodu.shopshops.com.cn/product/create_or_update',
