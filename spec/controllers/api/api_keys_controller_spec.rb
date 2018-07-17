@@ -10,9 +10,8 @@ describe Api::ApiKeysController, :vcr, type: :controller do
   describe 'POST #login' do
     it 'should return an auth token if credentials are correct' do
       post 'login', params: { name: @username, pwd: @password }
-
       res = JSON.parse response.body
-      expect(res['token']).to eq(@api_key.auth_token)
+      expect(res['data']['token']).to eq(@api_key.auth_token)
     end
 
     it 'should return 401 if name are incorrect' do
