@@ -67,8 +67,10 @@ rspec spec/
  
  * Create your local databases:
    * Run `sudo -i -u postgres` to open psql console
-   * Create a db for development, run `create user "shopshops_development" with password 'shopspassword';`
-   * Create a db for testing purpose, run `create user "shopshops_test" with password 'shopspassword';`
+   * Create a role, run `create user "shopsadmin" with password 'shopspassword';` grant create db permission to this user
+   * If you haven't grant create db to `shopsadmin`, do it by `ALTER USER shopsadmin CREATEDB;`
+   * Create a db for development, run `create database "shopshops_development" owner "shopsadmin";`
+   * Create a db for testing purpose, run `create database "shopshops_test" owner "shopsadmin";`
    * To view list of db, enter `\list` and you shall find db `shopshops_development` and `shopshops_test`
    
  * Start server:

@@ -35,8 +35,6 @@ class ShopifyAppController < ApplicationController
       # params['shop'] is shop's myshopify.com domain, which is unique identifier for each shopify store
       shop = request.params['shop']
       code = request.params['code']
-      timestamp =request.params['timestamp']
-      hmac = request.params['hmac']
       access_token = ShopifyApp::Utils.get_shop_access_token(shop, code)
       if access_token
         ShopifyApp::Utils.instantiate_session(shop, access_token)
@@ -51,7 +49,7 @@ class ShopifyAppController < ApplicationController
 
         ShopifyApp::Utils.create_webhooks
 
-        redirect_to welcome_shopify_app_index_path(code: code, shop: shop, hmac: hmac, timestamp: timestamp)
+        redirect_to welcome_shopify_app_index_path(shop: shopp)
         return
       end
     end
