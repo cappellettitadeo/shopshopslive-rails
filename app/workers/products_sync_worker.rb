@@ -28,9 +28,12 @@ class ProductsSyncWorker
         res = HTTParty.post(url, { headers: headers, body: body })
         if res.code != 200
           raise res
-          #return false
-        else
-          ## TODO Update ctr_vendor_id from the response
+        elsif res['data'] && res['data']['insert']
+          ## Update ctr_vendor_id from the response
+          res['data']['insert'].each do |row|
+            vendor = Vendor.where(id: row['id']).first
+            vendor.update_attributes(ctr_vendor_id: row['oid'])
+          end
         end
       rescue
         retry_count += 1
@@ -64,8 +67,12 @@ class ProductsSyncWorker
         if res.code != 200
           raise res
           #return false
-        else
-          ## TODO Update ctr_store_id from the response
+        elsif res['data'] && res['data']['insert']
+          ## Update ctr_store_id from the response
+          res['data']['insert'].each do |row|
+            store = Store.where(id: row['id']).first
+            store.update_attributes(ctr_store_id: row['oid'])
+          end
         end
       rescue
         retry_count += 1
