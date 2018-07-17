@@ -1,3 +1,5 @@
+require 'central_app'
+
 class Product < ApplicationRecord
   has_many :photos, as: :target, dependent: :destroy
   has_many :product_variants, dependent: :destroy
@@ -47,7 +49,12 @@ class Product < ApplicationRecord
       category = nil
       if product.categories.level_1.blank? && object.keywords.present?
         object.keywords.each do |keyword|
-          category = Category.most_alike_by_name_en(keyword)
+          # Following line assumes we have all ctr categories in our db and we don't need to query central app
+          #category = Category.most_alike_by_name_en(keyword)
+
+          # Assume central app returns only one category
+          ctr_category = CentralApp::Utils::Category.query("#{keyword}")
+          category = Category.create_update_from_ctr_category(ctr_category)
           break if category
         end
         category.products << product if category
@@ -55,8 +62,8 @@ class Product < ApplicationRecord
 
       # 2.1 Save sub-category to DB
       if product.categories.level_2.blank? && product.categories.level_1.present? && object.keywords.present?
-        level_1_category =  product.categories.level_1.first
-        sub_category = Category.most_alike_by_name_en(object.keywords.join(',').downcase, 2, level_1_category.id)
+        category =  product.categories.level_1.first
+        sub_category = Category.most_alike_by_name_en(object.keywords.join(',').downcase, 2, category.id)
         sub_category.products << product if sub_category
       end
 
