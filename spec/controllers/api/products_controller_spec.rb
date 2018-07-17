@@ -2,7 +2,7 @@ require 'rails_helper'
 
 describe Api::ProductsController, :vcr, type: :controller do
   before do
-    @api_key = ApiKey.generate_key
+    @api_key = ApiKey.generate_key("shopshops_us")
     request.headers["Authorization"] = @api_key.auth_token
     @products = create_list(:product_with_variants, 2, variants_count: 3)
   end
