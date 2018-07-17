@@ -24,8 +24,6 @@ module ShopifyApp
       def product_listings_add_or_update(store, object)
         updated_product = object.product_listing
         if updated_product
-          Rails.logger.debug updated_product
-          Rails.logger.debug updated_product.product_id
           product_result = Scrapers::Shopify::Result.new(store, updated_product, nil)
           product, changed = Product.create_or_update_from_shopify_object(product_result)
           SyncQueue.where(target: product).first_or_create if changed
