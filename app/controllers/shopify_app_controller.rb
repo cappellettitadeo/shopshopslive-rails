@@ -63,7 +63,6 @@ class ShopifyAppController < ApplicationController
           redirect_to welcome_shopify_app_index_path(shop: shop) and return
         else
           redirect_to err_page_shopify_app_index_path(msg: 'Internal error: failed to persist store') and return
-          return
         end
       else
         redirect_to err_page_shopify_app_index_path(msg: 'Failed to get token from Shopify') and return
