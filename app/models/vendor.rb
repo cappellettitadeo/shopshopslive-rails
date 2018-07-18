@@ -2,6 +2,8 @@ class Vendor < ApplicationRecord
   has_many :products
   has_many :photos, as: :target, dependent: :destroy
 
+  acts_as_paranoid
+
   def self.sync_with_central_app
     vendors = CentralApp::Utils::Vendor.list_all
     if vendors.present?

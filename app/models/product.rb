@@ -12,6 +12,7 @@ class Product < ApplicationRecord
   scope :active, -> { where('expires_at > ? AND available IS TRUE', Time.now) }
 
   audited
+  acts_as_paranoid
 
   SCRAPED_PRODUCT_EXPIRATION = 3.days
 
@@ -158,5 +159,9 @@ class Product < ApplicationRecord
 
   def ctr_store_id
     store.ctr_store_id if store
+  end
+
+  def ctr_vendor_id
+    vendor.ctr_vendor_id if vendor
   end
 end

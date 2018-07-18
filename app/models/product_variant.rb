@@ -7,6 +7,7 @@ class ProductVariant < ApplicationRecord
   has_many :photos, as: :target, dependent: :destroy
 
   audited
+  acts_as_paranoid
 
   after_update :sync_with_ctr_app
 
