@@ -50,11 +50,11 @@ class Product < ApplicationRecord
       if product.categories.level_1.blank? && object.keywords.present?
         object.keywords.each do |keyword|
           # Following line assumes we have all ctr categories in our db and we don't need to query central app
-          #category = Category.most_alike_by_name_en(keyword)
+          category = Category.most_alike_by_name_en(keyword)
 
           # Assume central app returns only one category
-          ctr_category = CentralApp::Utils::Category.query("#{keyword}")
-          category = Category.create_update_from_ctr_category(ctr_category)
+          #ctr_category = CentralApp::Utils::Category.query("#{keyword}")
+          #category = Category.create_update_from_ctr_category(ctr_category)
           break if category
         end
         category.products << product if category

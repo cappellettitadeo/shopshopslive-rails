@@ -2,8 +2,8 @@ require 'shopify_app'
 require 'ostruct'
 
 class ShopifyAppController < ApplicationController
-  respond_to :json
 
+  respond_to :json
 
   def initialize
     super
@@ -14,9 +14,12 @@ class ShopifyAppController < ApplicationController
   end
 
   def install
-    session = ShopifyAPI::Session.new(request.params['shop'])
-    permission_url = session.create_permission_url(ShopifyApp::Const::SCOPE, "#{ShopifyApp::Const::APP_URL}/auth")
-    redirect_to permission_url
+    shop = request.params['shop']
+    if shop
+      session = ShopifyAPI::Session.new(shop)
+      permission_url = session.create_permission_url(ShopifyApp::Const::SCOPE, "#{ShopifyApp::Const::APP_URL}/auth")
+      redirect_to permission_url
+    end
   end
 
   def welcome
@@ -25,6 +28,15 @@ class ShopifyAppController < ApplicationController
       @api_key = ShopifyApp::Const::API_KEY
       @store = Store.find_by(source_url: @shop)
       @products = @store.products.where(available: true) if @store
+      if @products.blank? && @store
+        myshopify_domain = @store.source_url
+        access_token = @store.source_token
+        if myshopify_domain && access_token
+          ShopifyApp::Utils.instantiate_session(myshopify_domain, access_token)
+          # Call shopify API to fetch all product ids to check if user has posted product to our channel
+          @product_ids = ShopifyAPI::ProductListing.product_ids
+        end
+      end
     else
       redirect_to err_page_shopify_app_index_path(msg: 'unauthorized')
     end
@@ -42,18 +54,19 @@ class ShopifyAppController < ApplicationController
         store = ShopifyApp::Utils.persist_if_not_exists(shop, access_token)
         if store
           # Call the Scraper worker to fetch all products from the store upon the creation of a new store for shopify user
-          ShopifyStoresScraperWorker.new.perform(store.id)
+          ShopifyStoresScraperWorker.perform_async(store.id)
           # Fire ProductsSyncWorker immediately after the scraping is done
-          ProductsSyncWorker.new.perform
+          ProductsSyncWorker.perform_async
+          # Create webhooks for Shopify events/topics
+          ShopifyWebhooksWorker.perform_async(store.id)
 
-          ShopifyApp::Utils.create_webhooks
-
-          redirect_to welcome_shopify_app_index_path(shop: shop)
+          redirect_to welcome_shopify_app_index_path(shop: shop) and return
         else
-          redirect_to err_page_shopify_app_index_path(msg: 'Internal error: failed to persist store')
+          redirect_to err_page_shopify_app_index_path(msg: 'Internal error: failed to persist store') and return
+          return
         end
       else
-        redirect_to err_page_shopify_app_index_path(msg: 'Failed to get token from Shopify')
+        redirect_to err_page_shopify_app_index_path(msg: 'Failed to get token from Shopify') and return
       end
     end
     redirect_to err_page_shopify_app_index_path(msg: 'unauthorized')
