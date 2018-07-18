@@ -160,4 +160,8 @@ class Product < ApplicationRecord
   def ctr_store_id
     store.ctr_store_id if store
   end
+
+  def ctr_vendor_id
+    vendor.ctr_vendor_id if vendor
+  end
 end
