@@ -29,7 +29,8 @@ class InventorySyncWorker
       begin
         headers = CentralApp::Const.default_headers
         res = HTTParty.post(url, { headers: headers, body: body })
-        if res.code != 200
+        parsed_json = JSON.parse(res.body).with_indifferent_access
+        if parsed_json[:code] != 200
           raise res
         end
       rescue

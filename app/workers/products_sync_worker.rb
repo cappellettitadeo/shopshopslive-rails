@@ -30,7 +30,8 @@ class ProductsSyncWorker
         res = HTTParty.post(url, { headers: headers, body: body })
         puts "Res:"
         puts res
-        if res.code != 200
+        parsed_json = JSON.parse(res.body).with_indifferent_access
+        if parsed_json[:code] != 200
           raise res
         elsif res['data'] && res['data']['insert']
           ## Update ctr_vendor_id from the response
@@ -72,7 +73,8 @@ class ProductsSyncWorker
         res = HTTParty.post(url, { headers: headers, body: body })
         puts "Res:"
         puts res
-        if res.code != 200
+        parsed_json = JSON.parse(res.body).with_indifferent_access
+        if parsed_json[:code] != 200
           raise res
           #return false
         elsif res['data'] && res['data']['insert']
@@ -109,7 +111,8 @@ class ProductsSyncWorker
         res = HTTParty.post(url, { headers: headers, body: body })
         puts "Res:"
         puts res
-        if res.code != 200
+        parsed_json = JSON.parse(res.body).with_indifferent_access
+        if parsed_json[:code] != 200
           raise res
           #return false
         elsif res['data'] && res['data']['insert']
