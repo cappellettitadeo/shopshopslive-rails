@@ -10,10 +10,11 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180714041004) do
+ActiveRecord::Schema.define(version: 20180718195213) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+  enable_extension "hstore"
 
   create_table "api_keys", force: :cascade do |t|
     t.string "name"
@@ -150,6 +151,7 @@ ActiveRecord::Schema.define(version: 20180714041004) do
     t.index ["available"], name: "index_products_on_available"
     t.index ["ctr_product_id"], name: "index_products_on_ctr_product_id"
     t.index ["expires_at"], name: "index_products_on_expires_at"
+    t.index ["name"], name: "index_products_on_name"
     t.index ["source_id"], name: "index_products_on_source_id"
     t.index ["store_id"], name: "index_products_on_store_id"
     t.index ["vendor_id"], name: "index_products_on_vendor_id"
@@ -234,6 +236,7 @@ ActiveRecord::Schema.define(version: 20180714041004) do
     t.string "unit_no"
     t.string "name_en"
     t.index ["ctr_vendor_id"], name: "index_vendors_on_ctr_vendor_id"
+    t.index ["name_en"], name: "index_vendors_on_name_en"
   end
 
 end

@@ -18,8 +18,8 @@ class Vendor < ApplicationRecord
 
   def self.create_or_update_from_ctr_vendor(vendor)
     local_vendor = Vendor.where(ctr_vendor_id: vendor[:id]).first_or_create
-    local_vendor.name = vendor[:name]
-    local_vendor.name_en = vendor[:name_en]
+    local_vendor.name = vendor[:name].downcase
+    local_vendor.name_en = vendor[:name_en].downcase
     local_vendor.description = vendor[:description]
     local_vendor.save
     begin

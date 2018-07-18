@@ -22,8 +22,9 @@ class ProductVariant < ApplicationRecord
     self.reload
     if inventory >= count
       begin
-        #TODO email needs to be set by shopshops
-        draft_order = ShopifyAPI::DraftOrder.create(email: "xinghe@blurdating.com", line_items: [{quantity: count, variant_id: source_id}])
+        draft_order = ShopifyAPI::DraftOrder.create(email: ShopifyApp::Const::ACCOUNT_EMAIL,
+                                                    shipping_address: ShopifyApp::Const::CUSTOMER_INFO,
+                                                    line_items: [{quantity: count, variant_id: source_id}])
         if draft_order&.complete(payment_pending: true)
           self.inventory -= count
           self.save

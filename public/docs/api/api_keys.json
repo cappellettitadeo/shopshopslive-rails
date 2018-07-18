@@ -14,7 +14,7 @@
               "paramType": "query",
               "name": "name",
               "type": "string",
-              "description": "Username: shopshops",
+              "description": "Username: shopshops_api",
               "required": true
             },
             {
