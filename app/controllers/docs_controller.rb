@@ -1,5 +1,5 @@
 class DocsController < ApplicationController
-  http_basic_authenticate_with name: 'shopshops', password: 'shopshops2018'
+  http_basic_authenticate_with name: 'shopshops', password: 'Shopshops2018'
   layout 'docs'
 
   def index

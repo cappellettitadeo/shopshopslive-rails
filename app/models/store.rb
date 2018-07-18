@@ -9,6 +9,7 @@ class Store < ApplicationRecord
   scope :shopify, -> { where(source_type: 'shopify') }
 
   audited
+  acts_as_paranoid
 
   def self.create_or_update_from_shopify_shop(shopify_shop, access_token = nil)
     # changed is a flag to indicate whether the product or it's associations has been changed
