@@ -16,29 +16,29 @@ module Feed
     def self.build_query(params)
       query_array = []
       if params[:title]
-        query_array << "(name = '#{params[:title]}')"
+        query_array << "(name ILIKE '%#{params[:title].downcase}%')"
       end
       if params[:vendor]
-        vendor_id = Vendor.find_by_name(params[:vendor]).id rescue 0
+        vendor_id = Vendor.where("name_en ILIKE '%#{params[:vendor].downcase}%'").first.id rescue 0
         query_array << "(vendor_id = #{vendor_id})"
       end
       if params[:category]
-        category = Category.find_by_name(params[:category])
+        category = Category.where("name_en ILIKE '%#{params[:category].downcase}%'")
         ids = category.products.pluck(:id) rescue []
         ids = 0 if ids.empty?
         query_array << "(id IN (#{ids}))"
       end
       if params[:created_at_min]
-        query_array << "(created_at >= #{params[:created_at_min]})"
+        query_array << "(created_at >= '#{params[:created_at_min]}')"
       end
       if params[:created_at_max]
-        query_array << "(created_at <= #{params[:created_at_max]})"
+        query_array << "(created_at <= '#{params[:created_at_max]}')"
       end
       if params[:updated_at_min]
-        query_array << "(updated_at >= #{params[:updated_at_min]})"
+        query_array << "(updated_at >= '#{params[:updated_at_min]}')"
       end
       if params[:updated_at_max]
-        query_array << "(updated_at <= #{params[:updated_at_max]})"
+        query_array << "(updated_at <= '#{params[:updated_at_max]}')"
       end
       query_array.join(' AND ')
     end

@@ -4,7 +4,7 @@ class Api::ApiKeysController < ApiController
 
   swagger_api :login do
     summary "Login to get authentication token"
-    param :query, :name, :string, :required, "Username: shopshops"
+    param :query, :name, :string, :required, "Username: shopshops_api"
     param :query, :pwd, :string, :required, "Password: Shopshops2018"
   end
 
