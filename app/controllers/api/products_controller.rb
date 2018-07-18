@@ -68,15 +68,12 @@ class Api::ProductsController < ApiController
           end
         else
           logger.warn "header does not include topic"
+          render json: {ec: 400, em: "topic not provided"}, status: :bad_request and return
         end
-      else
-        render json: {ec: 403, em: "You're not authorized to perform this action."}, status: :forbidden and return
+        render json: {msg: 'Webhook notification received successfully.'}, status: :ok and return
       end
-    else
-      render json: {ec: 403, em: "You're not authorized to perform this action."}, status: :forbidden and return
     end
-
-    render json: {ec: 200, em: 'Webhook notification received successfully.'}, status: :ok
+    render json: {ec: 403, em: "You're not authorized to perform this action."}, status: :forbidden
   end
 
 end
