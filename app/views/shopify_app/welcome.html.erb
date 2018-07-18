@@ -13,20 +13,21 @@
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
   <style>
     html,
-    body, .product-not-listed {
+    body, .product-not-listed, .product-publishing {
       width: 100%;
       height: 100%;
     }
-    .product-not-listed, .tips{
+    .text{
+      font-family: "Whitney A","Whitney B","Larsseit",lucida grande,sans-serif;
+    }
+    .product-not-listed, .tips, .product-publishing{
       display: flex;
       flex-direction: column;
     }
-    .product-not-listed{
+    .product-not-listed, .product-publishing{
       align-items: center;
       justify-content: center;
-      background-image: url(<%= asset_path "background_image.jpg" %>);
-      background-repeat: no-repeat;
-      background-size: cover;
+      background-color: #f4f6f8;
     }
     .black-title{
       color: black;
@@ -37,6 +38,7 @@
     }
     h2{
       text-align: center;
+      font-size: 28px;
     }
     p{
       text-align: left;
@@ -50,6 +52,12 @@
     }
     h1, h2, p, .tips{
       color: white;
+    }
+    .hold-on-txt{
+      max-width: 50%;
+    }
+    .loading-gif{
+      margin-top: 40px;
     }
   </style>
 </head>
@@ -90,7 +98,11 @@
   </div>
 <%else%>
   <% if @product_ids.present? %>
-    <h1 class="black-title">We are examining your products, please return later.</h1>
+    <div class="product-publishing">
+      <h1 class="black-title hold-on-txt text">Just hold on, we're publishing your products to Shopshops.</h1>
+      <h2 class="black-title text">Please check back in a minute.</h2>
+      <%= image_tag ("shopshops_loading.gif"), class: "loading-gif" %>
+    </div>
   <%else%>
     <div class="product-not-listed">
       <h1>You've just connected with Shopshops.</h1>
