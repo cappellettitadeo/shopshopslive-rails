@@ -36,7 +36,8 @@ class Api::ApiKeysController < ApiController
   # For testing purposes only
   def trigger_inventory_callback
     # id 47 is the Blur-Dating store product variant
-    InventorySyncWorker.perform_async(47)
+    id = ProductVariant.last.id
+    InventorySyncWorker.perform_async(id)
     render json: { msg: 'success' }, status: :ok
   end
 end
