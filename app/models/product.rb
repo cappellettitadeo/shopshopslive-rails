@@ -50,7 +50,7 @@ class Product < ApplicationRecord
       category = nil
       if (product.categories.level_1.blank? && product.categories.level_2.blank?) && object.keywords.present?
         object.keywords.each do |keyword|
-          category = Category.fuzz_match_by_name_en(keyword)
+          category = Category.fuzzy_match_by_name_en(keyword)
           break if category
         end
         if category
