@@ -48,24 +48,23 @@ class Product < ApplicationRecord
     if product.save
       # 2. Save category to DB
       category = nil
-      if product.categories.level_1.blank? && object.keywords.present?
+      if (product.categories.level_1.blank? && product.categories.level_2.blank?) && object.keywords.present?
         object.keywords.each do |keyword|
-          # Following line assumes we have all ctr categories in our db and we don't need to query central app
-          category = Category.most_alike_by_name_en(keyword)
-
-          # Assume central app returns only one category
-          #ctr_category = CentralApp::Utils::Category.query("#{keyword}")
-          #category = Category.create_update_from_ctr_category(ctr_category)
+          category = Category.fuzz_match_by_name_en(keyword)
           break if category
         end
-        category.products << product if category
-      end
-
-      # 2.1 Save sub-category to DB
-      if product.categories.level_2.blank? && product.categories.level_1.present? && object.keywords.present?
-        category =  product.categories.level_1.first
-        sub_category = Category.most_alike_by_name_en(object.keywords.join(',').downcase, 2, category.id)
-        sub_category.products << product if sub_category
+        if category
+          case category.level
+          when 1
+            category.products << product
+          when 2
+            par_category = category.parent
+            # First assign parent Category
+            par_category.products << product
+            # Then assign second Category
+            category.products << product
+          end
+        end
       end
 
       # 3. Save all product variants to DB

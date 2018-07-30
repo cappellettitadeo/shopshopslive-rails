@@ -35,6 +35,7 @@ class Category < ApplicationRecord
     end
   end
 
+  # Deprecated
   def self.most_alike_by_name_en(name_en, level = 1, level_1_id = nil)
     most_alike_category = nil
     categories = []
@@ -54,5 +55,13 @@ class Category < ApplicationRecord
       end
     end
     most_alike_category
+  end
+
+  # Search All Categories to find the most alike match(it could be either
+  # level 1 or level 2 category)
+  def self.fuzzy_match_by_name_en(name_en)
+    fz = FuzzyMatch.new(Category.all, read: :name_en)
+    result = fz.find(name_en)
+    result
   end
 end
