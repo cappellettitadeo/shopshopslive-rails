@@ -6,11 +6,11 @@ module ShopifyApp
         #update store's status and its products (along with product's variants) availability if user uninstall our app
         if store
           store.update(status: 'inactive')
-          SyncQueue.where(target: store)
+          SyncQueue.where(target: store).first_or_create
           if store.products.present?
             store.products.each do |product|
               product.update(available: false)
-              SyncQueue.where(target: product)
+              SyncQueue.where(target: product).first_or_create
               if product.product_variants.present?
                 product.product_variants.each do |product_variant|
                   product_variant.update(available: false)

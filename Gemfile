@@ -86,3 +86,4 @@ gem "paranoia", "~> 2.2"
 gem 'simple_command'
 gem 'hashids'
 gem 'kaminari'
+gem 'fuzzy_match'

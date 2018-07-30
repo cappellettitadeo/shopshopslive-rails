@@ -30,6 +30,7 @@ class Api::ApiKeysController < ApiController
     Product.destroy_all
     Store.destroy_all
     Vendor.destroy_all
+    SyncQueue.destroy_all
     render json: { msg: 'success' }, status: :ok
   end
 
