@@ -58,9 +58,9 @@ class Product < ApplicationRecord
           when 1
             category.products << product
           when 2
-            par_category = category.parent
+            par_category = Category.find_by_id(category.parent_id)
             # First assign parent Category
-            par_category.products << product
+            par_category.products << product if par_category
             # Then assign second Category
             category.products << product
           end
