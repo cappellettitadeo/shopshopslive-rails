@@ -39,6 +39,10 @@ class Scrapers::Shopify::Result < Scrapers::Result
     @keywords if @keywords.present?
   end
 
+  def product_type
+    product.product_type
+  end
+
   def material
     unless @material.present?
       product.options.each do |option|

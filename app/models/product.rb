@@ -26,6 +26,7 @@ class Product < ApplicationRecord
     product.name = object.name
     product.description = object.description
     product.keywords = object.keywords
+    product.product_type = object.product_type
     product.material = object.material
     product.store_id = object.store_id
     product.vendor_id = object.vendor_id
