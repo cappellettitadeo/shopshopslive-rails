@@ -10,10 +10,11 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180718195213) do
+ActiveRecord::Schema.define(version: 20180801205306) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+  enable_extension "hstore"
 
   create_table "api_keys", force: :cascade do |t|
     t.string "name"
@@ -147,6 +148,7 @@ ActiveRecord::Schema.define(version: 20180718195213) do
     t.datetime "expires_at"
     t.datetime "delisted_at"
     t.datetime "relisted_at"
+    t.string "product_type"
     t.index ["available"], name: "index_products_on_available"
     t.index ["ctr_product_id"], name: "index_products_on_ctr_product_id"
     t.index ["expires_at"], name: "index_products_on_expires_at"
