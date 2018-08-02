@@ -128,7 +128,7 @@ class Product < ApplicationRecord
 
   def category_1st_id
     cat_1 = category_1st
-    cat_1.id if cat_1
+    cat_1.ctr_category_id if cat_1
   end
 
   def category_2nd
@@ -142,7 +142,7 @@ class Product < ApplicationRecord
 
   def category_2nd_id
     cat_2 = category_2nd
-    cat_2.id if cat_2
+    cat_2.ctr_category_id if cat_2
   end
 
   def ctr_vendor_id
