@@ -5,6 +5,7 @@ class ProductVariant < ApplicationRecord
   belongs_to :product
   belongs_to :size
   has_many :photos, as: :target, dependent: :destroy
+  has_many :options
 
   audited
   acts_as_paranoid
@@ -73,6 +74,23 @@ class ProductVariant < ApplicationRecord
     product_variant.size_id = variant.size_id
     product_variant.weight = variant.weight
     product_variant.weight_unit = variant.weight_unit
+    # Find or create the options
+    shopify_ids = []
+    variant.options.each do |o|
+      shopify_ids << o.option_id.to_s
+      option = product_variant.options.where(source_id: o.option_id.to_s).first_or_initialize
+      if option.id.nil?
+        option.name = o.name
+        option.value = o.value
+        option.save
+      end
+    end
+    # Delete options if they are not in Shopify anymore
+    product_variant.options.each do |op|
+      unless shopify_ids.include?(op.source_id)
+        op.destroy
+      end
+    end
     changed = true if product_variant.changed?
     product_variant.save
     changed
