@@ -3,8 +3,8 @@ require 'rubyfish'
 class Category < ApplicationRecord
   has_and_belongs_to_many :products
 
-  scope :level_1, -> { where(level: 1) }
-  scope :level_2, -> { where(level: 2) }
+  scope :level_1, -> {where(level: 1)}
+  scope :level_2, -> {where(level: 2)}
 
   def self.sync_with_central_app
     categories = CentralApp::Utils::Category.list_all
@@ -59,8 +59,18 @@ class Category < ApplicationRecord
 
   # Search All Categories to find the most alike match(it could be either
   # level 1 or level 2 category)
-  def self.fuzzy_match_by_name_en(name_en)
-    fz = FuzzyMatch.new(Category.all, read: :name_en)
+  def self.fuzzy_match_by_name_en(name_en, gender = nil)
+    case gender
+    when 'men'
+      lvl_1_men_cat = Category.find_by(level: 1, name_en: 'men')
+      categories = Category.where(parent_id: lvl_1_men_cat.id)
+    when 'women'
+      lvl_1_women_cat = Category.find_by(level: 1, name_en: 'women')
+      categories = Category.where(parent_id: lvl_1_women_cat.id)
+    else
+      categories = Category.all
+    end
+    fz = FuzzyMatch.new(categories, read: :name_en)
     result = fz.find(name_en)
     result
   end

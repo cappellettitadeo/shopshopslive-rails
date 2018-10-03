@@ -50,8 +50,23 @@ class Product < ApplicationRecord
       # 2. Save category to DB
       category = nil
       if (product.categories.level_1.blank? && product.categories.level_2.blank?) && object.keywords.present?
+        #check if gender is present in keywords
+        gender_keywords = {
+            :men => %w(man men male gentleman gentlemen boy boys lad),
+            :women => %w(woman women female lady ladies girl girls lass)
+        }
+        gender = nil
+        gender_keywords.each do |gender, keywords|
+          keywords.each do |gender_keyword|
+            if object.keywords.include? gender_keyword
+              gender = gender
+              break
+            end
+          end
+        end
+        #find a category by using fuzzy match
         object.keywords.each do |keyword|
-          category = Category.fuzzy_match_by_name_en(keyword)
+          category = Category.fuzzy_match_by_name_en(keyword, gender)
           break if category
         end
         if category
