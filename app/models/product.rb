@@ -58,7 +58,7 @@ class Product < ApplicationRecord
         gender = nil
         gender_keywords.each do |gender, keywords|
           keywords.each do |gender_keyword|
-            if object.keywords.include? gender_keyword
+            if object.keywords.concat(object.name.split).include? gender_keyword
               gender = gender
               break
             end
