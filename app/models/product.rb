@@ -56,14 +56,15 @@ class Product < ApplicationRecord
             :women => %w(woman women female lady ladies girl girls lass)
         }
         gender = nil
-        gender_keywords.each do |gender, keywords|
+        gender_keywords.each do |gender_key, keywords|
           keywords.each do |gender_keyword|
             if object.keywords.concat(object.name.split).include? gender_keyword
-              gender = gender
+              gender = gender_key.to_s
               break
             end
           end
         end
+
         #find a category by using fuzzy match
         object.keywords.each do |keyword|
           category = Category.fuzzy_match_by_name_en(keyword, gender)
