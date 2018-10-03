@@ -16,6 +16,11 @@ class Product < ApplicationRecord
 
   SCRAPED_PRODUCT_EXPIRATION = 3.days
 
+  GENDER_KEYWORDS = {
+    men: %w(man men man's men's male gentleman gentlemen boy boys boy's lad),
+    women: %w(woman women woman's women's female lady ladies girl girls girl's lass)
+  }
+
   def self.create_or_update_from_shopify_object(object)
     # changed is a flag to indicate whether the product or it's associations has been changed
     # and need to be synced with the central system
@@ -51,14 +56,10 @@ class Product < ApplicationRecord
       category = nil
       if (product.categories.level_1.blank? && product.categories.level_2.blank?) && object.keywords.present?
         #check if gender is present in keywords
-        gender_keywords = {
-            :men => %w(man men male gentleman gentlemen boy boys lad),
-            :women => %w(woman women female lady ladies girl girls lass)
-        }
         gender = nil
-        gender_keywords.each do |gender_key, keywords|
+        GENDER_KEYWORDS.each do |gender_key, keywords|
           keywords.each do |gender_keyword|
-            if object.keywords.concat(object.name.split).include? gender_keyword
+            if object.keywords.concat(object.name.downcase.split).include? gender_keyword
               gender = gender_key.to_s
               break
             end
