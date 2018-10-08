@@ -16,6 +16,11 @@ class Product < ApplicationRecord
 
   SCRAPED_PRODUCT_EXPIRATION = 3.days
 
+  GENDER_KEYWORDS = {
+    men: %w(man men man's men's male gentleman gentlemen boy boys boy's lad),
+    women: %w(woman women woman's women's female lady ladies girl girls girl's lass)
+  }
+
   def self.create_or_update_from_shopify_object(object)
     # changed is a flag to indicate whether the product or it's associations has been changed
     # and need to be synced with the central system
@@ -50,8 +55,20 @@ class Product < ApplicationRecord
       # 2. Save category to DB
       category = nil
       if (product.categories.level_1.blank? && product.categories.level_2.blank?) && object.keywords.present?
+        #check if gender is present in keywords
+        gender = nil
+        GENDER_KEYWORDS.each do |gender_key, keywords|
+          keywords.each do |gender_keyword|
+            if object.keywords.concat(object.name.downcase.split).include? gender_keyword
+              gender = gender_key.to_s
+              break
+            end
+          end
+        end
+
+        #find a category by using fuzzy match
         object.keywords.each do |keyword|
-          category = Category.fuzzy_match_by_name_en(keyword)
+          category = Category.fuzzy_match_by_name_en(keyword, gender)
           break if category
         end
         if category

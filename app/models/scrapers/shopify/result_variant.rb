@@ -108,6 +108,10 @@ class Scrapers::Shopify::ResultVariant < Scrapers::Result
     @size_id
   end
 
+  def options
+    variant.option_values
+  end
+
   def updated_at
     @updated_at ||= variant.updated_at
   end
