@@ -96,7 +96,7 @@ class ProductVariant < ApplicationRecord
     changed
   end
 
-  def size
+  def sizes
     size.size if size
   end
 
