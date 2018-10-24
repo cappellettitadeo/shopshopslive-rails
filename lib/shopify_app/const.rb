@@ -4,7 +4,7 @@ module ShopifyApp
     API_SECRET ||= ENV['SHOPIFY_API_SECRET']
     BASE_URL ||= ENV['BASE_URL']
     APP_URL ||= "#{BASE_URL}/shopify_app"
-    SCOPE ||= %w(read_product_listings write_draft_orders)
+    SCOPE ||= %w(read_product_listings write_draft_orders write_products write_customers write_orders write_inventory write_shipping write_checkouts unauthenticated_write_checkouts unauthenticated_write_customers read_shopify_payments_payouts)
     CUSTOMER_INFO ||= {
       first_name: 'Shopshops',
       last_name: 'Sales'
