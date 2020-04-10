@@ -72,6 +72,7 @@ class ProductVariant < ApplicationRecord
     product_variant.product_id = product.id
     product_variant.source_sku = variant.source_sku
     product_variant.size_id = variant.size_id
+    product_variant.image_id = variant.image_id
     product_variant.weight = variant.weight
     product_variant.weight_unit = variant.weight_unit
     # Find or create the options

@@ -1,3 +1,4 @@
+require 'central_app'
 class CentralAppSyncWorker
   include Sidekiq::Worker
 

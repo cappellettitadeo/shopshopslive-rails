@@ -16,6 +16,10 @@ class Scrapers::Shopify::ResultVariant < Scrapers::Result
     @barcode ||= variant.barcode
   end
 
+  def image_id
+    @image_id ||= variant.image_id
+  end
+
   def color
     unless @color
       if variant.option_values.present?

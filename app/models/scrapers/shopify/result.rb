@@ -59,7 +59,15 @@ class Scrapers::Shopify::Result < Scrapers::Result
   def photos
     unless @photos.present?
       if product.images.present?
-        @photos = product.images
+        new_images = []
+        product.images.each do |item|
+          item[:is_cover] = 0
+          if product.image.present? && item[:id] == product.image[:id]
+            item[:is_cover] = 1
+          end
+          new_images.push(item)
+        end
+        @photos = new_images
       end
     end
     @photos

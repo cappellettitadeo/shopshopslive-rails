@@ -18,6 +18,7 @@ module ShopifyApp
         end
       end
 
+      # Exchange temp code to permernant access_token
       def get_shop_access_token(shop, code)
         url = "https://#{shop}/admin/oauth/access_token"
 
@@ -29,6 +30,185 @@ module ShopifyApp
         response = HTTParty.post(url, body: payload)
         if response.code == 200
           response['access_token']
+        else
+          Rails.logger.warn response
+        end
+      end
+
+      # Payment using Stripe token
+      def submit_payment_by_stripe(shop, access_token, checkout, stripe_token)
+        url = "https://#{shop}/admin/checkouts/#{checkout.id}/payments.json"
+        headers = {
+          "X-Shopify-Access-Token": "#{access_token}",
+          "X-Shopify-Checkout-Version": "2016-08-28",
+          "Content-Type": "application/json",
+          "Host": "#{shop}"
+        }
+
+        # unique_token is a unique token defined by us
+        payload = {
+          "payment": {
+            "amount": "#{checkout.total_price}",
+            "unique_token": "#{checkout.id}_" + Time.now.to_i.to_s,
+            "payment_token": {
+              "payment_data": "#{stripe_token.id}",
+              "type": "stripe_vault_token"
+            },
+            "request_details": {
+              "ip_address": ShopifyApp::Const::SERVER_DEPLOY_IP,
+              "accept_language": "en",
+              "user_agent": ShopifyApp::Const::USER_AGENT,
+            }
+          },
+        }.to_json
+
+        response = HTTParty.post(url, :body => payload, :headers => headers)
+        if response.code == 200
+          p response
+        else
+          Rails.logger.warn response
+        end
+      end
+
+      # Direct payment via Shopify
+      def submit_payment_by_shopify(shop, access_token, checkout, cc_session_id)
+        url = "https://#{shop}/admin/checkouts/#{checkout.id}/payments.json"
+        headers = {
+          "X-Shopify-Access-Token": "#{access_token}",
+          "X-Shopify-Checkout-Version": "2016-08-28",
+          "Content-Type": "application/json",
+          "Host": "#{shop}"
+        }
+
+        payload = {
+          "payment": {
+            "amount": "#{checkout.total_price}",
+            "unique_token": "#{checkout.id}_" + Time.now.to_i.to_s,
+            "session_id": "#{cc_session_id}",
+            "request_details": {
+              "ip_address": ShopifyApp::Const::SERVER_DEPLOY_IP,
+              "accept_language": "en",
+              "user_agent": ShopifyApp::Const::USER_AGENT,
+            }
+          },
+        }.to_json
+
+        response = HTTParty.post(url, :body => payload, :headers => headers)
+        if response.code == 200
+          p response
+        else
+          Rails.logger.warn response
+        end
+      end
+
+      # Submit card detail onto Shopify vault
+      def submit_card_to_vault(checkout, card)
+        url = "https://elb.deposit.shopifycs.com/sessions"
+        headers = {
+          "Content-Type": "application/json",
+          "Accept": "application/json"
+        }
+
+        payload = {
+          "payment": {
+            "amount": "#{checkout.total_price}",
+            "unique_token": "#{checkout.id}_" + Time.now.to_i.to_s,
+            "credit_card": {
+              "number": "#{card[:number]}",
+              "month": "#{card[:month]}",
+              "year": "#{card[:year]}",
+              "verification_value": "#{card[:cvc]}",
+              "first_name": "#{card[:first_name]}",
+              "last_name": "#{card[:last_name]}"
+            }
+          },
+        }.to_json
+
+        response = HTTParty.post(url, :body => payload, :headers => headers)
+        if response.code == 200
+          p response
+        else
+          Rails.logger.warn response
+        end
+      end
+
+      def retrieve_payment(shop, access_token, checkout, payment_id)
+        url = "https://#{shop}/admin/checkouts/#{checkout.id}/payments/#{payment_id}.json"
+        headers = {
+          "X-Shopify-Access-Token": "#{access_token}",
+          "X-Shopify-Checkout-Version": "2016-08-28",
+          "Content-Type": "application/json",
+          "Host": "#{shop}"
+        }
+
+        response = HTTParty.get(url, :headers => headers)
+        if response.code == 200
+          p response
+        else
+          Rails.logger.warn response
+        end
+      end
+
+      def polling_for_shipping(shop, access_token, checkout)
+        url = "https://#{shop}/admin/checkouts/#{checkout.id}/shipping_rates.json"
+        headers = {
+          "X-Shopify-Access-Token": "#{access_token}",
+          "Content-Type": "application/json",
+          "Host": "#{shop}"
+        }
+
+        try_again = true
+        while try_again
+          response = HTTParty.get(url, :headers => headers)
+          if response.code == 200
+            try_again = false
+            return response["shipping_rates"]
+          elsif response.code == 202
+            # Should retry when shipping_rate not ready
+            sleep 0.05
+          else
+            try_again = false
+            Rails.logger.warn response
+          end
+        end
+      end
+
+      def retrieve_checkout(shop, access_token, checkout)
+        url = "https://#{shop}/admin/checkouts/#{checkout.id}.json"
+        headers = {
+          "X-Shopify-Access-Token": "#{access_token}",
+          "Content-Type": "application/json",
+          "Host": "#{shop}"
+        }
+
+        response = HTTParty.get(url, :headers => headers)
+        if response.code == 200
+          p response
+        else
+          Rails.logger.warn response
+        end
+      end
+
+      def select_shipping_rate(shop, access_token, checkout, shipping_handle)
+        url = "https://#{shop}/admin/checkouts/#{checkout.id}.json"
+        headers = {
+          "X-Shopify-Access-Token": "#{access_token}",
+          "Content-Type": "application/json",
+          "Host": "#{shop}"
+        }
+
+        payload = {
+          "checkout": {
+            "token": "#{checkout.id}",
+            "shipping_line": {
+              "handle": "#{shipping_handle}"
+            }
+          }
+        }.to_json
+
+        response = HTTParty.patch(url, :headers => headers, :body => payload)
+        if response.code == 200
+          p response
         else
           Rails.logger.warn response
         end

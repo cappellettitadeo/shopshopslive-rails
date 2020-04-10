@@ -14,7 +14,7 @@ gem 'rubyfish'
 #respond_to has been extracted to the responders gem
 gem 'responders'
 #The Shopify API gem allows Ruby developers to programmatically access the admin section of Shopify stores.
-gem 'shopify_api'
+gem 'shopify_api', '5.1.0'
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails', '~> 5.1.5'
 # Use postgres as the database for Active Record
@@ -25,6 +25,8 @@ gem 'puma', '~> 3.7'
 # gem 'jbuilder', '~> 2.5'
 # Use Redis adapter to run Action Cable in production
 gem 'redis', '~> 4.0'
+# Use Stripe to do payment
+gem 'stripe'
 # Use ActiveModel has_secure_password
 # gem 'bcrypt', '~> 3.1.7'
 

@@ -91,6 +91,8 @@ ActiveRecord::Schema.define(version: 20181002135249) do
     t.string "name"
     t.string "file"
     t.string "target_type"
+    t.string "image_id"
+    t.integer "is_cover" , default: 0
     t.integer "target_id"
     t.string "photo_type"
     t.integer "position"
@@ -101,6 +103,7 @@ ActiveRecord::Schema.define(version: 20181002135249) do
     t.string "source_url"
     t.index ["position"], name: "index_photos_on_position"
     t.index ["source_url"], name: "index_photos_on_source_url"
+    t.index ["image_id"], name: "index_photos_on_image_id"
     t.index ["target_type", "target_id"], name: "index_photos_on_target_type_and_target_id"
   end
 
@@ -121,6 +124,7 @@ ActiveRecord::Schema.define(version: 20181002135249) do
     t.string "ctr_sku_id"
     t.string "source_id"
     t.string "source_sku"
+    t.string "image_id"
     t.float "original_price"
     t.float "price"
     t.boolean "discounted", default: false
@@ -139,6 +143,7 @@ ActiveRecord::Schema.define(version: 20181002135249) do
     t.index ["ctr_sku_id"], name: "index_product_variants_on_ctr_sku_id"
     t.index ["product_id"], name: "index_product_variants_on_product_id"
     t.index ["source_id"], name: "index_product_variants_on_source_id"
+    t.index ["image_id"], name: "index_product_variants_on_image_id"
   end
 
   create_table "products", force: :cascade do |t|

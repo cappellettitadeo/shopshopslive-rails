@@ -7,9 +7,10 @@ class PhotoUploader < CarrierWave::Uploader::Base
   include CarrierWave::MiniMagick
   include Cloudinary::CarrierWave
 
-   CarrierWave.configure do |config|
-     config.cache_storage = :file
-    end
+
+  CarrierWave.configure do |config|
+   config.cache_storage = :file
+  end
 
   process :eager => true
   process :use_filename => true

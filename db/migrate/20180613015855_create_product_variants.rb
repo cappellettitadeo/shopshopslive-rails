@@ -4,6 +4,7 @@ class CreateProductVariants < ActiveRecord::Migration[5.1]
       t.string :name
       t.integer :product_id
       t.string :ctr_sku_id
+      t.string :image_id
       t.integer :source_id
       t.string :source_sku
       t.float :original_price
@@ -23,5 +24,6 @@ class CreateProductVariants < ActiveRecord::Migration[5.1]
     end
     add_index :product_variants, :product_id
     add_index :product_variants, :source_id
+    add_index :product_variants, :image_id
   end
 end

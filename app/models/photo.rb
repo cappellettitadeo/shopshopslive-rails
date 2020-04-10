@@ -8,7 +8,7 @@ class Photo < ApplicationRecord
 
   audited
 
-  def self.compose(target, photo_type, photo_url, width = nil, height = nil, position = nil)
+  def self.compose(target, photo_type, photo_url, width = nil, height = nil, position = nil, id = nil, is_cover = 0)
     changed = false
     photo = Photo.where(source_url: photo_url, target: target).first_or_initialize
     if photo.new_record?
@@ -18,6 +18,8 @@ class Photo < ApplicationRecord
       photo.width = width
       photo.height = height
       photo.position = position
+      photo.image_id = id
+      photo.is_cover = is_cover
       changed = true if photo.changed?
       photo.save
       changed

@@ -24,12 +24,14 @@ class Category < ApplicationRecord
       cat.save
 
       # 2. Create/Update Sub-categories
-      category[:sub_categories].each do |sub|
-        sub_cat = Category.where(ctr_category_id: sub[:id], level: 2).first_or_create
-        sub_cat.name_en = sub[:name_en].downcase
-        sub_cat.name = sub[:name].downcase
-        sub_cat.parent_id = cat.id
-        sub_cat.save
+      if category[:sub_count] > 0
+          category[:sub_categories].each do |sub|
+            sub_cat = Category.where(ctr_category_id: sub[:id], level: 2).first_or_create
+            sub_cat.name_en = sub[:name_en].downcase
+            sub_cat.name = sub[:name].downcase
+            sub_cat.parent_id = cat.id
+            sub_cat.save
+          end
       end
       cat
     end

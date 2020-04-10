@@ -106,7 +106,7 @@ class Product < ApplicationRecord
       # 4. Save all product photos to DB
       if object.photos.present?
         object.photos.each do |photo|
-          photo_updated = Photo.compose(product, 'product', photo.src, photo.width, photo.height, photo.position)
+          photo_updated = Photo.compose(product, 'product', photo.src, photo.width, photo.height, photo.position, photo.id, photo.is_cover)
           # 4.1 Set changed to true if any photo has been updated
           changed = true if photo_updated
         end
