@@ -62,9 +62,9 @@ class Scrapers::Shopify::Result < Scrapers::Result
         new_images = []
         product.images.each do |item|
           item[:is_cover] = 0
-          if product.image.present? && item[:id] == product.image[:id]
-            item[:is_cover] = 1
-          end
+          # if product.image.present? && item[:id] == product.image[:id]
+          #   item[:is_cover] = 1
+          # end
           new_images.push(item)
         end
         @photos = new_images
