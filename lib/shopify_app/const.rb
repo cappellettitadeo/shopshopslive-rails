@@ -11,7 +11,7 @@ module ShopifyApp
       last_name: 'Sales'
     }
     #TODO Email needs to be set by shopshops
-    ACCOUNT_EMAIL ||= 'lisonglin@shopshops.com.cn'
+    ACCOUNT_EMAIL ||= 'liyiawu@shopshops.com.cn'
     EVENTS_TOPICS ||= {
         :product_listings => %w(add remove update),
         :shop => %w(update),
