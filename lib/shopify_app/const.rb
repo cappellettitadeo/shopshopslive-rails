@@ -4,13 +4,14 @@ module ShopifyApp
     API_SECRET ||= ENV['SHOPIFY_API_SECRET']
     BASE_URL ||= ENV['BASE_URL']
     APP_URL ||= "#{BASE_URL}/shopify_app"
-    SCOPE ||= %w(read_product_listings write_draft_orders write_products write_customers write_orders write_inventory write_shipping write_checkouts unauthenticated_write_checkouts unauthenticated_write_customers read_shopify_payments_payouts)
+    #SCOPE ||= %w(read_product_listings write_draft_orders write_products write_customers write_orders write_inventory write_shipping write_checkouts unauthenticated_write_checkouts unauthenticated_write_customers read_shopify_payments_payouts)
+    SCOPE ||= %w(read_product_listings write_draft_orders)
     CUSTOMER_INFO ||= {
       first_name: 'ShopShops',
       last_name: 'Sales'
     }
     #TODO Email needs to be set by shopshops
-    ACCOUNT_EMAIL ||= 'xiaolu.z@shopshops.com.cn'
+    ACCOUNT_EMAIL ||= 'lisonglin@shopshops.com.cn'
     EVENTS_TOPICS ||= {
         :product_listings => %w(add remove update),
         :shop => %w(update),
