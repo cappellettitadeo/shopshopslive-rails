@@ -217,7 +217,7 @@ module ShopifyApp
       def instantiate_session(myshopify_domain, token)
         ShopifyAPI::Base.clear_session
         ShopifyAPI::Session.setup(api_key: ShopifyApp::Const::API_KEY, secret: ShopifyApp::Const::API_SECRET)
-        session = ShopifyAPI::Session.new(myshopify_domain, token)
+        session = ShopifyAPI::Session.new(domain: myshopify_domain, token: token, api_version: '2020-07')
         ShopifyAPI::Base.activate_session(session)
       end
 
