@@ -5,6 +5,9 @@ class Order < ApplicationRecord
 
   scope :paid, -> { where(status: 'paid').order('created_at DESC') }
 
+  before_create :generate_confirmation_id
+  before_save :calculate_price, if: Proc.new { |p| !p.override_price }
+
   STATUS = %w(submitted paid partially_paid refunded refunding fulfilled delivered closed)
 
   def refundable?
@@ -61,14 +64,13 @@ class Order < ApplicationRecord
     loop do
       date = Time.now.strftime("%Y%m%d%H%M%S%2N")
       con_id = 'E' + date + SecureRandom.random_number(100000..999999).to_s
-      break con_id unless Purchase.find_by_confirmation_id(con_id)
+      break con_id unless Order.find_by_confirmation_id(con_id)
     end
     self.confirmation_id = con_id
   end
 
   def calculate_price
     price = line_items.joins(:product_variant).sum("product_variants.price * line_items.quantity")
-    self.origin_price = price
     self.subtotal_price = price
     self.total_price = price + shipping_fee.to_f + tax.to_f
   end
