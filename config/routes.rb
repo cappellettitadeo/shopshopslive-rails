@@ -41,10 +41,10 @@ Rails.application.routes.draw do
         post :callback
       end
     end
-    resources :inventory do
-    end
-
+    resources :inventory
+    resources :users
   end
+
 
   resources :shopify_app do
     collection do
@@ -54,5 +54,4 @@ Rails.application.routes.draw do
       get :welcome
     end
   end
-
 end

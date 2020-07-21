@@ -35,7 +35,6 @@ module ShopshopsHub
     config.middleware.use ActionDispatch::Session::CookieStore
     config.session_store :cookie_store
     config.middleware.use Rack::MethodOverride
-    config.i18n.default_locale = "zh-CN"
     config.active_record.belongs_to_required_by_default = false
     config.time_zone = 'Beijing'
 
