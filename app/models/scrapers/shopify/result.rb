@@ -79,11 +79,7 @@ class Scrapers::Shopify::Result < Scrapers::Result
 
   def source_id
     unless @source_id
-      if product.product_id
-        @source_id = product.product_id
-      else
-        @source_id = product.id if product.id
-      end
+      @source_id = product.id
     end
     @source_id
   end
