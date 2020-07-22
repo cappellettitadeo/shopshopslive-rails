@@ -1,14 +1,24 @@
 class Order < ApplicationRecord
   belongs_to :user
+  belongs_to :shipping_address
 
   has_many :line_items
 
   scope :paid, -> { where(status: 'paid').order('created_at DESC') }
 
   before_create :generate_confirmation_id
-  before_save :calculate_price, if: Proc.new { |p| !p.override_price }
+  before_save :calculate_price
 
   STATUS = %w(submitted paid partially_paid refunded refunding fulfilled delivered closed)
+
+  def generate_order_with_shopify
+    # 1. Request Shopify create order API
+    self.status = 'paid'
+    self.currency = 'USD'
+    self.shipping_method = ''
+    self.completed_at = Time.now
+    self.save
+  end
 
   def refundable?
     %w[paid partially_paid fulfilled delivered closed].include?(status)
@@ -63,7 +73,7 @@ class Order < ApplicationRecord
     con_id = nil
     loop do
       date = Time.now.strftime("%Y%m%d%H%M%S%2N")
-      con_id = 'E' + date + SecureRandom.random_number(100000..999999).to_s
+      con_id = 'S' + date + SecureRandom.random_number(100000..999999).to_s
       break con_id unless Order.find_by_confirmation_id(con_id)
     end
     self.confirmation_id = con_id

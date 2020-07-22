@@ -45,7 +45,7 @@ module ShopifyApp
           draft_order: {
             line_items: items
           },
-          customer: { id:  }
+          customer: { id: 1 },
           use_customer_default_address: true
         }
         response = HTTParty.post(url, body: payload)

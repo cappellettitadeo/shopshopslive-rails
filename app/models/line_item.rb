@@ -33,4 +33,12 @@ class LineItem < ApplicationRecord
   def update_order
     order.save if order
   end
+
+  def created_at_formatted
+    created_at.strftime("%Y-%m-%d %H:%M:%S")
+  end
+
+  def updated_at_formatted
+    updated_at.strftime("%Y-%m-%d %H:%M:%S")
+  end
 end

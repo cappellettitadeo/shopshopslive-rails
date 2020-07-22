@@ -43,6 +43,8 @@ Rails.application.routes.draw do
     end
     resources :inventory
     resources :users
+    resources :orders do
+    end
   end
 
 

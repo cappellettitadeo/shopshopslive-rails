@@ -9,6 +9,6 @@ class ShippingAddress < ApplicationRecord
   end
 
   def address_with_name
-    address + " #{name} #{phone}"
+    address + " #{full_name} #{phone}"
   end
 end

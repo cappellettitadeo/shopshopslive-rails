@@ -26,7 +26,7 @@ class Api::UsersController < ApiController
       hash = UserSerializer.new(user).serializable_hash
       render json: hash, status: :ok
     else
-      render json: { ec: 400, em: "请输入手机号" }, status: :not_found
+      render json: { ec: 400, em: "请输入手机号" }, status: :bad_request
     end
   end
 
