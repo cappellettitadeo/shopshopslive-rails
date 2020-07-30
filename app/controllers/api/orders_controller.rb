@@ -1,18 +1,35 @@
 class Api::OrdersController < ApiController
+  def index
+    page = params[:page] || 1
+    if Order::STATUS.include?(params[:status])
+      orders = Order.where(status: params[:status]).page(page)
+      count = orders.total_count
+      json = OrderSerializer.new(orders).serializable_hash[:data]
+      render json: { data: json, count: count, current_page: page }, status: :ok
+    else
+      render json: { ec: 400, em: "Invalid Status" }, status: :bad_request
+    end
+  end
+
   def create
     if params[:order][:user_id].present?
       user = User.find_by_id params[:order][:user_id]
       if user
         # 1. Create an order
         order = Order.create user_id: params[:order][:user_id]
-        # 2. Update the address
+        # 2. Check if it's a draft order
+        if params[:order][:status] == 'draft'
+          order.status = 'draft'
+          order.save
+        end
+        # 3. Update the address
         address = user.shipping_addresses.where(id: params[:order][:shipping_address_id]).first
         if address
           order.update_attributes(shipping_address_id: params[:order][:shipping_address_id])
         else
           render json: { ec: 404, em: "无法找到ShippingAddress" }, status: :not_found and return
         end
-        # 3. Create line items
+        # 4. Create line items
         if params[:order][:line_items].present?
           items = params[:order][:line_items]
           items.each do |li|
@@ -25,7 +42,7 @@ class Api::OrdersController < ApiController
           render json: { ec: 400, em: "line_items缺失" }, status: :bad_requst and return
         end
         order.save
-        # 4. Generate order with shopify
+        # 5. Generate order with shopify
         begin
           order.generate_order_with_shopify
         rescue => e
@@ -41,11 +58,20 @@ class Api::OrdersController < ApiController
     end
   end
 
+  def confirm_payment
+    order = Order.find_by_id params[:id]
+    if order
+      render json: hash, status: :ok
+    else
+      render json: { ec: 404, em: "无法找到该用户" }, status: :not_found
+    end
+  end
+
   def update
     order = Order.find_by_id params[:id]
     if order
       order.update_attributes(order_params)
-      hash = UserSerializer.new(user).serializable_hash
+      hash = OrderSerializer.new(order).serializable_hash
       render json: hash, status: :ok
     else
       render json: { ec: 404, em: "无法找到该用户" }, status: :not_found

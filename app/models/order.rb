@@ -1,4 +1,6 @@
 class Order < ApplicationRecord
+  paginates_per 20
+
   belongs_to :user
   belongs_to :shipping_address
 

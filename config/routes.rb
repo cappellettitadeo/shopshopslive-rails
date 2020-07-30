@@ -44,6 +44,9 @@ Rails.application.routes.draw do
     resources :inventory
     resources :users
     resources :orders do
+      member do
+        post :confirm_payment
+      end
     end
   end
 
