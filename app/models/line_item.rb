@@ -6,6 +6,10 @@ class LineItem < ApplicationRecord
   after_save :update_order
   after_destroy :update_order
 
+  def suborder
+    Order.find_by_id(suborder_id) if suborder_id
+  end
+
   def name
     product.name if product
   end

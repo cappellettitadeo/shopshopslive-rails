@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20200722074222) do
+ActiveRecord::Schema.define(version: 20200802064640) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -87,6 +87,8 @@ ActiveRecord::Schema.define(version: 20200722074222) do
     t.string "name"
     t.string "color"
     t.integer "size_id"
+    t.integer "suborder_id"
+    t.index ["suborder_id"], name: "index_line_items_on_suborder_id"
   end
 
   create_table "options", force: :cascade do |t|
@@ -117,7 +119,14 @@ ActiveRecord::Schema.define(version: 20200722074222) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "confirmation_id"
+    t.integer "order_type", default: 0
+    t.integer "master_order_id"
+    t.integer "store_id"
+    t.boolean "draft", default: false
+    t.string "source_id"
+    t.string "ctr_source_id"
     t.index ["confirmation_id"], name: "index_orders_on_confirmation_id"
+    t.index ["master_order_id"], name: "index_orders_on_master_order_id"
     t.index ["status"], name: "index_orders_on_status"
     t.index ["user_id"], name: "index_orders_on_user_id"
   end
@@ -222,6 +231,7 @@ ActiveRecord::Schema.define(version: 20200722074222) do
     t.integer "source_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "zip"
     t.index ["source_id"], name: "index_shipping_addresses_on_source_id"
     t.index ["user_id"], name: "index_shipping_addresses_on_user_id"
   end
@@ -301,6 +311,8 @@ ActiveRecord::Schema.define(version: 20200722074222) do
     t.string "slug"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "source_id"
+    t.string "ctr_source_id"
     t.index ["email"], name: "index_users_on_email"
     t.index ["phone"], name: "index_users_on_phone"
   end

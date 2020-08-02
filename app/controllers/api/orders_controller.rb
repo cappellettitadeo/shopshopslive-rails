@@ -19,24 +19,48 @@ class Api::OrdersController < ApiController
         order = Order.create user_id: params[:order][:user_id]
         # 2. Check if it's a draft order
         if params[:order][:status] == 'draft'
-          order.status = 'draft'
+          order.draft = true
           order.save
         end
         # 3. Update the address
-        address = user.shipping_addresses.where(id: params[:order][:shipping_address_id]).first
-        if address
-          order.update_attributes(shipping_address_id: params[:order][:shipping_address_id])
+        if params[:order][:shipping_address_id]
+          address = user.shipping_addresses.where(id: params[:order][:shipping_address_id]).first
+        elsif params[:order][:shipping_address]
+          address = user.shipping_addresses.create(shipping_address_params)
+        end
+        if address.id
+          order.update_attributes(shipping_address_id: address.id)
         else
-          render json: { ec: 404, em: "无法找到ShippingAddress" }, status: :not_found and return
+          render json: { ec: 404, em: address.errors.full_messages[0] }, status: :not_found and return
         end
         # 4. Create line items
         if params[:order][:line_items].present?
           items = params[:order][:line_items]
+          store_ids = []
           items.each do |li|
             pv = ProductVariant.where(ctr_sku_id: li[:variant_id]).first
             if pv
-              order.line_items.create(product_id: pv.product_id, product_variant_id: pv.id, quantity: li[:quantity], name: pv.name, price: pv.price, color: pv.color, size_id: pv.size_id)
+              item = LineItem.create(order_id: order.id, product_id: pv.product_id, product_variant_id: pv.id,
+                                      quantity: li[:quantity], name: pv.name, price: pv.price, color: pv.color, size_id: pv.size_id)
+              s_id = pv.product.store_id
+              # Check if all items are from 1 store or multiple stores
+              if store_ids.empty?
+                store_ids << s_id
+                order.store_id = s_id
+                order.save
+              elsif !store_ids.include?(s_id)
+                # If the store id is not in the store_ids, it means this items is from another store
+                # Then create a suborder
+                store_ids << s_id
+                s_order = Order.create(master_order_id: order.id, order_type: 1, store_id: s_id)
+                item.update_attributes(suborder_id: s_order.id)
+              end
             end
+          end
+          # If store_ids is > 1, it means there are multiple stores
+          # Create a suborder for the first line item
+          if store_ids.size > 1
+            Order.create(master_order_id: order.id, order_type: 1, store_id: store_ids.first)
           end
         else
           render json: { ec: 400, em: "line_items缺失" }, status: :bad_requst and return
@@ -61,9 +85,19 @@ class Api::OrdersController < ApiController
   def confirm_payment
     order = Order.find_by_id params[:id]
     if order
-      render json: hash, status: :ok
+      if !order.status.nil?
+        render json: { ec: 400, em: "订单无法被完成，status: #{order.status}" }, status: :bad_request
+      else
+        begin
+          order.complete
+        rescue => e
+          render json: { ec: 400, em: e.message }, status: :bad_request and return
+        end
+        hash = OrderSerializer.new(order).serializable_hash
+        render json: hash, status: :ok
+      end
     else
-      render json: { ec: 404, em: "无法找到该用户" }, status: :not_found
+      render json: { ec: 404, em: "无法找到该订单" }, status: :not_found
     end
   end
 
@@ -94,6 +128,10 @@ class Api::OrdersController < ApiController
   end
 
   def line_item_params
-    params.require(:order).permit(:product_id, :product_variant_id, :quantity)
+    params.require(:line_item).permit(:product_id, :product_variant_id, :quantity)
+  end
+
+  def shipping_address_params
+    params.require(:order).require(:shipping_address).permit(:address1, :address2, :city, :province, :country, :zip, :first_name, :last_name, :phone)
   end
 end

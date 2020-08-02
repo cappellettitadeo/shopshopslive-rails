@@ -2,6 +2,7 @@ class Order < ApplicationRecord
   paginates_per 20
 
   belongs_to :user
+  belongs_to :store
   belongs_to :shipping_address
 
   has_many :line_items
@@ -12,11 +13,72 @@ class Order < ApplicationRecord
   before_save :calculate_price
 
   STATUS = %w(submitted paid partially_paid refunded refunding fulfilled delivered closed)
+  # 0: Master order
+  # 1: Suborder - for different stores
+  TYPE = [0, 1]
+
+  def suborders
+    order_type == 0 && Order.where(master_order_id: id)
+  end
+
+  def line_items
+    if order_type == 0
+      LineItem.where(order_id: id)
+    elsif order_type == 1 
+      LineItem.where(suborder_id: id)
+    end
+  end
+
+  def master_order
+    order_type == 1 && Order.find_by_id(master_order_id)
+  end
+
+  def complete
+    if draft
+      if suborders.present?
+        suborders.each do |s|
+          s.complete_draft
+        end
+      else
+        self.complete_draft
+      end
+    else
+      if suborders.present?
+      else
+      end
+    end
+  end
+
+  def complete_draft
+    res = ShopifyApp::Order.complete_draft_order(store, self)
+    self.completed_at = res["completed_at"]
+    self.status = 'paid'
+    self.draft = false
+    self.invoice_url = res["invoice_url"]
+    # Replace draft order source_id with order source_id
+    self.source_id = res["order_id"]
+    self.save
+  end
 
   def generate_order_with_shopify
+    # 1. If there are suborders, create orders on shopify for each suborder
+    if suborders.present?
+      suborders.each do |s|
+      end
+    else
+      if draft
+        res = ShopifyApp::Order.create_draft_order(store, self)
+      else
+        res = ShopifyApp::Order.create_order(store, self)
+      end
+    end
     # 1. Request Shopify create order API
-    self.status = 'paid'
+    self.source_id = res['id']
+    #self.status = 'paid'
     self.currency = 'USD'
+    self.tax = res['total_tax']
+    self.total_price = res['total_price']
+    self.subtotal_price = res['subtotal_price']
     self.shipping_method = ''
     self.completed_at = Time.now
     self.save

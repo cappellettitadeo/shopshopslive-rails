@@ -45,7 +45,7 @@ Rails.application.routes.draw do
     resources :users
     resources :orders do
       member do
-        post :confirm_payment
+        put :confirm_payment
       end
     end
   end

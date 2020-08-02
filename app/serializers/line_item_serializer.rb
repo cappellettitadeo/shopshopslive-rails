@@ -3,10 +3,6 @@ class LineItemSerializer
 
   attributes :id, :product_id, :product_variant_id, :order_id, :quantity, :price, :name, :color
 
-  attribute :size do |l|
-    l.size.name if l.size
-  end
-
   attribute :created_at do |l|
     l.created_at_formatted
   end
