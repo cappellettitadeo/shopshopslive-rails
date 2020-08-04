@@ -60,6 +60,28 @@ class Order < ApplicationRecord
     self.save
   end
 
+  def refund(line_items)
+    if refundable?
+      res = ShopifyApp::Order.get_order(store, self)
+      # 1. Get line_item id from Shopify order
+      res["line_items"].each do |li|
+        item = line_items.where(product_variant_id: li["variant_id"], quantity: li["quantity"]).first
+        item.source_id = li["id"]
+        item.save
+      end
+      # 2. Refund line_items
+      res = ShopifyApp::Order.refund(store, self)
+    end
+  end
+
+  def refundable?
+    !['refunded', 'refunding', 'closed'].include?(status)
+  end
+
+  def sync_with_shopify
+    res = ShopifyApp::Order.get_order(store, self)
+  end
+
   def generate_order_with_shopify
     # 1. If there are suborders, create orders on shopify for each suborder
     if suborders.present?
@@ -80,7 +102,6 @@ class Order < ApplicationRecord
     self.total_price = res['total_price']
     self.subtotal_price = res['subtotal_price']
     self.shipping_method = ''
-    self.completed_at = Time.now
     self.save
   end
 

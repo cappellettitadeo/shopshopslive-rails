@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20200802064640) do
+ActiveRecord::Schema.define(version: 20200802142051) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -88,6 +88,7 @@ ActiveRecord::Schema.define(version: 20200802064640) do
     t.string "color"
     t.integer "size_id"
     t.integer "suborder_id"
+    t.string "source_id"
     t.index ["suborder_id"], name: "index_line_items_on_suborder_id"
   end
 
