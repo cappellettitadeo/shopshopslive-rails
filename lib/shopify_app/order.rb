@@ -163,7 +163,64 @@ module ShopifyApp
         end
       end
 
-      def refund(store, order)
+      def calculate_refund(store, order, line_items)
+        url = "https://#{store.source_url}/admin/api/#{API_VERSION}/orders/#{order.source_id}/refunds/calculate.json"
+        ShopifyApp::Utils.instantiate_session(store.source_url, store.source_token)
+        headers = {
+          "X-Shopify-Access-Token": store.source_token
+        }
+        items = []
+        line_items.each do |li|
+          items << { line_item_id: li.source_id, quantity: li.quantity, restock_type: 'no_restock'  }
+        end
+        payload = {
+          refund: {
+            refund_line_items: items,
+          }
+        }
+        res = HTTParty.post(url, body: payload, headers: headers)
+        Rails.logger.warn res
+        if res.code == 200
+          res["refund"]
+        else
+          raise "Shopify Error: " + res["errors"].to_s
+        end
+      end
+
+      def refund(store, order, line_items)
+        # 1. Calculate refund
+        res = calculate_refund(store, order, line_items)
+        new_trans = []
+        res["transactions"].each do |trans|
+          if trans["kind"] == 'suggested_refund' 
+            trans["kind"] = 'refund'  
+            new_trans << trans
+          end
+        end
+        if new_trans.present?
+          res["transactions"] = new_trans
+        else
+          raise "Shopify Error: " + res
+        end
+        # 2. use response for refund submission
+        url = "https://#{store.source_url}/admin/api/#{API_VERSION}/orders/#{order.source_id}/refunds.json"
+        ShopifyApp::Utils.instantiate_session(store.source_url, store.source_token)
+        headers = {
+          "X-Shopify-Access-Token": store.source_token
+        }
+        payload = {
+          refund: res
+        }
+        binding.pry
+        res = HTTParty.post(url, body: payload, headers: headers)
+        trans = res['transactions'].first
+        status = trans['status']
+        Rails.logger.warn res
+        if res.code == 201 && status == 'success'
+          res["refund"]
+        else
+          raise "Shopify Refund Error: " + trans['error_code']
+        end
       end
 
       def update_draft_order(store, check_out)

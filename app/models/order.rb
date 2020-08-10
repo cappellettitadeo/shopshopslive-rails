@@ -65,12 +65,32 @@ class Order < ApplicationRecord
       res = ShopifyApp::Order.get_order(store, self)
       # 1. Get line_item id from Shopify order
       res["line_items"].each do |li|
-        item = line_items.where(product_variant_id: li["variant_id"], quantity: li["quantity"]).first
-        item.source_id = li["id"]
-        item.save
+        pv = ProductVariant.where(source_id: li["variant_id"]).first
+        if pv
+          item = self.line_items.where(product_variant_id: pv.id, quantity: li["quantity"]).first
+          item.source_id = li["id"].to_s
+          item.save
+        end
       end
       # 2. Refund line_items
-      res = ShopifyApp::Order.refund(store, self)
+      suborder_ids = line_items.pluck(:suborder_id).compact.uniq
+      if suborder_ids.size >= 1
+        # If there is >= 1 suborder, use suborder for refund 
+        suborder_ids.each do |id|
+          items = line_items.where(suborder_id: id)
+          order = Order.find_by_id(id)
+          res = ShopifyApp::Order.refund(order.store, order, items)
+          # Update line item status
+          res['refund_line_items'].each do |ri|
+            li = line_items.where(source_id: ri['line_item_id'].to_s).first
+            li.status = 'refund'
+            li.source_refund_id = ri['id']
+            li.save
+          end
+        end
+      else
+        res = ShopifyApp::Order.refund(store, self, line_items)
+      end
     end
   end
 
