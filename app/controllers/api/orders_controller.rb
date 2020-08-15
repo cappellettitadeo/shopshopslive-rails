@@ -117,19 +117,31 @@ class Api::OrdersController < ApiController
     order = Order.find_by_id params[:id]
     if order
       if order.refundable?
-        ids = params[:line_item_ids]
-        items = order.line_items.where(id: ids)
-        if items.present?
-          begin
-            order.refund(items)
-          rescue => e
-            render json: { ec: 400, em: e.message }, status: :bad_request and return
+        # Check if line_item and quantity is right
+        ids = []
+        items = []
+        error = nil
+        params[:order][:line_items].each do |li|
+          item = order.line_items.where(id: li[:id]).first
+          if item.nil?
+            error = "无法找到对应line_item. ID: #{li[:id]}"
+            break
+          elsif item.quantity < li[:quantity]
+            error = '退款商品数量大于订单商品数量.ID: #{li[:id]}'
+            break
           end
-          hash = OrderSerializer.new(order).serializable_hash
-          render json: hash, status: :ok
-        else
-          render json: { ec: 404, em: "无法找到对应line_item" }, status: :not_found
+          items << [item, li[:quantity]]
         end
+        if error
+          render json: { ec: 400, em: error }, status: :bad_request and return
+        end
+        begin
+          order.refund(items)
+        rescue => e
+          render json: { ec: 400, em: e.message }, status: :bad_request and return
+        end
+        hash = OrderSerializer.new(order).serializable_hash
+        render json: hash, status: :ok
       else
         render json: { ec: 400, em: "该订单无法退款, status: #{order.status}" }, status: :bad_request
       end

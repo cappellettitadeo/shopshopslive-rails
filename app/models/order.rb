@@ -73,24 +73,47 @@ class Order < ApplicationRecord
         end
       end
       # 2. Refund line_items
-      suborder_ids = line_items.pluck(:suborder_id).compact.uniq
-      if suborder_ids.size >= 1
+      suborder_ids = []
+      line_items.each do |li|
+        item = li[0]
+        suborder_ids << item.suborder_id if item.suborder_id
+      end
+      if suborder_ids.uniq.size >= 1
         # If there is >= 1 suborder, use suborder for refund 
         suborder_ids.each do |id|
-          items = line_items.where(suborder_id: id)
+          items = line_items.select {|arr| arr[0].suborder_id == id }
           order = Order.find_by_id(id)
           res = ShopifyApp::Order.refund(order.store, order, items)
           # Update line item status
-          res['refund_line_items'].each do |ri|
-            li = line_items.where(source_id: ri['line_item_id'].to_s).first
-            li.status = 'refund'
-            li.source_refund_id = ri['id']
-            li.save
-          end
+          update_line_items(res,line_items)
+          update_order_status(order)
         end
       else
         res = ShopifyApp::Order.refund(store, self, line_items)
+        update_line_items(res, line_items)
+        update_order_status(self)
       end
+    end
+  end
+
+  def update_order_status(order)
+    order_li_size = order.line_items.size
+    if order_li_size == order.line_items.where(status: 'refunded').size
+      order.status = 'refunded' 
+    elsif order_li_size > order.line_items.where(status: 'refunded').size
+      order.status = 'partially_refunded' 
+    end
+    order.save
+  end
+
+  def update_line_items(res, line_items)
+    # Update line item status
+    res['refund_line_items'].each do |ri|
+      li = line_items.where(source_id: ri['line_item_id'].to_s).first
+      li.status = 'refund'
+      li.source_refund_id = ri['id']
+      binding.pry
+      li.save
     end
   end
 

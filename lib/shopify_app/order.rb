@@ -171,7 +171,9 @@ module ShopifyApp
         }
         items = []
         line_items.each do |li|
-          items << { line_item_id: li.source_id, quantity: li.quantity, restock_type: 'no_restock'  }
+          item = li[0]
+          quantity = li[1]
+          items << { line_item_id: item.source_id, quantity: quantity, restock_type: 'no_restock'  }
         end
         payload = {
           refund: {
