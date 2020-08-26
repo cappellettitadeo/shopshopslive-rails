@@ -124,7 +124,7 @@ class ProductVariant < ApplicationRecord
         option = product_variant.options.where(source_id: o.id.to_s).first_or_initialize
         if option.id.nil?
           option.name = o.name
-          option.value = o.value
+          option.value = o.values[0]
           option.save
         end
       end
