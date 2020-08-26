@@ -120,8 +120,8 @@ class ProductVariant < ApplicationRecord
     rescue => e
       # backward compatible
       variant.options.each do |o|
-        shopify_ids << o.option_id.to_s
-        option = product_variant.options.where(source_id: o.option_id.to_s).first_or_initialize
+        shopify_ids << o.id.to_s
+        option = product_variant.options.where(source_id: o.id.to_s).first_or_initialize
         if option.id.nil?
           option.name = o.name
           option.value = o.value
