@@ -9,7 +9,16 @@ class Scrapers::Shopify::Scraper < Scrapers::Scraper
     if myshopify_domain && access_token
       ShopifyApp::Utils.instantiate_session(myshopify_domain, access_token)
       # Call shopify API to fetch all products
-      products = ShopifyAPI::Product.find(:all, params: { limit: 250 })
+      begin
+        products = ShopifyAPI::Product.find(:all, params: { limit: 250 })
+      rescue => e
+        # Need to ask the store to re-auth
+        if e.message.match('403')
+          products = ShopifyAPI::ProductListing.find(:all, params: { limit: 250 })
+          process_products(store, products, scraper)
+          return
+        end
+      end
       process_products(store, products, scraper)
       while products.next_page?
         products = products.fetch_next_page
