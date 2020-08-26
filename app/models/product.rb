@@ -35,7 +35,7 @@ class Product < ApplicationRecord
     product.material = object.material
     product.store_id = object.store_id
     # TODO: Ctr app timeout
-    #product.vendor_id = object.vendor_id
+    product.vendor_id = object.vendor_id
     product.source_id = object.source_id
     product.available = true
 

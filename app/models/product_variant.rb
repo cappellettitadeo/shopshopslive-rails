@@ -77,41 +77,54 @@ class ProductVariant < ApplicationRecord
     product_variant.weight_unit = variant.weight_unit
     # Find or create the options
     shopify_ids = []
-    if variant.option1
-      variant.options.each do |option|
-        if option.values.include?(variant.option1.downcase)
-          name = option.name.downcase
-          id = option.id.to_s
-          shopify_ids << id
-          option = product_variant.options.where(source_id: id).first_or_initialize
-          option.name = name
-          option.value = variant.option1
-          option.save
+    begin
+      if variant.option1
+        variant.options.each do |option|
+          if option.values.include?(variant.option1.downcase)
+            name = option.name.downcase
+            id = option.id.to_s
+            shopify_ids << id
+            option = product_variant.options.where(source_id: id).first_or_initialize
+            option.name = name
+            option.value = variant.option1
+            option.save
+          end
         end
       end
-    end
-    if variant.option2
-      variant.options.each do |option|
-        if option.values.include?(variant.option2.downcase)
-          name = option.name.downcase
-          id = option.id.to_s
-          shopify_ids << id
-          option = product_variant.options.where(source_id: id).first_or_initialize
-          option.name = name
-          option.value = variant.option2
-          option.save
+      if variant.option2
+        variant.options.each do |option|
+          if option.values.include?(variant.option2.downcase)
+            name = option.name.downcase
+            id = option.id.to_s
+            shopify_ids << id
+            option = product_variant.options.where(source_id: id).first_or_initialize
+            option.name = name
+            option.value = variant.option2
+            option.save
+          end
         end
       end
-    end
-    if variant.option3
-      variant.options.each do |option|
-        if option.values.include?(variant.option3.downcase)
-          name = option.name.downcase
-          id = option.id.to_s
-          shopify_ids << id
-          option = product_variant.options.where(source_id: id).first_or_initialize
-          option.name = name
-          option.value = variant.option3
+      if variant.option3
+        variant.options.each do |option|
+          if option.values.include?(variant.option3.downcase)
+            name = option.name.downcase
+            id = option.id.to_s
+            shopify_ids << id
+            option = product_variant.options.where(source_id: id).first_or_initialize
+            option.name = name
+            option.value = variant.option3
+            option.save
+          end
+        end
+      end
+    rescue => e
+      # backward compatible
+      variant.options.each do |o|
+        shopify_ids << o.option_id.to_s
+        option = product_variant.options.where(source_id: o.option_id.to_s).first_or_initialize
+        if option.id.nil?
+          option.name = o.name
+          option.value = o.value
           option.save
         end
       end
