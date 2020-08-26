@@ -5,7 +5,7 @@ module ShopifyApp
     BASE_URL ||= ENV['BASE_URL']
     APP_URL ||= "#{BASE_URL}/shopify_app"
     #SCOPE ||= %w(read_product_listings write_draft_orders write_products write_customers write_orders write_inventory write_shipping write_checkouts unauthenticated_write_checkouts unauthenticated_write_customers read_shopify_payments_payouts)
-    SCOPE ||= %w(read_product_listings write_draft_orders)
+    SCOPE ||= %w(read_product_listings read_products write_customers read_shipping write_checkouts write_orders write_draft_orders write_fulfillments)
     CUSTOMER_INFO ||= {
       first_name: 'ShopShops',
       last_name: 'Sales'

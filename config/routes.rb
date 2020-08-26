@@ -41,10 +41,16 @@ Rails.application.routes.draw do
         post :callback
       end
     end
-    resources :inventory do
+    resources :inventory
+    resources :users
+    resources :orders do
+      member do
+        put :confirm_payment
+        put :refund
+      end
     end
-
   end
+
 
   resources :shopify_app do
     collection do
@@ -54,5 +60,4 @@ Rails.application.routes.draw do
       get :welcome
     end
   end
-
 end

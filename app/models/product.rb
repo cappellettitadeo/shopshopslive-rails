@@ -34,7 +34,8 @@ class Product < ApplicationRecord
     product.product_type = object.product_type
     product.material = object.material
     product.store_id = object.store_id
-    product.vendor_id = object.vendor_id
+    # TODO: Ctr app timeout
+    #product.vendor_id = object.vendor_id
     product.source_id = object.source_id
     product.available = true
 
@@ -126,7 +127,7 @@ class Product < ApplicationRecord
     access_token = store.source_token
     ShopifyApp::Utils.instantiate_session(shop_domain, access_token)
     #update product and variant
-    product_listing = ShopifyAPI::ProductListing.find(source_id)
+    product_listing = ShopifyAPI::Product.find(source_id)
     ShopifyCreateProductWorker.new.perform(store, product_listing, nil)
   end
 

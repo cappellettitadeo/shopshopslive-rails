@@ -150,6 +150,7 @@ module CentralApp
           Utils.list_all('brands', url)
         end
 
+        # TODO: Not working
         def query(keyword)
           url = Const.vendor_query_url
           Utils.query(keyword, url)

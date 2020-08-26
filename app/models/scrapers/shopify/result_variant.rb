@@ -22,7 +22,7 @@ class Scrapers::Shopify::ResultVariant < Scrapers::Result
 
   def color
     unless @color
-      if variant.option_values.present?
+      if defined?(variant.option_values) && variant.option_values.present?
         variant.option_values.each do |option|
           if option.name.downcase == "color"
             @color = option.value
@@ -59,6 +59,18 @@ class Scrapers::Shopify::ResultVariant < Scrapers::Result
     @inventory ||= variant.inventory_quantity
   end
 
+  def option1
+    @option1 ||= variant.option1
+  end
+
+  def option2
+    @option2 ||= variant.option2
+  end
+
+  def option3
+    @option3 ||= variant.option3
+  end
+
   def name
     @name ||= variant.title
   end
@@ -87,7 +99,7 @@ class Scrapers::Shopify::ResultVariant < Scrapers::Result
     unless @size_id
       position = nil
       size = nil
-      if variant.option_values.present?
+      if defined?(variant.option_values) && variant.option_values.present?
         variant.option_values.each do |option|
           if option.name.downcase == "size"
             size = option.value
@@ -113,7 +125,7 @@ class Scrapers::Shopify::ResultVariant < Scrapers::Result
   end
 
   def options
-    variant.option_values
+    product.options
   end
 
   def updated_at

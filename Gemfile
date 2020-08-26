@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-ruby '2.3.1'
+ruby '2.5.1'
 
 git_source(:github) do |repo_name|
   repo_name = "#{repo_name}/#{repo_name}" unless repo_name.include?("/")
@@ -14,7 +14,7 @@ gem 'rubyfish'
 #respond_to has been extracted to the responders gem
 gem 'responders'
 #The Shopify API gem allows Ruby developers to programmatically access the admin section of Shopify stores.
-gem 'shopify_api', '5.1.0'
+gem 'shopify_api'
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails', '~> 5.1.5'
 # Use postgres as the database for Active Record

@@ -9,12 +9,20 @@ class Scrapers::Shopify::Scraper < Scrapers::Scraper
     if myshopify_domain && access_token
       ShopifyApp::Utils.instantiate_session(myshopify_domain, access_token)
       # Call shopify API to fetch all products
-      products = ShopifyAPI::ProductListing.find(:all)
-      if products.present?
-        # Call worker to create products
-        products.each do |product|
-          ShopifyCreateProductWorker.new.perform(store, product, scraper)
-        end
+      products = ShopifyAPI::Product.find(:all, params: { limit: 250 })
+      process_products(store, products, scraper)
+      while products.next_page?
+        products = products.fetch_next_page
+        process_products(store, products, scraper)
+      end
+    end
+  end
+
+  def process_products(store, products, scraper)
+    if products.present?
+      # Call worker to create products
+      products.each do |product|
+        ShopifyCreateProductWorker.new.perform(store, product, scraper)
       end
     end
   end
