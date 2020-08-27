@@ -17,6 +17,8 @@ class Scrapers::Shopify::Scraper < Scrapers::Scraper
           products = ShopifyAPI::ProductListing.find(:all, params: { limit: 250 })
           process_products(store, products, scraper)
           return
+        elsif e.message.match('403')
+          return
         end
       end
       process_products(store, products, scraper)
