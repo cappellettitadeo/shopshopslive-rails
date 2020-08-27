@@ -22,7 +22,7 @@ class Scrapers::Shopify::Scraper < Scrapers::Scraper
         end
       end
       process_products(store, products, scraper)
-      while products.next_page?
+      while products.present? && products.next_page?
         products = products.fetch_next_page
         process_products(store, products, scraper)
       end
