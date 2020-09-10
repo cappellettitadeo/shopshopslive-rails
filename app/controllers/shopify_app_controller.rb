@@ -16,7 +16,7 @@ class ShopifyAppController < ApplicationController
   def install
     shop = request.params['shop']
     if shop
-      session = ShopifyAPI::Session.new(shop)
+      session = ShopifyAPI::Session.new(domain: shop, api_version: '2020-07', token: nil)
       permission_url = session.create_permission_url(ShopifyApp::Const::SCOPE, "#{ShopifyApp::Const::APP_URL}/auth")
       redirect_to permission_url
     end
