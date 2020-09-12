@@ -112,7 +112,6 @@ class Order < ApplicationRecord
       li = line_items.where(source_id: ri['line_item_id'].to_s).first
       li.status = 'refund'
       li.source_refund_id = ri['id']
-      binding.pry
       li.save
     end
   end

@@ -50,6 +50,7 @@ class Api::ProductsController < ApiController
 
       if store&.source_token
         topic = request.env['HTTP_X_SHOPIFY_TOPIC']
+        puts "Product Topic: #{topic}"
         if topic
           ShopifyApp::Utils.instantiate_session(shop, store.source_token)
           data_object = JSON.parse(data, object_class: OpenStruct)

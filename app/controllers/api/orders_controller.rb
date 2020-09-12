@@ -1,4 +1,7 @@
 class Api::OrdersController < ApiController
+  skip_before_action :authenticate_request, only: [:shopify_webhook]
+  before_action :check_variants, only: [:create]
+
   def index
     page = params[:page] || 1
     if Order::STATUS.include?(params[:status])
@@ -19,6 +22,7 @@ class Api::OrdersController < ApiController
         order = Order.create user_id: params[:order][:user_id]
         # 2. Check if it's a draft order
         if params[:order][:status] == 'draft'
+          order.status = 'submitted'
           order.draft = true
           order.save
         end
@@ -85,7 +89,7 @@ class Api::OrdersController < ApiController
   def confirm_payment
     order = Order.find_by_id params[:id]
     if order
-      if !order.status.nil?
+      if order.status != 'submitted'
         render json: { ec: 400, em: "订单无法被完成，status: #{order.status}" }, status: :bad_request
       else
         begin
@@ -160,7 +164,65 @@ class Api::OrdersController < ApiController
     end
   end
 
+  def shopify_webhook
+    # inspect hmac value in header and verify webhook
+    hmac = request.env['HTTP_X_SHOPIFY_HMAC_SHA256']
+
+    request.body.rewind
+    data = request.body.read
+
+    if ShopifyApp::Utils.webhook_ok?(hmac, data)
+      shop = request.env['HTTP_X_SHOPIFY_SHOP_DOMAIN']
+      store = Store.find_by(source_url: shop)
+
+      if store&.source_token
+        topic = request.env['HTTP_X_SHOPIFY_TOPIC']
+        puts "Order Topic: #{topic}"
+        if topic
+          ShopifyApp::Utils.instantiate_session(shop, store.source_token)
+          data_object = JSON.parse(data, object_class: OpenStruct)
+          case topic
+          when "app/uninstalled"
+            ShopifyApp::Webhook.app_uninstalled(store)
+          when "fulfillments/create", "fulfillments/update"
+            ShopifyApp::Webhook.fulfill(data_object)
+          when "orders/updated"
+            ShopifyApp::Webhook.order(data_object)
+          when "shop/update"
+            ShopifyApp::Webhook.shop_update(data_object)
+          when "product_listings/add", "product_listings/update"
+            ShopifyApp::Webhook.product_listings_add_or_update(store, data_object)
+          when "product_listings/remove"
+            ShopifyApp::Webhook.product_listings_remove(data_object)
+          else
+            logger.warn "topic handler not found"
+          end
+        else
+          logger.warn "header does not include topic"
+          render json: {ec: 400, em: "topic not provided"}, status: :bad_request and return
+        end
+        render json: {msg: 'Webhook notification received successfully.'}, status: :ok and return
+      end
+    end
+    render json: {ec: 403, em: "You're not authorized to perform this action."}, status: :forbidden
+  end
+
+
   private
+  def check_variants
+    if params[:order][:line_items].present?
+      items = params[:order][:line_items]
+      items.each do |li|
+        pv = ProductVariant.where(ctr_sku_id: li[:ctr_sku_id]).first
+        if pv.nil? || pv.product.nil? || pv.product.store.nil?
+          render json: { ec: 404, em: "无法找到ctr_sku_id: #{li[:ctr_sku_id]}" }, status: :not_found and return
+        elsif pv.inventory < li[:quantity]
+          render json: { ec: 400, em: "库存不足, ctr_sku_id: #{li[:ctr_sku_id]}" }, status: :bad_request and return
+        end
+      end
+    end
+  end
+  
   def order_params
     params.require(:order).permit(:user_id, :line_items, :shipping_address_id, :status, :currency, :shipping_method)
   end

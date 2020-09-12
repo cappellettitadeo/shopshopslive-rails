@@ -14,6 +14,11 @@ module ShopifyApp
     ACCOUNT_EMAIL ||= 'liyiawu@shopshops.com.cn'
     EVENTS_TOPICS ||= {
         :product_listings => %w(add remove update),
+        :draft_orders => %w(create update),
+        :fulfillments => %w(create update),
+        :orders => %w(create updated cancelled fulfilled paid partially_fulfilled),
+        :products => %w(create update delete),
+        :refunds => %w(create),
         :shop => %w(update),
         :app => %w(uninstalled)}
     USER_AGENT ||= 'Mozilla\/5.0 with ShopShops'

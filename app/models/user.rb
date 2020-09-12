@@ -4,10 +4,17 @@ class User < ApplicationRecord
   has_many :shipping_addresses, -> { order 'created_at DESC' }
   has_many :orders, -> { order 'created_at DESC' }
 
+  before_save :set_full_name
   after_create :set_slug
 
   def default_shipping_address
     shipping_addresses.where(default_address: true).first
+  end
+
+  def set_full_name
+    if full_name.nil? && first_name && last_name
+      self.full_name = "#{first_name} #{last_name}"
+    end
   end
 
   def set_slug

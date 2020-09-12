@@ -38,6 +38,10 @@ class LineItem < ApplicationRecord
     order.save if order
   end
 
+  def ctr_sku_id
+    product_variant.ctr_sku_id
+  end
+
   def created_at_formatted
     created_at.strftime("%Y-%m-%d %H:%M:%S")
   end

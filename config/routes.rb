@@ -44,6 +44,9 @@ Rails.application.routes.draw do
     resources :inventory
     resources :users
     resources :orders do
+      collection do
+        post :shopify_webhook
+      end
       member do
         put :confirm_payment
         put :refund

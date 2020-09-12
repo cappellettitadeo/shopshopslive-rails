@@ -49,6 +49,23 @@ module ShopifyApp
         SyncQueue.where(target: store).first_or_create if changed
       end
 
+      def fulfill(object)
+        order = ::Order.find_by_source_id(object.order_id)
+        if object.status == 'success' && order
+          order.tracking_url = object.tracking_url
+          order.shipping_status = object.shipping_status
+          order.status = 'fulfilled'
+          order.save
+        elsif object.status == 'cancelled' && order
+          order.tracking_url = nil
+          order.shipping_status = 'cancelled'
+          order.status = 'paid'
+          order.save
+        end
+      end
+
+      def order(object)
+      end
     end
   end
 end

@@ -213,7 +213,6 @@ module ShopifyApp
         payload = {
           refund: res
         }
-        binding.pry
         res = HTTParty.post(url, body: payload, headers: headers)
         trans = res['transactions'].first
         status = trans['status']
