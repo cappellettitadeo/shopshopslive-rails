@@ -171,7 +171,7 @@ module ShopifyApp
         }
         items = []
         line_items.each do |li|
-          item = li[0]
+          item = li[0].reload
           quantity = li[1]
           items << { line_item_id: item.source_id, quantity: quantity, restock_type: 'no_restock'  }
         end
@@ -214,7 +214,7 @@ module ShopifyApp
           refund: res
         }
         res = HTTParty.post(url, body: payload, headers: headers)
-        trans = res['transactions'].first
+        trans = res['refund']['transactions'].first
         status = trans['status']
         Rails.logger.warn res
         if res.code == 201 && status == 'success'

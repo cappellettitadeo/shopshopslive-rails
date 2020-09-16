@@ -60,17 +60,27 @@ class Order < ApplicationRecord
     self.save
   end
 
+  def update_line_item(order)
+    res = ShopifyApp::Order.get_order(order.store, order)
+    res["line_items"].each do |li|
+      pv = ProductVariant.where(source_id: li["variant_id"]).first
+      if pv
+        item = order.line_items.where(product_variant_id: pv.id, quantity: li["quantity"]).first
+        item.source_id = li["id"].to_s
+        item.save
+      end
+    end
+  end
+
   def refund(line_items)
     if refundable?
-      res = ShopifyApp::Order.get_order(store, self)
       # 1. Get line_item id from Shopify order
-      res["line_items"].each do |li|
-        pv = ProductVariant.where(source_id: li["variant_id"]).first
-        if pv
-          item = self.line_items.where(product_variant_id: pv.id, quantity: li["quantity"]).first
-          item.source_id = li["id"].to_s
-          item.save
+      if suborders.present?
+        suborders.each do |o|
+          update_line_item(o)
         end
+      else
+        update_line_item(self)
       end
       # 2. Refund line_items
       suborder_ids = []
@@ -117,34 +127,41 @@ class Order < ApplicationRecord
   end
 
   def refundable?
-    !['refunded', 'refunding', 'closed'].include?(status)
+    %w(paid partially_paid fulfilled delivered).include?(status)
   end
 
   def sync_with_shopify
-    res = ShopifyApp::Order.get_order(store, self)
+    ShopifyApp::Order.get_order(store, self)
   end
 
-  def generate_order_with_shopify
-    # 1. If there are suborders, create orders on shopify for each suborder
-    if suborders.present?
-      suborders.each do |s|
-      end
+  def process_order_with_shopify(order)
+    if order.draft
+      res = ShopifyApp::Order.create_draft_order(order.store, order)
+      self.status = 'submitted'
     else
-      if draft
-        res = ShopifyApp::Order.create_draft_order(store, self)
-      else
-        res = ShopifyApp::Order.create_order(store, self)
-      end
+      res = ShopifyApp::Order.create_order(order.store, order)
+      self.status = 'paid'
     end
-    # 1. Request Shopify create order API
     self.source_id = res['id']
-    #self.status = 'paid'
     self.currency = 'USD'
     self.tax = res['total_tax']
     self.total_price = res['total_price']
     self.subtotal_price = res['subtotal_price']
     self.shipping_method = ''
     self.save
+  end
+
+  def generate_order_with_shopify
+    # 1. If there are suborders, create orders on shopify for each suborder
+    if suborders.present?
+      suborders.each do |s|
+        process_order_with_shopify(s)
+      end
+      self.status = draft ? 'submitted' : 'paid' 
+      self.save
+    else
+      process_order_with_shopify(self)
+    end
   end
 
   def refundable?
