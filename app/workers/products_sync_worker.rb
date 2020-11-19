@@ -147,6 +147,8 @@ class ProductsSyncWorker
           retry
         end
       end
+      # Destroy this batch of items
+      items.destroy_all
     end
     # Clear the sync queue after the job is done
     #SyncQueue.products.destroy_all
