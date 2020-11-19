@@ -148,7 +148,7 @@ class ProductsSyncWorker
         end
       end
       # Destroy this batch of items
-      items.destroy_all
+      items.each {|i| i.delete}
     end
     # Clear the sync queue after the job is done
     #SyncQueue.products.destroy_all
