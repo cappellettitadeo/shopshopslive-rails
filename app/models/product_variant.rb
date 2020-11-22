@@ -80,7 +80,7 @@ class ProductVariant < ApplicationRecord
     begin
       if variant.option1
         variant.options.each do |option|
-          if option.values.include?(variant.option1.downcase)
+          if option.values.include?(variant.option1)
             name = option.name.downcase
             id = option.id.to_s
             shopify_ids << id
@@ -93,7 +93,7 @@ class ProductVariant < ApplicationRecord
       end
       if variant.option2
         variant.options.each do |option|
-          if option.values.include?(variant.option2.downcase)
+          if option.values.include?(variant.option2)
             name = option.name.downcase
             id = option.id.to_s
             shopify_ids << id
@@ -106,7 +106,7 @@ class ProductVariant < ApplicationRecord
       end
       if variant.option3
         variant.options.each do |option|
-          if option.values.include?(variant.option3.downcase)
+          if option.values.include?(variant.option3)
             name = option.name.downcase
             id = option.id.to_s
             shopify_ids << id
