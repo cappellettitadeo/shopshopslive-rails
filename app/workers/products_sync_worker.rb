@@ -131,7 +131,8 @@ class ProductsSyncWorker
             end
           end
         end
-      rescue
+      rescue => e
+        puts e.message
         retry_count += 1
         if retry_count == CentralApp::Const::MAX_NUM_OF_ATTEMPTS
           # TODO Temp disable airbrake
