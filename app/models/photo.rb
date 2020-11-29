@@ -13,7 +13,7 @@ class Photo < ApplicationRecord
     photo = Photo.where(source_url: photo_url, target: target).first_or_initialize
     if photo.new_record?
       photo.photo_type = photo_type
-      photo.remote_file_url = photo_url if photo_url
+      #photo.remote_file_url = photo_url if photo_url
       photo.source_url = photo_url
       photo.width = width
       photo.height = height
