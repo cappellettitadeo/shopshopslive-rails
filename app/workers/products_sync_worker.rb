@@ -23,13 +23,13 @@ class ProductsSyncWorker
       # 1.2 POST to Central System
       body = { count: vendors.count, brands: vendors_hash[:data] }.to_json
       puts "Vendors:"
-      puts body
+      #puts body
       retry_count = 0
       begin
         headers = CentralApp::Const.default_headers
         res = HTTParty.post(url, { headers: headers, body: body })
         puts "Res:"
-        puts res
+        #puts res
         parsed_json = JSON.parse(res.body).with_indifferent_access
         if parsed_json[:code] != 200
           raise res
@@ -67,13 +67,13 @@ class ProductsSyncWorker
       # 2.2 POST to Central System
       body = { count: stores.count, stores: stores_hash[:data] }.to_json
       puts "Stores:"
-      puts body
+      #puts body
       retry_count = 0
       begin
         headers = CentralApp::Const.default_headers
         res = HTTParty.post(url, { headers: headers, body: body })
         puts "Res:"
-        puts res
+        #puts res
         parsed_json = JSON.parse(res.body).with_indifferent_access
         if parsed_json[:code] != 200
           raise res
@@ -106,13 +106,13 @@ class ProductsSyncWorker
       products_hash = ProductSerializer.new(products).serializable_hash
       body = { count: products.count, products: products_hash[:data] }.to_json
       puts "Products:"
-      puts body
+      #puts body
       retry_count = 0
       begin
         headers = CentralApp::Const.default_headers
         res = HTTParty.post(url, { headers: headers, body: body })
         puts "Res:"
-        puts res
+        #puts res
         parsed_json = JSON.parse(res.body).with_indifferent_access
         if parsed_json[:code] != 200
           raise res
