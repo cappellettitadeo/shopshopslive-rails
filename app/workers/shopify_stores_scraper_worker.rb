@@ -17,11 +17,11 @@ class ShopifyStoresScraperWorker
       #end
     end
     #update expired product's availability to false
-    expired_products = Product.where('expires_at < ?', DateTime.now)
-    if expired_products.present?
-      expired_products.each do |expired_product|
-        expired_product.update(available: false)
-      end
-    end
+    #expired_products = Product.where('expires_at < ?', DateTime.now)
+    #if expired_products.present?
+    #  expired_products.each do |expired_product|
+    #    expired_product.update(available: false)
+    #  end
+    #end
   end
 end
