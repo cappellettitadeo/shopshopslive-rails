@@ -34,7 +34,7 @@ class Scrapers::Shopify::Scraper < Scrapers::Scraper
     if products.present?
       # Call worker to create products
       products.each do |product|
-        ShopifyCreateProductWorker.perform_async(store, product, scraper)
+        ShopifyCreateProductWorker.new.perform(store, product, scraper)
       end
     end
   end
