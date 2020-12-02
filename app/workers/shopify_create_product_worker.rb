@@ -4,6 +4,7 @@ class ShopifyCreateProductWorker
   def perform(store, product, scraper)
     product_result = Scrapers::Shopify::Result.new(store, product, scraper)
     product, changed = Product.create_or_update_from_shopify_object(product_result)
+    puts "Product created, ID: #{product.id}"
     # Add product to SyncQueue if either product, product_variant, product_photo
     # vendor or store has changed
     SyncQueue.where(target: product).first_or_create if changed
