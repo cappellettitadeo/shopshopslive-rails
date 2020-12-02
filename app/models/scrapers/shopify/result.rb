@@ -3,7 +3,7 @@ require 'central_app'
 class Scrapers::Shopify::Result < Scrapers::Result
   def initialize(store, product, scraper)
     @store = store
-    @product = product
+    @product = JSON.parse product
     @scraper = scraper
   end
 

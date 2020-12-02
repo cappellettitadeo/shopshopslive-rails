@@ -10,6 +10,7 @@ class Scrapers::Shopify::Scraper < Scrapers::Scraper
       ShopifyApp::Utils.instantiate_session(myshopify_domain, access_token)
       # Call shopify API to fetch all products
       begin
+        puts "Fetch products"
         products = ShopifyAPI::Product.find(:all, params: { limit: 250 })
       rescue => e
         # Need to ask the store to re-auth
