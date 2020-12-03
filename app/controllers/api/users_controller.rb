@@ -17,7 +17,7 @@ class Api::UsersController < ApiController
             country: (add[:country].present? ? add[:country] : 'CN'),
           }
           begin
-            user.shipping_addresses.create!(hash)
+            user.shipping_addresses.create!(hash) unless user.shipping_addresses.where(address1: add[:address1]).present?
           rescue => e
             render json: { ec: 400, em: e.message }, status: :bad_request and return
           end
