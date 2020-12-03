@@ -20,12 +20,16 @@ class AuthorizeApiRequest
 
   def decoded_auth_token
     @decoded_auth_token ||= JsonWebToken.decode(http_auth_header)
+    puts 'decode auth token'
+    puts @decoded_auth_token
   end
 
   def http_auth_header
+    puts headers['Authorization']
     if headers['Authorization'].present?
       return headers['Authorization'].split(' ').last
     else
+      puts 'miss token'
       errors.add(:token, 'Missing token')
     end
     nil
