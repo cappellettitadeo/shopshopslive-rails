@@ -14,9 +14,6 @@ class AuthorizeApiRequest
   attr_reader :headers
 
   def api_key
-    puts 'api_key:'
-    puts decoded_auth_token
-    puts decoded_auth_token[:api_key]
     @api_key ||= ApiKey.find_by_key(decoded_auth_token[:api_key]) if decoded_auth_token
     puts '@api_key'
     puts @api_key
@@ -25,8 +22,6 @@ class AuthorizeApiRequest
 
   def decoded_auth_token
     @decoded_auth_token ||= JsonWebToken.decode(http_auth_header)
-    puts 'decode auth token'
-    puts @decoded_auth_token
     @decoded_auth_token
   end
 
@@ -35,7 +30,6 @@ class AuthorizeApiRequest
     if headers['Authorization'].present?
       return headers['Authorization'].split(' ').last
     else
-      puts 'miss token'
       errors.add(:token, 'Missing token')
     end
     nil
