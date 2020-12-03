@@ -15,6 +15,7 @@ class AuthorizeApiRequest
 
   def api_key
     puts 'api_key:'
+    puts decoded_auth_token
     puts decoded_auth_token[:api_key]
     @api_key ||= ApiKey.find_by_key(decoded_auth_token[:api_key]) if decoded_auth_token
     puts '@api_key'
