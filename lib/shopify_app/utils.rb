@@ -235,11 +235,11 @@ module ShopifyApp
         ShopifyApp::Const::EVENTS_TOPICS.each do |event, topics|
           topics.each do |topic|
             new_topic = "#{event}/#{topic}"
-            #new_address = "#{ShopifyApp::Const::BASE_URL}/api/products/shopify_webhook"
-            if ['product_listings', 'products'].include?(event)
-              new_address = "https://3240edc77ed2.ngrok.io/api/products/shopify_webhook"
+            #new_address = "/api/products/shopify_webhook"
+            if ['product_listings', 'products', 'shop', 'app'].include?(event)
+              new_address = "#{ShopifyApp::Const::BASE_URL}/api/products/shopify_webhook"
             else
-              new_address = "https://3240edc77ed2.ngrok.io/api/orders/shopify_webhook"
+              new_address = "#{ShopifyApp::Const::BASE_URL}/api/orders/shopify_webhook"
             end
             #you may create as many webhooks as you want for each topic
             unless ShopifyAPI::Webhook.where(:topic => new_topic, :address => new_address).present?

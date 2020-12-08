@@ -44,7 +44,11 @@ class Api::ProductsController < ApiController
     request.body.rewind
     data = request.body.read
 
+    puts "hamc: #{hmac}"
+    puts "Domain: #{request.env['HTTP_X_SHOPIFY_SHOP_DOMAIN']}"
+    puts "Webhook: #{data}"
     if ShopifyApp::Utils.webhook_ok?(hmac, data)
+      puts "Webhook ok"
       shop = request.env['HTTP_X_SHOPIFY_SHOP_DOMAIN']
       store = Store.find_by(source_url: shop)
 
