@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20200911032950) do
+ActiveRecord::Schema.define(version: 20201208050748) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -337,6 +337,15 @@ ActiveRecord::Schema.define(version: 20200911032950) do
     t.string "name_en"
     t.index ["ctr_vendor_id"], name: "index_vendors_on_ctr_vendor_id"
     t.index ["name_en"], name: "index_vendors_on_name_en"
+  end
+
+  create_table "webhook_requests", force: :cascade do |t|
+    t.jsonb "res"
+    t.string "source"
+    t.string "domain"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["domain"], name: "index_webhook_requests_on_domain"
   end
 
 end

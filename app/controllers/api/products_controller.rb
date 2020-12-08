@@ -54,6 +54,7 @@ class Api::ProductsController < ApiController
         if topic
           ShopifyApp::Utils.instantiate_session(shop, store.source_token)
           data_object = JSON.parse(data, object_class: OpenStruct)
+          WebhookRequest.create(source: 'shopify', res: data_object, domain: shop)
           case topic
           when "app/uninstalled"
             ShopifyApp::Webhook.app_uninstalled(store)
