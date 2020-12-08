@@ -177,11 +177,11 @@ class Api::OrdersController < ApiController
 
       if store&.source_token
         topic = request.env['HTTP_X_SHOPIFY_TOPIC']
-        puts "Order Topic: #{topic}"
+        logger.warn "Order Topic: #{topic}"
         if topic
           ShopifyApp::Utils.instantiate_session(shop, store.source_token)
           data_object = JSON.parse(data, object_class: OpenStruct)
-          WebhookRequest.create(source: 'shopify', res: data_object, domain: shop)
+          WebhookRequest.create(source: 'shopify', res: data_object, domain: shop, topic: topic)
           case topic
           when "app/uninstalled"
             ShopifyApp::Webhook.app_uninstalled(store)

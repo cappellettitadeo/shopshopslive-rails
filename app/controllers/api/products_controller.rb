@@ -44,21 +44,19 @@ class Api::ProductsController < ApiController
     request.body.rewind
     data = request.body.read
 
-    puts "hamc: #{hmac}"
-    puts "Domain: #{request.env['HTTP_X_SHOPIFY_SHOP_DOMAIN']}"
-    puts "Webhook: #{data}"
+    logger.warn "Domain: #{request.env['HTTP_X_SHOPIFY_SHOP_DOMAIN']}"
+    logger.warn "Webhook: #{data}"
     if ShopifyApp::Utils.webhook_ok?(hmac, data)
-      puts "Webhook ok"
       shop = request.env['HTTP_X_SHOPIFY_SHOP_DOMAIN']
       store = Store.find_by(source_url: shop)
 
       if store&.source_token
         topic = request.env['HTTP_X_SHOPIFY_TOPIC']
-        puts "Product Topic: #{topic}"
+        logger.warn "Product Topic: #{topic}"
         if topic
           ShopifyApp::Utils.instantiate_session(shop, store.source_token)
           data_object = JSON.parse(data, object_class: OpenStruct)
-          WebhookRequest.create(source: 'shopify', res: data_object, domain: shop)
+          WebhookRequest.create(source: 'shopify', res: data_object, domain: shop, topic: topic)
           case topic
           when "app/uninstalled"
             ShopifyApp::Webhook.app_uninstalled(store)
