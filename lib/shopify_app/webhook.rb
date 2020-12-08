@@ -61,10 +61,10 @@ module ShopifyApp
           order.shipping_status = 'cancelled'
           order.status = 'paid'
           order.save
+        elsif object.status == 'refund' && order
+          order.status = 'refund'
+          order.save
         end
-      end
-
-      def order(object)
       end
     end
   end

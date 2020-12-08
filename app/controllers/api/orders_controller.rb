@@ -187,7 +187,7 @@ class Api::OrdersController < ApiController
           when "fulfillments/create", "fulfillments/update"
             ShopifyApp::Webhook.fulfill(data_object)
           when "orders/updated"
-            ShopifyApp::Webhook.order(data_object)
+            ShopifyApp::Webhook.fulfill(data_object)
           when "shop/update"
             ShopifyApp::Webhook.shop_update(data_object)
           when "product_listings/add", "product_listings/update"
