@@ -234,7 +234,7 @@ module ShopifyApp
       def create_webhooks
         ShopifyApp::Const::EVENTS_TOPICS.each do |event, topics|
           topics.each do |topic|
-            new_topic = "#{event}/#{topic}"
+            new_topic = "#{event.to_s}/#{topic.to_s}"
             #new_address = "/api/products/shopify_webhook"
             if [:product_listings, :products, :shop, :app].include?(event)
               new_address = "#{ShopifyApp::Const::BASE_URL}/api/products/shopify_webhook"
