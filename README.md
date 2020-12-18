@@ -29,8 +29,8 @@ rspec spec/
     [Follow this tutorial to install it](https://github.com/rvm/rvm)
     
 
-* Install ruby version 2.3.1:
-    * RVM makes your life easier, simply run command `rvm install 2.3.1`
+* Install ruby version 2.5.1:
+    * RVM makes your life easier, simply run command `rvm install 2.5.1`
     * If you failed to install it, try running the following commands then retry it:
         ```
          rvmsudo rvm cleanup all
