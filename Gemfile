@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-ruby '2.6.0'
+ruby '2.6.7'
 
 git_source(:github) do |repo_name|
   repo_name = "#{repo_name}/#{repo_name}" unless repo_name.include?("/")
@@ -89,3 +89,4 @@ gem 'simple_command'
 gem 'hashids'
 gem 'kaminari'
 gem 'fuzzy_match'
+gem 'sassc', '~> 2.4'

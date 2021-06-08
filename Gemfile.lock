@@ -369,7 +369,7 @@ DEPENDENCIES
   vcr
 
 RUBY VERSION
-   ruby 2.6.0p57
+   ruby 2.6.7p57
 
 BUNDLED WITH
    1.17.3
