@@ -36,7 +36,6 @@ module ShopshopsHub
     config.session_store :cookie_store
     config.middleware.use Rack::MethodOverride
     config.active_record.belongs_to_required_by_default = false
-    config.assets.initialize_on_precompile = false
     config.time_zone = 'Beijing'
 
     # Enable sidekiq for active jobs
