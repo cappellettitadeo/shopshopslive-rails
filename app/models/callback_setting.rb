@@ -8,7 +8,7 @@ class CallbackSetting < ApplicationRecord
     parsed_json = CentralApp::Utils::Callback.list_all
 
     if parsed_json
-      parsed_json.each do |key, value|
+      parsed_json[:data].each do |key, value|
         url = value[:callback].strip rescue nil
         mode = value[:mode].strip
         bunch_size = value[:bunchsize]
