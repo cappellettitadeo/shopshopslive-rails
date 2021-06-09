@@ -68,8 +68,6 @@ gem 'jquery-rails'
 # Utility
 gem 'devise'
 gem 'jwt'
-#gem 'swagger-docs'
-#gem 'swagger-ui_rails'
 gem 'carrierwave'
 gem 'mini_magick'
 gem 'cloudinary'

@@ -1,18 +1,6 @@
 class Api::InventoryController < ApiController
   before_action :find_resource
 
-  swagger_controller :inventory, "库存管理"
-
-  swagger_api :query do
-    summary "库存查询接口"
-    param :header, 'Authorization', :string, :required, '当前用户Auth token'
-    param :query, :prod_id, :string, :required, "中心系统商品ID"
-    param :query, :sku_id, :string, :required, "中心系统商品sku id"
-
-    response :bad_request
-    response :ok
-  end
-
   def query
     hash = {
       prod_id: params[:prod_id],
@@ -21,17 +9,6 @@ class Api::InventoryController < ApiController
       vendor_id: @product.vendor_id
     }
     render json: { data: hash }, status: :ok
-  end
-
-  swagger_api :lock do
-    summary "库存锁定接口"
-    param :header, 'Authorization', :string, :required, '当前用户Auth token'
-    param :query, :prod_id, :string, :required, "中心系统商品ID"
-    param :query, :sku_id, :string, :required, "中心系统商品sku id"
-    param :query, :locked_count, :string, :required, "锁定商品数量"
-
-    response :bad_request
-    response :ok
   end
 
   def lock
