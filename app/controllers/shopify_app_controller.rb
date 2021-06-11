@@ -43,7 +43,7 @@ class ShopifyAppController < ApplicationController
   end
 
   def auth
-    if ShopifyApp::Utils.valid_request_from_shopify?(request)
+    #if ShopifyApp::Utils.valid_request_from_shopify?(request)
       # params['shop'] is shop's myshopify.com domain, which is unique identifier for each shopify store
       shop = request.params['shop']
       code = request.params['code']
@@ -67,8 +67,8 @@ class ShopifyAppController < ApplicationController
       else
         redirect_to err_page_shopify_app_index_path(msg: 'Failed to get token from Shopify') and return
       end
-    end
-    redirect_to err_page_shopify_app_index_path(msg: 'unauthorized')
+    #end
+    #redirect_to err_page_shopify_app_index_path(msg: 'unauthorized')
   end
 
   def err_page
