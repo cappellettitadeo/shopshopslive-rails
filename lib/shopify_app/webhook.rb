@@ -21,10 +21,10 @@ module ShopifyApp
         end
       end
 
-      def product_listings_add_or_update(store, object)
+      def product_listings_add_or_update(store, object, source = 'product_listing')
         updated_product = object.product_listing
         if updated_product
-          product_result = Scrapers::Shopify::Result.new(store, updated_product, nil)
+          product_result = Scrapers::Shopify::Result.new(store, updated_product, nil, source)
           product, changed = Product.create_or_update_from_shopify_object(product_result)
           SyncQueue.where(target: product).first_or_create if changed
         end

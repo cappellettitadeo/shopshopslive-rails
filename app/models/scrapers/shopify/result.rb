@@ -1,8 +1,9 @@
 require 'central_app'
 
 class Scrapers::Shopify::Result < Scrapers::Result
-  def initialize(store, product, scraper)
+  def initialize(store, product, scraper, source = 'product_listing')
     @store = store
+    @source = source
     @product = product
     @scraper = scraper
   end
@@ -76,7 +77,15 @@ class Scrapers::Shopify::Result < Scrapers::Result
 
   def source_id
     unless @source_id
-      @source_id = product.id
+      if @source == 'product_listing'
+				if product.product_id
+					@source_id = product.product_id
+				else
+					@source_id = product.id if product.id
+				end
+			else
+				@source_id = product.id
+			end
     end
     @source_id
   end
@@ -94,7 +103,7 @@ class Scrapers::Shopify::Result < Scrapers::Result
       if product.variants.present?
         @variants = []
         product.variants.each do |variant|
-          @variants.push(Scrapers::Shopify::ResultVariant.new(store, product, variant))
+          @variants.push(Scrapers::Shopify::ResultVariant.new(store, product, variant, @source))
         end
       end
     end

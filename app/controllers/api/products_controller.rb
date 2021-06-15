@@ -44,6 +44,14 @@ class Api::ProductsController < ApiController
             ShopifyApp::Webhook.shop_update(data_object)
           when "product_listings/add", "product_listings/update"
             ShopifyApp::Webhook.product_listings_add_or_update(store, data_object)
+          when "products/add", "products/update"
+            if topic == 'products/update'
+              product = Product.find_by_source_id data_object.id
+              if product.nil?
+                render json: {msg: 'Webhook notification received successfully.'}, status: :ok and return
+              end
+            end
+            ShopifyApp::Webhook.product_listings_add_or_update(store, data_object, 'product')
           when "product_listings/remove"
             ShopifyApp::Webhook.product_listings_remove(data_object)
           else

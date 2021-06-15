@@ -55,7 +55,7 @@ class ProductVariant < ApplicationRecord
     false
   end
 
-  def self.create_or_update_from_shopify_object(product, variant)
+  def self.create_or_update_from_shopify_object(product, variant, source = 'product_listing')
     changed = false
 
     product_variant = ProductVariant.where(source_id: variant.source_id).first_or_create
@@ -77,7 +77,7 @@ class ProductVariant < ApplicationRecord
     product_variant.weight_unit = variant.weight_unit
     # Find or create the options
     shopify_ids = []
-    begin
+    if source == 'product'
       if variant.option1
         variant.options.each do |option|
           if option.values.include?(variant.option1)
@@ -117,14 +117,14 @@ class ProductVariant < ApplicationRecord
           end
         end
       end
-    rescue => e
+    elsif source == 'product_listing'
       # backward compatible
       variant.options.each do |o|
-        shopify_ids << o.id.to_s
-        option = product_variant.options.where(source_id: o.id.to_s).first_or_initialize
+        shopify_ids << o.option_id.to_s
+        option = product_variant.options.where(source_id: o.option_id.to_s).first_or_initialize
         if option.id.nil?
           option.name = o.name
-          option.value = o.values[0]
+          option.value = o.value
           option.save
         end
       end

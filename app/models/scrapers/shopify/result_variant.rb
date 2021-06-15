@@ -1,5 +1,6 @@
 class Scrapers::Shopify::ResultVariant < Scrapers::Result
-  def initialize(store, product, variant)
+  def initialize(store, product, variant, source)
+    @source = source
     @store = store
     @product = product
     @variant = variant
@@ -125,7 +126,11 @@ class Scrapers::Shopify::ResultVariant < Scrapers::Result
   end
 
   def options
-    product.options
+    if @source == 'product_listing'
+      variant.option_values
+    else
+      product.options
+    end
   end
 
   def updated_at
