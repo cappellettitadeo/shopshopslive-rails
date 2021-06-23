@@ -15,11 +15,24 @@ class Api::OrdersController < ApiController
   end
 
   def create
-    if params[:order][:user_id].present?
-      user = User.find_by_id params[:order][:user_id]
+    if order_params[:ctr_order_id].nil?
+      render json: { ec: 400, em: "ctr_order_id缺失" }, status: :bad_requst and return
+    end
+    if params[:order][:user].present?
+      # 1. Find/Create a user
+      user = User.find_by_ctr_user_id params[:order][:user][:ctr_user_id]
       if user
+        user.update_attributes(user_params)
+      else
+        user = User.new(user_params)
+      end
+      if user.save
         # 1. Create an order
-        order = Order.create user_id: params[:order][:user_id]
+        begin
+          order = Order.create!(user: user, ctr_order_id: order_params[:ctr_order_id])
+        rescue => e
+          render json: { ec: 400, em: "ctr_order_id已存在" }, status: :bad_requst and return
+        end
         # 2. Check if it's a draft order
         if params[:order][:status] == 'draft'
           order.status = 'submitted'
@@ -27,10 +40,8 @@ class Api::OrdersController < ApiController
           order.save
         end
         # 3. Update the address
-        if params[:order][:shipping_address_id]
-          address = user.shipping_addresses.where(id: params[:order][:shipping_address_id]).first
-        elsif params[:order][:shipping_address]
-          address = user.shipping_addresses.create(shipping_address_params)
+        if params[:order][:shipping_address]
+          address = user.shipping_addresses.where(shipping_address_params).first_or_create
         end
         if address.id
           order.update_attributes(shipping_address_id: address.id)
@@ -79,15 +90,15 @@ class Api::OrdersController < ApiController
         hash = OrderSerializer.new(order).serializable_hash
         render json: hash, status: :ok
       else
-        render json: { ec: 404, em: "无法找到该用户" }, status: :not_found and return
+        render json: { ec: 400, em: user.errors.full_messages[0] }, status: :not_found and return
       end
     else
-      render json: { ec: 400, em: "user_id缺失" }, status: :bad_request
+      render json: { ec: 400, em: "user缺失" }, status: :bad_request
     end
   end
 
   def confirm_payment
-    order = Order.find_by_id params[:id]
+    order = Order.find_by_ctr_order_id params[:id]
     if order
       if order.status != 'submitted'
         render json: { ec: 400, em: "订单无法被完成，status: #{order.status}" }, status: :bad_request
@@ -106,11 +117,21 @@ class Api::OrdersController < ApiController
   end
 
   def update
-    order = Order.find_by_id params[:id]
+    order = Order.find_by_ctr_order_id params[:id]
     if order
-      # TODO Need to know what fields can be updated
       order.update_attributes(order_params)
-      hash = OrderSerializer.new(order).serializable_hash
+      if params[:order][:line_items]
+        items = params[:order][:line_items]
+        items.each do |item|
+          li = order.line_items.joins(:product_variant).where("product_variants.ctr_sku_id = ?", item[:ctr_sku_id]).first
+          if li
+            li.update_attributes(quantity: item[:quantity])
+          else
+            render json: { ec: 404, em: "无法找到该line_item，ctr_sku_id: #{item[:ctr_sku_id]}" }, status: :not_found and return
+          end
+        end
+      end
+      hash = OrderSerializer.new(order.reload).serializable_hash
       render json: hash, status: :ok
     else
       render json: { ec: 404, em: "无法找到该订单" }, status: :not_found
@@ -118,23 +139,25 @@ class Api::OrdersController < ApiController
   end
 
   def refund
-    order = Order.find_by_id params[:id]
+    order = Order.find_by_ctr_order_id params[:id]
     if order
       if order.refundable?
         # Check if line_item and quantity is right
         ids = []
         items = []
         error = nil
-        params[:order][:line_items].each do |li|
-          item = order.line_items.where(id: li[:id]).first
-          if item.nil?
-            error = "无法找到对应line_item. ID: #{li[:id]}"
-            break
-          elsif item.quantity < li[:quantity]
-            error = '退款商品数量大于订单商品数量.ID: #{li[:id]}'
+        params[:order][:line_items].each do |item|
+          li = order.line_items.joins(:product_variant).where("product_variants.ctr_sku_id = ?", item[:ctr_sku_id]).first
+          if li
+            li.update_attributes(quantity: item[:quantity])
+          elsif li.quantity < item[:quantity]
+            render json: { ec: 400, em: "退款商品数量大于订单商品数量，ctr_sku_id: #{item[:ctr_sku_id]}" }, status: :bad_request and return
+          else
+            render json: { ec: 404, em: "无法找到该line_item，ctr_sku_id: #{item[:ctr_sku_id]}" }, status: :not_found and return
+          end
             break
           end
-          items << [item, li[:quantity]]
+          items << [item, item[:quantity]]
         end
         if error
           render json: { ec: 400, em: error }, status: :bad_request and return
@@ -147,7 +170,7 @@ class Api::OrdersController < ApiController
         hash = OrderSerializer.new(order).serializable_hash
         render json: hash, status: :ok
       else
-        render json: { ec: 400, em: "该订单无法退款, status: #{order.status}" }, status: :bad_request
+        render json: { ec: 400, em: "该订单未支付，无法退款, 当前订单状态: #{order.status}" }, status: :bad_request
       end
     else
       render json: { ec: 404, em: "无法找到该订单" }, status: :not_found
@@ -155,7 +178,7 @@ class Api::OrdersController < ApiController
   end
 
   def show
-    order = Order.find_by_id params[:id]
+    order = Order.find_by_ctr_order_id params[:id]
     if order
       hash = OrderSerializer.new(order).serializable_hash
       render json: hash, status: :ok
@@ -225,11 +248,15 @@ class Api::OrdersController < ApiController
   end
   
   def order_params
-    params.require(:order).permit(:user_id, :line_items, :shipping_address_id, :status, :currency, :shipping_method)
+    params.require(:order).permit(:ctr_order_id, :user_id, :shipping_address_id, :status, :currency, :shipping_method)
+  end
+
+  def user_params
+    params.require(:order).require(:user).permit(:first_name, :last_name, :phone, :full_name, :gender, :email, :ctr_user_id)
   end
 
   def line_item_params
-    params.require(:line_item).permit(:product_id, :product_variant_id, :quantity)
+    params.require(:line_items).permit(:product_id, :product_variant_id, :quantity)
   end
 
   def shipping_address_params

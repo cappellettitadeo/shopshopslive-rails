@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20201208055313) do
+ActiveRecord::Schema.define(version: 20210621095403) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -127,7 +127,7 @@ ActiveRecord::Schema.define(version: 20201208055313) do
     t.integer "store_id"
     t.boolean "draft", default: false
     t.string "source_id"
-    t.string "ctr_source_id"
+    t.string "ctr_order_id"
     t.string "tracking_url"
     t.string "shipping_status"
     t.index ["confirmation_id"], name: "index_orders_on_confirmation_id"
@@ -317,7 +317,7 @@ ActiveRecord::Schema.define(version: 20201208055313) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "source_id"
-    t.string "ctr_source_id"
+    t.string "ctr_user_id"
     t.index ["email"], name: "index_users_on_email"
     t.index ["phone"], name: "index_users_on_phone"
   end

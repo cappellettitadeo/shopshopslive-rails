@@ -6,6 +6,7 @@ class User < ApplicationRecord
 
   before_save :set_full_name
   after_create :set_slug
+  after_commit :update_shopify_customer, if: proc { |user| user.previous_changes.present?  }
 
   def default_shipping_address
     shipping_addresses.where(default_address: true).first
@@ -45,5 +46,14 @@ class User < ApplicationRecord
 
   def updated_at_formatted
     updated_at.strftime("%Y-%m-%d %H:%M:%S")
+  end
+
+  def update_shopify_customer
+    if source_id
+      # Update existing shopify customer
+    else
+      # Create a new shopify customer
+      res = ShopifyApp::Order.create_customer(self)
+    end
   end
 end

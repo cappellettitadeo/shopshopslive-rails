@@ -6,22 +6,23 @@ module ShopifyApp
 
     class << self
 
-      def create_customer(store, check_out)
-        url = "https://#{store.source_url}/admin/api/#{API_VERSION}/draft_orders.json"
+      def create_customer(user, store)
+        url = "https://#{store.source_url}/admin/api/#{API_VERSION}/customers.json"
         ShopifyApp::Utils.instantiate_session(store.source_url, store.source_token)
-        #items = []
-        #line_items.each do |i|
-        #  items << { variant_id: '31509288517689', quantity: 1 }
-        #end
-        items = [{ variant_id: '31509288517689', quantity: 1 }] 
-
         payload = {
-          draft_order: {
-            line_items: items
+          customer: {
+            first_name: user.first_name,
+            last_name: user.last_name,
+            name: user.full_name,
+            email: user.email,
+            phone: user.phone,
+            addresses: []
           }
         }
+        user.shipping_addresses.each do |add|
+          payload[:customer][:addresses] << add.as_json(except: [:id, :user_id, :source_id, :created_at, :updated_at, :full_name])
+        end
         res = HTTParty.post(url, body: payload)
-
         if res.code == 201
         else
           raise res["errors"] 
@@ -32,29 +33,18 @@ module ShopifyApp
         url = "https://#{store.source_url}/admin/api/#{API_VERSION}/customers/#{customer_id}/address.json"
         ShopifyApp::Utils.instantiate_session(store.store.source_url, store.source_token)
         payload = {
-          shipping_address: {
-            address1: address.address1,
-            address2: address.address2,
-            first_name: address.first_name,
-            last_name: address.last_name,
-            name: address.full_name,
-            city: address.city,
-            province: address.province,
-            country: address.country,
-            zip: address.zip,
-            phone: address.phone
-          }
+          shipping_address: add.as_json(except: [:id, :user_id, :source_id, :created_at, :updated_at, :full_name])
         }
-        response = HTTParty.post(url, body: payload)
-        if response.code == 201
-          response
+        res = HTTParty.post(url, body: payload)
+        if res.code == 201
+          res
         else
-          Rails.logger.warn response
+          Rails.logger.warn res
+          raise "Shopify Error: " + res["errors"] 
         end
       end
 
       def create_draft_order(store, order)
-        user_id = order.user.source_id
         url = "https://#{store.source_url}/admin/api/#{API_VERSION}/draft_orders.json"
         ShopifyApp::Utils.instantiate_session(store.source_url, store.source_token)
         items = []
@@ -65,7 +55,6 @@ module ShopifyApp
         payload = {
           draft_order: {
             line_items: items,
-            customer: { id: user_id },
             shipping_address: {
               address1: address.address1,
               address2: address.address2,
@@ -104,7 +93,6 @@ module ShopifyApp
         payload = {
           draft_order: {
             line_items: items,
-            customer: { id: user_id },
             shipping_address: {
               address1: address.address1,
               address2: address.address2,

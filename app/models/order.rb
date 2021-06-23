@@ -12,6 +12,8 @@ class Order < ApplicationRecord
   before_create :generate_confirmation_id
   before_save :calculate_price
 
+  validates_uniqueness_of :ctr_order_id
+
   STATUS = %w(submitted paid partially_paid refunded refunding fulfilled delivered closed)
   # 0: Master order
   # 1: Suborder - for different stores
@@ -224,9 +226,9 @@ class Order < ApplicationRecord
   end
 
   def calculate_price
-    price = line_items.joins(:product_variant).sum("product_variants.price * line_items.quantity")
+    price = line_items.joins(:product_variant).sum("product_variants.price * line_items.quantity").round(2)
     self.subtotal_price = price
-    self.total_price = price + shipping_fee.to_f + tax.to_f
+    self.total_price = (price + shipping_fee.to_f + tax.to_f).round(2)
   end
 
   private

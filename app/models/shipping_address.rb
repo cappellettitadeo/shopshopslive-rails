@@ -15,6 +15,9 @@ class ShippingAddress < ApplicationRecord
   end
 
   def check_input
+    if user.nil?
+      return false
+    end
     if first_name.nil?
       self.first_name = user.first_name
     end
