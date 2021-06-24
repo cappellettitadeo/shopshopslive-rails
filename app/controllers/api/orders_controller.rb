@@ -155,8 +155,6 @@ class Api::OrdersController < ApiController
           else
             render json: { ec: 404, em: "无法找到该line_item，ctr_sku_id: #{item[:ctr_sku_id]}" }, status: :not_found and return
           end
-            break
-          end
           items << [item, item[:quantity]]
         end
         if error
