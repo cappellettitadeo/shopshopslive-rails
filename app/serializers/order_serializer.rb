@@ -2,7 +2,8 @@ class OrderSerializer
   include FastJsonapi::ObjectSerializer
 
   attributes :id, :status, :user_id, :refunded_at, :currency, :shipping_method, :shipping_fee, :subtotal_price,
-    :total_price, :tax, :invoice_url, :confirmation_id, :draft, :source_id, :tracking_url, :shipping_status, :ctr_order_id
+    :total_price, :tax, :invoice_url, :confirmation_id, :draft, :source_id, :tracking_url, :shipping_status, :ctr_order_id,
+    :tracking_no, :tracking_company
 
   attribute :line_items do |o|
     LineItemSerializer.new(o.line_items).serializable_hash[:data]

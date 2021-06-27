@@ -51,19 +51,45 @@ module ShopifyApp
 
       def fulfill(object)
         order = ::Order.find_by_source_id(object.order_id)
-        if object.status == 'success' && order
-          order.tracking_url = object.tracking_url
-          order.shipping_status = object.shipping_status
-          order.status = 'fulfilled'
+        if order
+          if object.status == 'success'
+            order.tracking_url = object.tracking_url
+            order.tracking_no = object.tracking_number
+            order.tracking_company = object.tracking_company
+            order.shipping_status = object.shipping_status
+            order.status = 'fulfilled'
+          elsif object.status == 'cancelled'
+            order.tracking_url = nil
+            order.shipping_status = 'cancelled'
+            order.status = 'paid'
+          elsif object.status == 'refund'
+            order.status = 'refund'
+          elsif object.status == 'failure'
+            order.status = 'fulfill_failed'
+            order.shipping_status = 'failure'
+          end
           order.save
-        elsif object.status == 'cancelled' && order
-          order.tracking_url = nil
-          order.shipping_status = 'cancelled'
-          order.status = 'paid'
-          order.save
-        elsif object.status == 'refund' && order
-          order.status = 'refund'
-          order.save
+        end
+        # Trigger callback to Central system
+        # TODO waiting for ctr to provide url
+        url = ''
+        json = OrderSerializer.new(order.reload).serializable_hash.to_json
+        retry_count = 0
+        begin
+          headers = CentralApp::Const.default_headers
+          res = HTTParty.post(url, { headers: headers, body: json })
+          parsed_json = JSON.parse(res.body).with_indifferent_access
+          if parsed_json[:code] != 200
+            raise res
+          end
+        rescue
+          retry_count += 1
+          if retry_count == CentralApp::Const::MAX_NUM_OF_ATTEMPTS
+            return false
+          end
+          if retry_count < CentralApp::Const::MAX_NUM_OF_ATTEMPTS && CentralApp::Utils::Token.get_token
+            retry
+          end
         end
       end
     end

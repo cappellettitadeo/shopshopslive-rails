@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20210621095403) do
+ActiveRecord::Schema.define(version: 20210627131419) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -130,6 +130,8 @@ ActiveRecord::Schema.define(version: 20210621095403) do
     t.string "ctr_order_id"
     t.string "tracking_url"
     t.string "shipping_status"
+    t.string "tracking_no"
+    t.string "tracking_company"
     t.index ["confirmation_id"], name: "index_orders_on_confirmation_id"
     t.index ["master_order_id"], name: "index_orders_on_master_order_id"
     t.index ["status"], name: "index_orders_on_status"

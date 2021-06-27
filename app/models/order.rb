@@ -14,7 +14,7 @@ class Order < ApplicationRecord
 
   validates_uniqueness_of :ctr_order_id
 
-  STATUS = %w(submitted paid partially_paid refunded refunding fulfilled delivered closed)
+  STATUS = %w(submitted paid partially_paid refunded refunding fulfilled partial_fulfilled delivered closed)
   # 0: Master order
   # 1: Suborder - for different stores
   TYPE = [0, 1]
