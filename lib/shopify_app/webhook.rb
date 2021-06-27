@@ -49,27 +49,30 @@ module ShopifyApp
         SyncQueue.where(target: store).first_or_create if changed
       end
 
-      def fulfill(object)
-        order = ::Order.find_by_source_id(object.order_id)
-        if order
-          if object.status == 'success'
-            order.tracking_url = object.tracking_url
-            order.tracking_no = object.tracking_number
-            order.tracking_company = object.tracking_company
-            order.shipping_status = object.shipping_status
-            order.status = 'fulfilled'
-          elsif object.status == 'cancelled'
-            order.tracking_url = nil
-            order.shipping_status = 'cancelled'
-            order.status = 'paid'
-          elsif object.status == 'refund'
-            order.status = 'refund'
-          elsif object.status == 'failure'
-            order.status = 'fulfill_failed'
-            order.shipping_status = 'failure'
-          end
-          order.save
+      def fulfill(object, type)
+        if type == 'fulfillment'
+          order = ::Order.find_by_source_id(object.order_id)
+        elsif type == 'order'
+          order = ::Order.find_by_source_id(object.id)
         end
+        return unless order
+        if object.status == 'success'
+          order.tracking_url = object.tracking_url
+          order.tracking_no = object.tracking_number
+          order.tracking_company = object.tracking_company
+          order.shipping_status = object.shipping_status
+          order.status = 'fulfilled'
+        elsif object.status == 'cancelled'
+          order.tracking_url = nil
+          order.shipping_status = 'cancelled'
+          order.status = 'paid'
+        elsif object.status == 'refund'
+          order.status = 'refund'
+        elsif object.status == 'failure'
+          order.status = 'fulfill_failed'
+          order.shipping_status = 'failure'
+        end
+        order.save
         # Trigger callback to Central system
         # TODO waiting for ctr to provide url
         url = ''
