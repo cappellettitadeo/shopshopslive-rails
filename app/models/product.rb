@@ -9,6 +9,8 @@ class Product < ApplicationRecord
   belongs_to :vendor
   belongs_to :scraper
 
+  validates_uniqueness_of :source_id
+
   scope :active, -> { where('expires_at > ? AND available IS TRUE', Time.now) }
 
   audited
