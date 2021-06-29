@@ -9,7 +9,7 @@ class Product < ApplicationRecord
   belongs_to :vendor
   belongs_to :scraper
 
-  validates_uniqueness_of :source_id
+  validates_uniqueness_of :source_id, allow_blank: true
 
   scope :active, -> { where('expires_at > ? AND available IS TRUE', Time.now) }
 
