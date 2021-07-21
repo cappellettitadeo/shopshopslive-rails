@@ -226,7 +226,7 @@ module ShopifyApp
         shopify_shop = ShopifyAPI::Shop.current
         if shopify_shop.present?
           store, changed = Store.create_or_update_from_shopify_shop(shopify_shop, access_token)
-          SyncQueue.where(target: store).first_or_create if changed
+          CentralApp::Utils::StoreC.sync([store])
           store
         end
       end
