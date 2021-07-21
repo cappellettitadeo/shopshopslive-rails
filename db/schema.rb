@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20210627131419) do
+ActiveRecord::Schema.define(version: 20210721074309) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -132,6 +132,9 @@ ActiveRecord::Schema.define(version: 20210627131419) do
     t.string "shipping_status"
     t.string "tracking_no"
     t.string "tracking_company"
+    t.string "shopify_payment_account_id"
+    t.string "checkout_token"
+    t.string "payment_id"
     t.index ["confirmation_id"], name: "index_orders_on_confirmation_id"
     t.index ["master_order_id"], name: "index_orders_on_master_order_id"
     t.index ["status"], name: "index_orders_on_status"
@@ -219,7 +222,7 @@ ActiveRecord::Schema.define(version: 20210627131419) do
     t.index ["ctr_product_id"], name: "index_products_on_ctr_product_id"
     t.index ["expires_at"], name: "index_products_on_expires_at"
     t.index ["name"], name: "index_products_on_name"
-    t.index ["source_id"], name: "index_products_on_source_id"
+    t.index ["source_id"], name: "index_products_on_source_id", unique: true
     t.index ["store_id"], name: "index_products_on_store_id"
     t.index ["vendor_id"], name: "index_products_on_vendor_id"
   end

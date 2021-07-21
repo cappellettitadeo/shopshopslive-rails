@@ -46,7 +46,9 @@ module ShopifyApp
 
       def shop_update(shopify_shop)
         store, changed = Store.create_or_update_from_shopify_shop(shopify_shop)
-        SyncQueue.where(target: store).first_or_create if changed
+        if changed
+          CentralApp::Utils::StoreC.sync([store])
+        end
       end
 
       def fulfill(object, type)

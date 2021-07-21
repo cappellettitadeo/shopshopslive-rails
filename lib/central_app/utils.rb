@@ -94,9 +94,8 @@ module CentralApp
       end
     end
 
-    class Store
+    class StoreC
       class << self
-
         def list_all
           url = Const.store_list_url
           Utils.list_all('stores', url)
@@ -105,12 +104,39 @@ module CentralApp
         def query(keyword)
           url = Const.store_query_url
           Utils.query(keyword, url)
-          ## Subcategroy
-          # parsed_json[:data][:subItem]
-          # cat_1st_name = parsed_json[:category_1st_name]
-          # cat_1st_id = parsed_json[:category_1st_id]
-          # cat_2nd_name = parsed_json[:category_2nd_name]
-          # cat_2nd_id = parsed_json[:category_2nd_id]
+        end
+
+        def sync(stores)
+          store_setting = CallbackSetting.stores.first
+          url = store_setting.url
+          stores_hash = StoreSerializer.new(stores).serializable_hash
+
+          body = { count: stores.count, stores: stores_hash[:data] }.to_json
+          puts "Stores:"
+          retry_count = 0
+          begin
+            headers = CentralApp::Const.default_headers
+            res = HTTParty.post(url, { headers: headers, body: body })
+            puts "Res:"
+            parsed_json = JSON.parse(res.body).with_indifferent_access
+            if parsed_json[:code] != 200
+              raise res
+            elsif res['data'] && res['data']['insert']
+              ## Update ctr_store_id from the response
+              res['data']['insert'].each do |row|
+                store = Store.where(id: row['id']).first
+                store.update_attributes(ctr_store_id: row['oid'])
+              end
+            end
+          rescue
+            retry_count += 1
+            if retry_count == CentralApp::Const::MAX_NUM_OF_ATTEMPTS
+              return false
+            end
+            if retry_count < CentralApp::Const::MAX_NUM_OF_ATTEMPTS && CentralApp::Utils::Token.get_token
+              retry
+            end
+          end
         end
       end
     end

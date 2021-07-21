@@ -44,7 +44,7 @@ class Store < ApplicationRecord
   end
 
   def self.sync_with_central_app
-    stores = CentralApp::Utils::Store.list_all
+    stores = CentralApp::Utils::StoreC.list_all
     if stores.present?
       stores.each do |str|
         str = Category.where(ctr_store_id: str[:id]).first_or_create

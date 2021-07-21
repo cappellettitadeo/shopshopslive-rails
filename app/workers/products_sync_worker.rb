@@ -13,7 +13,7 @@ class ProductsSyncWorker
     return unless product_setting &.bunch_update?
 
     SyncQueue.products.find_in_batches(batch_size: product_setting.bunch_size) do |items|
-      products = items.collect(&:target).compact
+      products = items.collect(&:target).uniq.compact
       ## 1. Find all unique vendors from these products
       vendors = products.collect(&:vendor).uniq.compact
       # 1.1 Create/Update vendors to Central System
@@ -57,50 +57,10 @@ class ProductsSyncWorker
          end
       end
 
-
       ## 2. Find all stores from these products
       stores = products.collect(&:store).uniq.compact
-      # 2.1 Create/Update stores to Central System
-      url = store_setting.url
-      stores_hash = StoreSerializer.new(stores).serializable_hash
+      CentralApp::Utils::StoreC.sync(stores)
 
-      # 2.2 POST to Central System
-      body = { count: stores.count, stores: stores_hash[:data] }.to_json
-      puts "Stores:"
-      #puts body
-      retry_count = 0
-      begin
-        headers = CentralApp::Const.default_headers
-        res = HTTParty.post(url, { headers: headers, body: body })
-        puts "Res:"
-        #puts res
-        parsed_json = JSON.parse(res.body).with_indifferent_access
-        if parsed_json[:code] != 200
-          raise res
-          #return false
-        elsif res['data'] && res['data']['insert']
-          ## Update ctr_store_id from the response
-          res['data']['insert'].each do |row|
-            store = Store.where(id: row['id']).first
-            store.update_attributes(ctr_store_id: row['oid'])
-          end
-        end
-      rescue
-        retry_count += 1
-        if retry_count == CentralApp::Const::MAX_NUM_OF_ATTEMPTS
-          # TODO Temp disable airbrake
-          #Airbrake.notify({ error_message: "Failed to post to #{url}", parameters: {
-          #    callback_setting_id: store_setting.id,
-          #    body: body,
-          #    response: res
-          #}})
-          return false
-        end
-        if retry_count < CentralApp::Const::MAX_NUM_OF_ATTEMPTS && CentralApp::Utils::Token.get_token
-          #sleep(CentralApp::Utils.sec_till_next_try(retry_count))
-          retry
-        end
-      end
       ## 3. Create/Update products to Central System
       url = product_setting.url
       products_hash = ProductSerializer.new(products).serializable_hash
