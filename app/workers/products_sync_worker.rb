@@ -112,6 +112,14 @@ class ProductsSyncWorker
       items.each {|i| i.delete}
     end
     # Clear the sync queue after the job is done
-    #SyncQueue.products.destroy_all
+    SyncQueue.products.destroy_all
+    # Search for missing ctr_product_id products and add to the queue again
+    products = Product.active.where(ctr_product_id: nil)
+    products.each do |p|
+      SyncQueue.where(target_type: 'Product', target_id: p.id).first_or_create
+    end
+    if SyncQueue.products.count > 0
+      ProductsSyncWorker.perform_async
+    end
   end
 end
