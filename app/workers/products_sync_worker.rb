@@ -14,6 +14,7 @@ class ProductsSyncWorker
 
     SyncQueue.products.find_in_batches(batch_size: product_setting.bunch_size) do |items|
       products = items.collect(&:target).uniq.compact
+      next if products.empty?
       ## 1. Find all unique vendors from these products
       vendors = products.collect(&:vendor).uniq.compact
       # 1.1 Create/Update vendors to Central System
