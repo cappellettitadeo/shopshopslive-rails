@@ -117,7 +117,9 @@ class ProductsSyncWorker
     # Search for missing ctr_product_id products and add to the queue again
     products = Product.active.where(ctr_product_id: nil)
     products.each do |p|
-      SyncQueue.where(target_type: 'Product', target_id: p.id).first_or_create
+      if p.store
+        SyncQueue.where(target_type: 'Product', target_id: p.id).first_or_create
+      end
     end
     if SyncQueue.products.count > 0
       ProductsSyncWorker.perform_async
