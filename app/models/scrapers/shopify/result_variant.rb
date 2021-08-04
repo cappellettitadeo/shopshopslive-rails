@@ -77,7 +77,7 @@ class Scrapers::Shopify::ResultVariant < Scrapers::Result
   end
 
   def original_price
-    @original_price = variant.price
+    @original_price = variant.compare_at_price
   end
 
   def product_id

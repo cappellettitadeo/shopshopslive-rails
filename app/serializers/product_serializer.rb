@@ -12,7 +12,7 @@ class ProductSerializer
   end
 
   attribute :photos do |product|
-    images = product.photos
+    images = product.photos.order('position ASC')
     PhotoSerializer.new(images).serializable_hash[:data]
   end
 end
