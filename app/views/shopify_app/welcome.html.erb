@@ -78,7 +78,7 @@
           <th class="align-middle" scope="row"><%= index + 1 %></th>
           <td >
             <% if product.photos.present? %>
-              <%= image_tag(product.photos.first.thumb_url, size: "50x50") %>
+              <%= image_tag(product.photos.order('position ASC').first.thumb_url, size: "50x50") %>
             <%else%>
               <%= image_tag("img_placeholder.png", size: "50x50")%>
             <%end%>
