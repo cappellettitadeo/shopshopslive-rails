@@ -9,6 +9,10 @@ class OrderSerializer
     LineItemSerializer.new(o.line_items).serializable_hash[:data]
   end
 
+  attribute :id do |o|
+    o.source_id
+  end
+
   attribute :shipping_address do |o|
     o.shipping_address.as_json
   end

@@ -15,9 +15,6 @@ class Api::OrdersController < ApiController
   end
 
   def create
-    if order_params[:ctr_order_id].nil?
-      render json: { ec: 400, em: "ctr_order_id缺失" }, status: :bad_requst and return
-    end
     if params[:order][:user].present?
       # 1. Find/Create a user
       user = User.find_by_ctr_user_id params[:order][:user][:ctr_user_id]
@@ -28,11 +25,7 @@ class Api::OrdersController < ApiController
       end
       if user.save
         # 1. Create an order
-        begin
-          order = Order.create!(user: user, ctr_order_id: order_params[:ctr_order_id])
-        rescue => e
-          render json: { ec: 400, em: "ctr_order_id已存在" }, status: :bad_requst and return
-        end
+        order = Order.create!(user: user)
         # 2. Check if it's a draft order
         if params[:order][:status] == 'draft'
           order.status = 'submitted'
@@ -98,7 +91,7 @@ class Api::OrdersController < ApiController
   end
 
   def confirm_payment
-    order = Order.find_by_ctr_order_id params[:id]
+    order = Order.find_by_source_id params[:id]
     if order
       if order.status != 'submitted'
         render json: { ec: 400, em: "订单无法被完成，status: #{order.status}" }, status: :bad_request
@@ -117,7 +110,7 @@ class Api::OrdersController < ApiController
   end
 
   def update
-    order = Order.find_by_ctr_order_id params[:id]
+    order = Order.find_by_source_id params[:id]
     if order
       order.update_attributes(order_params)
       if params[:order][:line_items]
@@ -139,7 +132,7 @@ class Api::OrdersController < ApiController
   end
 
   def refund
-    order = Order.find_by_ctr_order_id params[:id]
+    order = Order.find_by_source_id params[:id]
     if order
       if order.refundable?
         # Check if line_item and quantity is right
@@ -176,7 +169,7 @@ class Api::OrdersController < ApiController
   end
 
   def show
-    order = Order.find_by_ctr_order_id params[:id]
+    order = Order.find_by_source_id params[:id]
     if order
       hash = OrderSerializer.new(order).serializable_hash
       render json: hash, status: :ok
