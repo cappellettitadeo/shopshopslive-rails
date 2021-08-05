@@ -12,7 +12,7 @@ class Order < ApplicationRecord
   before_create :generate_confirmation_id
   before_save :calculate_price
 
-  validates_uniqueness_of :ctr_order_id
+  #validates_uniqueness_of :ctr_order_id
 
   STATUS = %w(submitted paid partially_paid refunded refunding fulfilled partial_fulfilled delivered closed)
   # 0: Master order
