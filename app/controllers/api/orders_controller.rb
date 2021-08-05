@@ -46,7 +46,7 @@ class Api::OrdersController < ApiController
           items = params[:order][:line_items]
           store_ids = []
           items.each do |li|
-            pv = ProductVariant.where(ctr_sku_id: li[:variant_id]).first
+            pv = ProductVariant.where(ctr_sku_id: li[:ctr_sku_id]).first
             if pv
               item = LineItem.create(order_id: order.id, product_id: pv.product_id, product_variant_id: pv.id,
                                       quantity: li[:quantity], name: pv.name, price: pv.price, color: pv.color, size_id: pv.size_id)
@@ -247,7 +247,7 @@ class Api::OrdersController < ApiController
   end
 
   def line_item_params
-    params.require(:line_items).permit(:product_id, :product_variant_id, :quantity)
+    params.require(:line_items).permit(:product_id, :ctr_sku_id, :quantity)
   end
 
   def shipping_address_params
