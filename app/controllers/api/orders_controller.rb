@@ -68,7 +68,9 @@ class Api::OrdersController < ApiController
           # If store_ids is > 1, it means there are multiple stores
           # Create a suborder for the first line item
           if store_ids.size > 1
-            Order.create(master_order_id: order.id, order_type: 1, store_id: store_ids.first)
+            first_order = Order.create(master_order_id: order.id, order_type: 1, store_id: store_ids.first)
+            item = order.line_items[0]
+            item.update_attributes(suborder_id: first_order.id)
           end
         else
           render json: { ec: 400, em: "line_items缺失" }, status: :bad_requst and return

@@ -13,6 +13,20 @@ class OrderSerializer
     o.source_id
   end
 
+  attribute :suborders do |o|
+    subs = o.suborders
+    if subs.present?
+      arr = []
+      subs.each do |sub|
+        arr << { id: sub.source_id }
+      end
+      arr
+    else
+      []
+    end
+  end
+
+
   attribute :shipping_address do |o|
     o.shipping_address.as_json
   end
