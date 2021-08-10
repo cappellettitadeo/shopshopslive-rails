@@ -77,11 +77,11 @@ class Api::OrdersController < ApiController
         end
         order.save
         # 5. Generate order with shopify
-        begin
+        #begin
           order.generate_order_with_shopify
-        rescue => e
-          render json: { ec: 400, em: e.message }, status: :bad_request and return
-        end
+        #rescue => e
+        #  render json: { ec: 400, em: e.message }, status: :bad_request and return
+        #end
         hash = OrderSerializer.new(order).serializable_hash
         render json: hash, status: :ok
       else
