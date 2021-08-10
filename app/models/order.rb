@@ -159,8 +159,9 @@ class Order < ApplicationRecord
           tax += tl['price'].to_f
         end
       end
-      item = LineItem.where(source_id: li['id']).first
-      item.update_attributes(tax: tax) if item
+      vid = li['variant_id']
+      item = line_items.joins(:product_variant).where('product_variants.source_id = ?', vid).first
+      item.update_attributes(tax: tax, source_id: li['id']) if item
     end
   end
 

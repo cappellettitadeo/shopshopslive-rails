@@ -1,7 +1,7 @@
 class LineItemSerializer
   include FastJsonapi::ObjectSerializer
 
-  attributes :id, :product_id, :ctr_sku_id, :product_variant_id, :order_id, :quantity, :price, :name, :color
+  attributes :id, :product_id, :ctr_sku_id, :product_variant_id, :order_id, :quantity, :price, :name, :color, :tax
 
   attribute :created_at do |l|
     l.created_at_formatted
