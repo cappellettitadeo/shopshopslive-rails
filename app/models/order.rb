@@ -151,6 +151,17 @@ class Order < ApplicationRecord
     self.subtotal_price = res['subtotal_price']
     self.shipping_method = ''
     self.save
+    # Updat line_items
+    res['line_items'].each do |li|
+      tax = 0
+      if li['tax_lines'].present?
+        li['tax_lines'].each do |tl|
+          tax += tl['price']
+        end
+      end
+      item = LineItem.where(source_id: li['id']).first
+      item.update_attributes(tax: tax) if item
+    end
   end
 
   def generate_order_with_shopify
