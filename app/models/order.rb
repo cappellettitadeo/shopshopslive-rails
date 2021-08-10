@@ -156,7 +156,7 @@ class Order < ApplicationRecord
       tax = 0
       if li['tax_lines'].present?
         li['tax_lines'].each do |tl|
-          tax += tl['price']
+          tax += tl['price'].to_f
         end
       end
       item = LineItem.where(source_id: li['id']).first
