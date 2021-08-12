@@ -44,10 +44,6 @@ class Order < ApplicationRecord
       else
         self.complete_draft
       end
-    else
-      if suborders.present?
-      else
-      end
     end
   end
 

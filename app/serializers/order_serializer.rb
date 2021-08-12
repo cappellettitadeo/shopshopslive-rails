@@ -13,7 +13,7 @@ class OrderSerializer
     o.source_id
   end
 
-  attribute :suborders do |o|
+  attribute :sub_orders do |o|
     subs = o.suborders
     if subs.present?
       arr = []
