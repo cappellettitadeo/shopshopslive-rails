@@ -30,6 +30,7 @@ class Api::OrdersController < ApiController
         if params[:order][:status] == 'draft'
           order.status = 'submitted'
           order.draft = true
+          order.ctr_order_id = params[:order][:ctr_order_id] if params[:order][:ctr_order_id]
           order.save
         end
         # 3. Update the address
