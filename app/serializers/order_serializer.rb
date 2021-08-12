@@ -18,7 +18,8 @@ class OrderSerializer
     if subs.present?
       arr = []
       subs.each do |sub|
-        arr << { id: sub.source_id }
+        ctr = sub.store.ctr_store_id rescue nil
+        arr << { id: sub.source_id, ctr_store_id: ctr }
       end
       arr
     else
