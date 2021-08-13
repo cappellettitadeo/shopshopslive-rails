@@ -164,6 +164,30 @@ class Order < ApplicationRecord
     end
   end
 
+  def update_order_with_shopify(order)
+    res = ShopifyApp::Order.update_draft_order(order.store, order)
+    self.tax = res['total_tax']
+    self.total_price = res['total_price']
+    self.subtotal_price = res['subtotal_price']
+    self.shipping_method = ''
+    self.save
+    # Updat line_items
+    res['line_items'].each do |li|
+      tax = 0
+      if li['tax_lines'].present?
+        li['tax_lines'].each do |tl|
+          puts "tax: #{tl['price'].to_f}"
+          tax += tl['price'].to_f
+        end
+      end
+      vid = li['variant_id']
+      item = line_items.joins(:product_variant).where('product_variants.source_id = ?', vid.to_s).first
+      puts "item: #{item.present?}"
+      item.update_attributes(tax: tax, source_id: li['id']) if item
+      puts "item tax: #{item.reload.tax}"
+    end
+  end
+
   def generate_order_with_shopify
     # 1. If there are suborders, create orders on shopify for each suborder
     if suborders.present?

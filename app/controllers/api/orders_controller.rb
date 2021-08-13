@@ -128,6 +128,18 @@ class Api::OrdersController < ApiController
           end
         end
       end
+      # Update the address
+      if params[:order][:shipping_address]
+        user = order.user
+        address = user.shipping_addresses.where(shipping_address_params).first_or_create
+        if address.id
+          order.update_attributes(shipping_address_id: address.id)
+        else
+          render json: { ec: 404, em: address.errors.full_messages[0] }, status: :not_found and return
+        end
+      end
+      # Update shopify
+      order.update_order_with_shopify
       hash = OrderSerializer.new(order.reload).serializable_hash
       render json: hash, status: :ok
     else
