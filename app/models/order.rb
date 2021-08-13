@@ -152,12 +152,15 @@ class Order < ApplicationRecord
       tax = 0
       if li['tax_lines'].present?
         li['tax_lines'].each do |tl|
+          puts "tax: #{tl['price'].to_f}"
           tax += tl['price'].to_f
         end
       end
       vid = li['variant_id']
       item = line_items.joins(:product_variant).where('product_variants.source_id = ?', vid.to_s).first
+      puts "item: #{item.present?}"
       item.update_attributes(tax: tax, source_id: li['id']) if item
+      puts "item tax: #{item.reload.tax}"
     end
   end
 
