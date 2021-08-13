@@ -165,7 +165,7 @@ class Order < ApplicationRecord
   end
 
   def update_order_with_shopify
-    res = ShopifyApp::Order.update_draft_order(order.store, order)
+    res = ShopifyApp::Order.update_draft_order(store, self)
     self.tax = res['total_tax']
     self.total_price = res['total_price']
     self.subtotal_price = res['subtotal_price']
