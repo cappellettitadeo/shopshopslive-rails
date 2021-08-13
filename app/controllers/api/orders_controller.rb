@@ -115,6 +115,7 @@ class Api::OrdersController < ApiController
   def update
     order = Order.find_by_source_id params[:id]
     if order
+      order_params.delete(:status)
       order.update_attributes(order_params)
       if params[:order][:line_items]
         items = params[:order][:line_items]
@@ -242,7 +243,7 @@ class Api::OrdersController < ApiController
   end
   
   def order_params
-    params.require(:order).permit(:ctr_order_id, :user_id, :shipping_address_id, :status, :currency, :shipping_method)
+    params.require(:order).permit(:ctr_order_id, :user_id, :shipping_address_id, :status, :currency, :shipping_method, :draft)
   end
 
   def user_params
