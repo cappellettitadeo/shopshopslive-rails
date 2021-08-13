@@ -110,7 +110,9 @@ module ShopifyApp
         headers = {
           "X-Shopify-Access-Token": store.source_token
         }
-        res = HTTParty.post(url, body: payload, headers: headers)
+        puts payload
+        res = HTTParty.put(url, body: payload, headers: headers)
+        puts res
         Rails.logger.warn res
         if res.code == 200
           res["draft_order"]
