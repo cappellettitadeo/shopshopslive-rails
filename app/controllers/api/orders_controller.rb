@@ -115,8 +115,7 @@ class Api::OrdersController < ApiController
   def update
     order = Order.find_by_source_id params[:id]
     if order
-      order_params.delete(:status)
-      order.update_attributes(order_params)
+      order.update_attributes(ctr_order_id: params[:order][:ctr_order_id]) if params[:order][:ctr_order_id]
       if params[:order][:line_items]
         items = params[:order][:line_items]
         items.each do |item|
@@ -216,7 +215,7 @@ class Api::OrdersController < ApiController
           when "app/uninstalled"
             ShopifyApp::Webhook.app_uninstalled(store)
           when "fulfillments/create", "fulfillments/update"
-            ShopifyApp::Webhook.fulfill(data_object, 'fulfillment')
+            #ShopifyApp::Webhook.fulfill(data_object, 'fulfillment')
           when "orders/updated"
             ShopifyApp::Webhook.fulfill(data_object, 'order')
           when "shop/update"

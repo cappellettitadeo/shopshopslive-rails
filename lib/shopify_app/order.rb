@@ -213,11 +213,6 @@ module ShopifyApp
           raise "Shopify Refund Error: " + trans['error_code']
         end
       end
-
-      def update_draft_order(store, check_out)
-        url = "https://#{store.source_url}/admin/api/#{API_VERSION}/draft_orders.json"
-        ShopifyApp::Utils.instantiate_session(store.source_url, store.source_token)
-      end
     end
   end
 end
