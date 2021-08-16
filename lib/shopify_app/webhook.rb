@@ -57,6 +57,8 @@ module ShopifyApp
         elsif type == 'order'
           order = ::Order.find_by_source_order_id(object.id) || ::Order.find_by_source_id(object.id)
         end
+        puts "Fulfill Order:"
+        puts order
         return unless order
         order.fulfill_obj = object
         if object.status == 'success'
@@ -65,6 +67,7 @@ module ShopifyApp
           order.tracking_company = object.tracking_company
           order.shipping_status = object.shipment_status
           order.status = 'fulfilled'
+          puts "Success"
         elsif object.status == 'cancelled'
           order.tracking_url = nil
           order.shipping_status = 'cancelled'

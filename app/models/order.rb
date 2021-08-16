@@ -153,17 +153,23 @@ class Order < ApplicationRecord
         arr << json
       end
       body = { count: arr.size, orders: arr }
+      puts "Sync Body"
+      puts body
       res = HTTParty.post(url, { headers: headers, body: body })
       parsed_json = JSON.parse(res.body).with_indifferent_access
+      puts "res"
+      puts parsed_json
       if parsed_json[:code] != 200
         raise res
       else
+        puts "else res"
         res['data'].each do |li|
           order = Order.where(source_order_id: li['order_id'].to_s).first
           order.update_attributes(sync_at: Time.now) if order && order.sync_at.nil?
         end
       end
     rescue
+      puts "retry"
       retry_count += 1
       if retry_count == CentralApp::Const::MAX_NUM_OF_ATTEMPTS
         return false
