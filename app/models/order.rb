@@ -160,7 +160,7 @@ class Order < ApplicationRecord
         puts json
         arr << json
       end
-      body = { count: arr.size, orders: arr }
+      body = { count: arr.size, orders: arr }.to_json
       puts "Sync Body"
       puts body
       res = HTTParty.post(url, { headers: headers, body: body })
