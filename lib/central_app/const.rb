@@ -20,6 +20,9 @@ module CentralApp
         },
         callback: {
             list: '/setting/callback'
+        },
+        order: {
+            update: '/v1/intemodule/order/update'
         }
     }
 
@@ -46,6 +49,10 @@ module CentralApp
 
       def inventory_update_url
         Const::APP_BASE_URL + API_ENDPOINTS[:inventory][:update]
+      end
+
+      def order_update_url
+        Const::APP_BASE_URL + API_ENDPOINTS[:order][:update]
       end
 
       def store_list_url

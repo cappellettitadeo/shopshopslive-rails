@@ -8,6 +8,7 @@ class Order < ApplicationRecord
   has_many :line_items
 
   scope :paid, -> { where(status: 'paid').order('created_at DESC') }
+  scope :unsynced, -> { where(sync_at: nil).where('fulfill_obj IS NOT NULL') }
 
   before_create :generate_confirmation_id
   before_save :calculate_price
@@ -53,8 +54,8 @@ class Order < ApplicationRecord
     self.status = 'paid'
     self.draft = false
     self.invoice_url = res["invoice_url"]
-    # Replace draft order source_id with order source_id
-    self.source_id = res["order_id"]
+    # add new order id source_order_id
+    self.source_order_id = res["order_id"]
     self.save
   end
 
@@ -130,6 +131,47 @@ class Order < ApplicationRecord
 
   def sync_with_shopify
     ShopifyApp::Order.get_order(store, self)
+  end
+
+  def sync_with_central_system(object)
+    # Trigger callback to Central system
+    url = CentralApp::Const.order_update_url
+    retry_count = 0
+    begin
+      headers = CentralApp::Const.default_headers
+      arr = []
+      object.line_items.each do |li|
+        item = line_items.joins(:product_variant).where('product_variants.source_id = ?', li.variant_id.to_s).first
+        json = { 
+          order_id: source_order_id,
+          order_status: 1,
+          ctr_sku_id: item.ctr_sku_id,
+          shipping_company: tracking_company,
+          shipping_track_no: tracking_number,
+          shipping_url: tracking_url
+        }
+        arr << json
+      end
+      body = { count: arr.size, orders: arr }
+      res = HTTParty.post(url, { headers: headers, body: body })
+      parsed_json = JSON.parse(res.body).with_indifferent_access
+      if parsed_json[:code] != 200
+        raise res
+      else
+        res['data'].each do |li|
+          order = Order.where(source_order_id: li['order_id'].to_s).first
+          order.update_attributes(sync_at: Time.now) if order && order.sync_at.nil?
+        end
+      end
+    rescue
+      retry_count += 1
+      if retry_count == CentralApp::Const::MAX_NUM_OF_ATTEMPTS
+        return false
+      end
+      if retry_count < CentralApp::Const::MAX_NUM_OF_ATTEMPTS && CentralApp::Utils::Token.get_token
+        retry
+      end
+    end
   end
 
   def process_order_with_shopify(order)

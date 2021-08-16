@@ -53,21 +53,22 @@ module ShopifyApp
 
       def fulfill(object, type)
         if type == 'fulfillment'
-          order = ::Order.find_by_source_id(object.order_id)
+          order = ::Order.find_by_source_order_id(object.order_id)
         elsif type == 'order'
-          order = ::Order.find_by_source_id(object.id)
+          order = ::Order.find_by_source_order_id(object.id) || ::Order.find_by_source_id(object.id)
         end
         return unless order
+        order.fulfill_obj = object
         if object.status == 'success'
           order.tracking_url = object.tracking_url
           order.tracking_no = object.tracking_number
           order.tracking_company = object.tracking_company
-          order.shipping_status = object.shipping_status
+          order.shipping_status = object.shipment_status
           order.status = 'fulfilled'
         elsif object.status == 'cancelled'
           order.tracking_url = nil
           order.shipping_status = 'cancelled'
-          order.status = 'paid'
+          order.status = 'cancelled'
         elsif object.status == 'refund'
           order.status = 'refund'
         elsif object.status == 'failure'
@@ -75,27 +76,7 @@ module ShopifyApp
           order.shipping_status = 'failure'
         end
         order.save
-        # Trigger callback to Central system
-        # TODO waiting for ctr to provide url
-        url = ''
-        json = OrderSerializer.new(order.reload).serializable_hash.to_json
-        retry_count = 0
-        begin
-          headers = CentralApp::Const.default_headers
-          res = HTTParty.post(url, { headers: headers, body: json })
-          parsed_json = JSON.parse(res.body).with_indifferent_access
-          if parsed_json[:code] != 200
-            raise res
-          end
-        rescue
-          retry_count += 1
-          if retry_count == CentralApp::Const::MAX_NUM_OF_ATTEMPTS
-            return false
-          end
-          if retry_count < CentralApp::Const::MAX_NUM_OF_ATTEMPTS && CentralApp::Utils::Token.get_token
-            retry
-          end
-        end
+        order.sync_with_central_system(object)
       end
     end
   end

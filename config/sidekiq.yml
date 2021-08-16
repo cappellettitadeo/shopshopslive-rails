@@ -3,6 +3,10 @@
     cron: '0 */30 * * * * Asia/Shanghai'   # Runs every 30 minutes
     description: "Update products in Central app"
     enabled: true
+  OrdersSyncWorker:
+    cron: '0 */30 * * * * Asia/Shanghai'   # Runs every 30 minutes
+    description: "Sync failed orders with Central app"
+    enabled: true
   CentralAppSyncWorker:
     cron: '0 0 */12 * * * Asia/Shanghai'   # Runs every 12 hour
     description: "Fetch all categories from Central app"
