@@ -146,14 +146,18 @@ class Order < ApplicationRecord
       puts object.line_items
       object.line_items.each do |li|
         item = line_items.joins(:product_variant).where('product_variants.source_id = ?', li.variant_id.to_s).first
+        puts "item"
+        puts item
         json = { 
           order_id: source_order_id,
           order_status: 1,
           ctr_sku_id: item.ctr_sku_id,
           shipping_company: tracking_company,
-          shipping_track_no: tracking_number,
+          shipping_track_no: tracking_no,
           shipping_url: tracking_url
         }
+        puts "json"
+        puts json
         arr << json
       end
       body = { count: arr.size, orders: arr }
