@@ -136,10 +136,14 @@ class Order < ApplicationRecord
   def sync_with_central_system(object)
     # Trigger callback to Central system
     url = CentralApp::Const.order_update_url
+    puts "object"
+    puts object
     retry_count = 0
     begin
       headers = CentralApp::Const.default_headers
       arr = []
+      puts "object line_item"
+      puts object.line_items
       object.line_items.each do |li|
         item = line_items.joins(:product_variant).where('product_variants.source_id = ?', li.variant_id.to_s).first
         json = { 
@@ -168,8 +172,9 @@ class Order < ApplicationRecord
           order.update_attributes(sync_at: Time.now) if order && order.sync_at.nil?
         end
       end
-    rescue
+    rescue => e
       puts "retry"
+      puts e
       retry_count += 1
       if retry_count == CentralApp::Const::MAX_NUM_OF_ATTEMPTS
         return false
