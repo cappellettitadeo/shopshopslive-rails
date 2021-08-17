@@ -79,7 +79,9 @@ module ShopifyApp
           order.shipping_status = 'failure'
         end
         order.save
-        order.sync_with_central_system(object)
+        if order.source_order_id
+          order.sync_with_central_system(object)
+        end
       end
     end
   end
