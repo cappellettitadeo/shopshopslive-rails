@@ -142,12 +142,8 @@ class Order < ApplicationRecord
     begin
       headers = CentralApp::Const.default_headers
       arr = []
-      puts "object line_item"
-      puts object.line_items
       object.line_items.each do |li|
         item = line_items.joins(:product_variant).where('product_variants.source_id = ?', li.variant_id.to_s).first
-        puts "item"
-        puts item
         json = { 
           order_id: source_order_id,
           order_status: 1,
@@ -160,10 +156,10 @@ class Order < ApplicationRecord
         puts json
         arr << json
       end
-      body = { count: arr.size, orders: arr }.to_json
+      req_body = { count: arr.size, orders: arr }.to_json
       puts "Sync Body"
-      puts body
-      res = HTTParty.post(url, { headers: headers, body: body })
+      puts req_body
+      res = HTTParty.post(url, { headers: headers, body: req_body })
       parsed_json = JSON.parse(res.body).with_indifferent_access
       puts "res"
       puts parsed_json
