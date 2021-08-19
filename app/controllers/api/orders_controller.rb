@@ -215,10 +215,10 @@ class Api::OrdersController < ApiController
           when "app/uninstalled"
             ShopifyApp::Webhook.app_uninstalled(store)
           when "fulfillments/create", "fulfillments/update"
-          #when "orders/fulfilled"
+          when "orders/fulfilled"
             ShopifyApp::Webhook.fulfill(data_object, 'fulfillment')
-          when "orders/updated"
-            ShopifyApp::Webhook.fulfill(data_object, 'order')
+          #when "orders/updated"
+            #ShopifyApp::Webhook.fulfill(data_object, 'order')
           when "shop/update"
             ShopifyApp::Webhook.shop_update(data_object)
           when "product_listings/add", "product_listings/update"
