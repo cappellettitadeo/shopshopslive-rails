@@ -66,7 +66,7 @@ module ShopifyApp
           order.tracking_no = object.tracking_number
           order.tracking_company = object.tracking_company
           order.shipping_status = object.shipment_status
-          order.status = 'fulfilled'
+          #order.status = 'fulfilled'
           puts "Success"
         elsif object.status == 'cancelled'
           order.tracking_url = nil

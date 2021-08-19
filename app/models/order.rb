@@ -147,6 +147,8 @@ class Order < ApplicationRecord
       if object.line_items
         object.line_items.each do |li|
           item = line_items.joins(:product_variant).where('product_variants.source_id = ?', li.variant_id.to_s).first
+          item.status = 'fulfilled'
+          item.save
           json = { 
             order_id: source_order_id,
             order_status: 1,
@@ -160,6 +162,10 @@ class Order < ApplicationRecord
           puts json
           arr << json
         end
+      end
+      if line_items.where(status: nil).present?
+        self.status = 'partial_fulfilled'
+        self.save
       end
       req_body = { count: arr.size, orders: arr }.to_json
       puts "Sync Body"
