@@ -166,6 +166,9 @@ class Order < ApplicationRecord
       if line_items.where(status: nil).present?
         self.status = 'partial_fulfilled'
         self.save
+      else
+        self.status = 'fulfilled'
+        self.save
       end
       req_body = { count: arr.size, orders: arr }.to_json
       puts "Sync Body"
