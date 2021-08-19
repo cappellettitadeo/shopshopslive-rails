@@ -142,19 +142,24 @@ class Order < ApplicationRecord
     begin
       headers = CentralApp::Const.default_headers
       arr = []
-      object.line_items.each do |li|
-        item = line_items.joins(:product_variant).where('product_variants.source_id = ?', li.variant_id.to_s).first
-        json = { 
-          order_id: source_order_id,
-          order_status: 1,
-          ctr_sku_id: item.ctr_sku_id,
-          shipping_company: tracking_company,
-          shipping_track_no: tracking_no,
-          shipping_url: tracking_url
-        }
-        puts "json"
-        puts json
-        arr << json
+      puts 'line_items'
+      puts object.line_items
+      if object.line_items
+        object.line_items.each do |li|
+          item = line_items.joins(:product_variant).where('product_variants.source_id = ?', li.variant_id.to_s).first
+          json = { 
+            order_id: source_order_id,
+            order_status: 1,
+            ctr_sku_id: item.ctr_sku_id,
+            shipping_company: tracking_company,
+            shipping_track_no: tracking_no,
+            shipping_url: tracking_url,
+            ctr_store_id: store.ctr_store_id
+          }
+          puts "json"
+          puts json
+          arr << json
+        end
       end
       req_body = { count: arr.size, orders: arr }.to_json
       puts "Sync Body"
@@ -167,6 +172,7 @@ class Order < ApplicationRecord
         raise res
       else
         puts "else res"
+        puts res
         res['data'].each do |li|
           order = Order.where(source_order_id: li['order_id'].to_s).first
           order.update_attributes(sync_at: Time.now) if order && order.sync_at.nil?
