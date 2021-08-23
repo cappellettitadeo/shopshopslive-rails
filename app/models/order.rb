@@ -150,7 +150,7 @@ class Order < ApplicationRecord
           item.status = 'fulfilled'
           item.save
           json = { 
-            order_id: source_order_id,
+            order_id: source_id,
             order_status: 1,
             ctr_sku_id: item.ctr_sku_id,
             shipping_company: tracking_company,
@@ -183,7 +183,7 @@ class Order < ApplicationRecord
         puts "else res"
         puts res
         res['data'].each do |li|
-          order = Order.where(source_order_id: li['order_id'].to_s).first
+          order = Order.where(source_id: li['order_id'].to_s).first
           order.update_attributes(sync_at: Time.now) if order && order.sync_at.nil?
         end
       end
