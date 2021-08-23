@@ -30,9 +30,11 @@ class Api::OrdersController < ApiController
         if params[:order][:status] == 'draft'
           order.status = 'submitted'
           order.draft = true
+          puts 'draft true'
           order.ctr_order_id = params[:order][:ctr_order_id] if params[:order][:ctr_order_id]
           order.save
         end
+        puts order.draft 
         # 3. Update the address
         if params[:order][:shipping_address]
           address = user.shipping_addresses.where(shipping_address_params).first_or_create
@@ -79,7 +81,9 @@ class Api::OrdersController < ApiController
         order.save
         # 5. Generate order with shopify
         #begin
-          order.generate_order_with_shopify
+        puts "draft"
+        puts order.draft 
+        order.generate_order_with_shopify
         #rescue => e
         #  render json: { ec: 400, em: e.message }, status: :bad_request and return
         #end

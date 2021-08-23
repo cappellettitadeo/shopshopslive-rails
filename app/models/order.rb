@@ -201,6 +201,8 @@ class Order < ApplicationRecord
   end
 
   def process_order_with_shopify(order)
+    puts "process draft"
+    puts order.draft
     if order.draft
       res = ShopifyApp::Order.create_draft_order(order.store, order)
       self.status = 'submitted'
