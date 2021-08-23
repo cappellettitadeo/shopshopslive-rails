@@ -30,11 +30,9 @@ class Api::OrdersController < ApiController
         if params[:order][:status] == 'draft'
           order.status = 'submitted'
           order.draft = true
-          puts 'draft true'
           order.ctr_order_id = params[:order][:ctr_order_id] if params[:order][:ctr_order_id]
           order.save
         end
-        puts order.draft 
         # 3. Update the address
         if params[:order][:shipping_address]
           address = user.shipping_addresses.where(shipping_address_params).first_or_create
@@ -63,7 +61,7 @@ class Api::OrdersController < ApiController
                 # If the store id is not in the store_ids, it means this items is from another store
                 # Then create a suborder
                 store_ids << s_id
-                s_order = Order.create(master_order_id: order.id, order_type: 1, store_id: s_id)
+                s_order = Order.create(master_order_id: order.id, order_type: 1, store_id: s_id, status: 'submitted', draft: true)
                 item.update_attributes(suborder_id: s_order.id)
               end
             end
@@ -71,7 +69,7 @@ class Api::OrdersController < ApiController
           # If store_ids is > 1, it means there are multiple stores
           # Create a suborder for the first line item
           if store_ids.size > 1
-            first_order = Order.create(master_order_id: order.id, order_type: 1, store_id: store_ids.first)
+            first_order = Order.create(master_order_id: order.id, order_type: 1, store_id: store_ids.first, status: 'submitted', draft: true)
             item = order.line_items[0]
             item.update_attributes(suborder_id: first_order.id)
           end
@@ -81,8 +79,6 @@ class Api::OrdersController < ApiController
         order.save
         # 5. Generate order with shopify
         #begin
-        puts "draft"
-        puts order.draft 
         order.generate_order_with_shopify
         #rescue => e
         #  render json: { ec: 400, em: e.message }, status: :bad_request and return
