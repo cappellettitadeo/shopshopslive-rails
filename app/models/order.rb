@@ -263,9 +263,13 @@ class Order < ApplicationRecord
   def generate_order_with_shopify
     # 1. If there are suborders, create orders on shopify for each suborder
     if suborders.present?
+      total_tax = 0
       suborders.each do |s|
         process_order_with_shopify(s)
+        total_tax += s.reload.tax.to_f
       end
+      self.currency = 'USD'
+      self.tax = total_tax
       self.status = draft ? 'submitted' : 'paid' 
       self.save
     else
