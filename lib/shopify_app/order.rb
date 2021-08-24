@@ -54,7 +54,7 @@ module ShopifyApp
         if order.master_order.present?
           address = order.shipping_address
         else
-          address = master_order.shipping_address
+          address = order.master_order.shipping_address
         end
         payload = {
           draft_order: {
