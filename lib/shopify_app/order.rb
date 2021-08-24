@@ -54,13 +54,9 @@ module ShopifyApp
         puts 'master order'
         puts order.master_order
         if order.master_order.present?
-          address = order.shipping_address
-          puts "order address"
-          puts address
-        else
           address = order.master_order.shipping_address
-          puts "master order address"
-          puts address
+        else
+          address = order.shipping_address
         end
         payload = {
           draft_order: {
