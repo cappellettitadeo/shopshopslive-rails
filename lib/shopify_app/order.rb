@@ -51,10 +51,16 @@ module ShopifyApp
         order.line_items.each do |li|
           items << { variant_id: li.product_variant.source_id, quantity: li.quantity, requires_shipping: true  }
         end
+        puts 'master order'
+        puts order.master_order
         if order.master_order.present?
           address = order.shipping_address
+          puts "order address"
+          puts address
         else
           address = order.master_order.shipping_address
+          puts "master order address"
+          puts address
         end
         payload = {
           draft_order: {
