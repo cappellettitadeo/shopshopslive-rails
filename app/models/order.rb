@@ -170,6 +170,7 @@ class Order < ApplicationRecord
         self.status = 'fulfilled'
         self.save
       end
+      return if arr.size == 0
       req_body = { count: arr.size, orders: arr }.to_json
       puts "Sync Body"
       puts req_body
