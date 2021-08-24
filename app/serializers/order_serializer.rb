@@ -10,7 +10,7 @@ class OrderSerializer
   end
 
   attribute :id do |o|
-    o.source_id
+    o.source_id || o.id
   end
 
   attribute :sub_orders do |o|
