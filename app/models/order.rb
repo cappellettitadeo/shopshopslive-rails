@@ -206,17 +206,19 @@ class Order < ApplicationRecord
     if order.draft
       res = ShopifyApp::Order.create_draft_order(order.store, order)
       self.status = 'submitted'
+      self.save
     else
       res = ShopifyApp::Order.create_order(order.store, order)
       self.status = 'paid'
+      self.save
     end
-    self.source_id = res['id']
-    self.currency = 'USD'
-    self.tax = res['total_tax']
-    self.total_price = res['total_price']
-    self.subtotal_price = res['subtotal_price']
-    self.shipping_method = ''
-    self.save
+    order.source_id = res['id']
+    order.currency = 'USD'
+    order.tax = res['total_tax']
+    order.total_price = res['total_price']
+    order.subtotal_price = res['subtotal_price']
+    order.shipping_method = ''
+    order.save
     # Updat line_items
     res['line_items'].each do |li|
       tax = 0
