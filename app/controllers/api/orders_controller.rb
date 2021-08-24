@@ -95,6 +95,7 @@ class Api::OrdersController < ApiController
 
   def confirm_payment
     order = Order.find_by_source_id params[:id]
+    order = Order.find_by_id params[:id] if order.nil?
     if order
       if order.status != 'submitted'
         render json: { ec: 400, em: "订单无法被完成，status: #{order.status}" }, status: :bad_request
