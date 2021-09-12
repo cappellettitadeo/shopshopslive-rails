@@ -78,7 +78,11 @@ module ShopifyApp
           order.status = 'fulfill_failed'
           order.shipping_status = 'failure'
         end
-        order.save
+        if order.status_changed? || order.shipping_status_changed?
+          order.save
+        else
+          return
+        end
         if order.source_order_id
           order.sync_with_central_system(object)
         end
