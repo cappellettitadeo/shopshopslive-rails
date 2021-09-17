@@ -27,7 +27,7 @@ class ShopifyAppController < ApplicationController
     if @shop
       @api_key = ShopifyApp::Const::API_KEY
       @store = Store.find_by(source_url: @shop)
-      @products = @store.products.where("ctr_product_id IS NOT NULL").where(available: true).limit(2) if @store
+      @products = @store.products.where("ctr_product_id IS NOT NULL").where(available: true).order("created_at DESC").limit(100) if @store
       if @products.blank? && @store
         myshopify_domain = @store.source_url
         access_token = @store.source_token
