@@ -1,6 +1,6 @@
 :schedule:
   ProductsSyncWorker:
-    cron: '0 */2 * * * * Asia/Shanghai'   # Runs every 30 minutes
+    cron: '0 */10 * * * * Asia/Shanghai'   # Runs every 30 minutes
     description: "Update products in Central app"
     enabled: true
   OrdersSyncWorker:
