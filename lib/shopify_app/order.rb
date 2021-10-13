@@ -128,7 +128,6 @@ module ShopifyApp
         end
       end
 
-
       def complete_draft_order(store, order)
         url = "https://#{store.source_url}/admin/api/#{API_VERSION}/draft_orders/#{order.source_id}/complete.json"
         ShopifyApp::Utils.instantiate_session(store.source_url, store.source_token)

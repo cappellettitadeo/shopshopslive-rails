@@ -114,20 +114,8 @@ class Api::OrdersController < ApiController
   end
 
   def update
-    order = Order.find_by_source_id params[:id]
+    order = Order.find_by_source_id(params[:id]) || Order.find_by_id(params[:id])
     if order
-      order.update_attributes(ctr_order_id: params[:order][:ctr_order_id]) if params[:order][:ctr_order_id]
-      if params[:order][:line_items]
-        items = params[:order][:line_items]
-        items.each do |item|
-          li = order.line_items.joins(:product_variant).where("product_variants.ctr_sku_id = ?", item[:ctr_sku_id]).first
-          if li
-            li.update_attributes(quantity: item[:quantity])
-          else
-            render json: { ec: 404, em: "无法找到该line_item，ctr_sku_id: #{item[:ctr_sku_id]}" }, status: :not_found and return
-          end
-        end
-      end
       # Update the address
       if params[:order][:shipping_address]
         user = order.user
@@ -138,8 +126,22 @@ class Api::OrdersController < ApiController
           render json: { ec: 404, em: address.errors.full_messages[0] }, status: :not_found and return
         end
       end
-      # Update shopify
-      order.update_order_with_shopify
+      order.update_attributes(ctr_order_id: params[:order][:ctr_order_id]) if params[:order][:ctr_order_id]
+      items = params[:order][:line_items]
+      items.each do |item|
+        li = order.line_items.joins(:product_variant).where("product_variants.ctr_sku_id = ?", item[:ctr_sku_id]).first
+        if li
+          li.update_attributes(quantity: item[:quantity])
+        end
+      end
+      order.save
+      if order.master_order
+        orders = order.suborders
+        orders.each do |o|
+          update_order(o, params)
+        end
+        order.update_price
+      end
       hash = OrderSerializer.new(order.reload).serializable_hash
       render json: hash, status: :ok
     else
@@ -238,6 +240,19 @@ class Api::OrdersController < ApiController
     render json: {ec: 403, em: "You're not authorized to perform this action."}, status: :forbidden
   end
 
+  def update_order(order, params)
+    if params[:order][:line_items]
+      items = params[:order][:line_items]
+      items.each do |item|
+        li = order.line_items.joins(:product_variant).where("product_variants.ctr_sku_id = ?", item[:ctr_sku_id]).first
+        if li
+          li.update_attributes(quantity: item[:quantity])
+        end
+      end
+    end
+    # Update shopify
+    order.update_order_with_shopify
+  end
 
   private
   def check_variants
