@@ -45,33 +45,23 @@ class Api::OrdersController < ApiController
         # 4. Create line items
         if params[:order][:line_items].present?
           items = params[:order][:line_items]
-          store_ids = []
+          skus = []
+          # Check if all items are from 1 store or multiple stores
+          items.each { |i| skus << i[:ctr_sku_id] }
+          store_ids = ProductVariant.joins(:product).where(ctr_sku_id: skus).pluck(:store_id).uniq
           items.each do |li|
             pv = ProductVariant.where(ctr_sku_id: li[:ctr_sku_id]).first
             if pv
+              # 1. Create a line item for the master order
               item = LineItem.create(order_id: order.id, product_id: pv.product_id, product_variant_id: pv.id,
                                       quantity: li[:quantity], name: pv.name, price: pv.price, color: pv.color, size_id: pv.size_id)
               s_id = pv.product.store_id
-              # Check if all items are from 1 store or multiple stores
-              if store_ids.empty?
-                store_ids << s_id
-                order.store_id = s_id
-                order.save
-              elsif !store_ids.include?(s_id)
-                # If the store id is not in the store_ids, it means this items is from another store
-                # Then create a suborder
-                store_ids << s_id
-                s_order = Order.create(master_order_id: order.id, order_type: 1, store_id: s_id, status: 'submitted', draft: true)
+              # 2. If it has multple stores create suborder
+              if store_ids.size > 1
+                s_order = Order.where(master_order_id: order.id, order_type: 1, store_id: s_id, status: 'submitted', draft: true).first_or_create
                 item.update_attributes(suborder_id: s_order.id)
               end
             end
-          end
-          # If store_ids is > 1, it means there are multiple stores
-          # Create a suborder for the first line item
-          if store_ids.size > 1
-            first_order = Order.create(master_order_id: order.id, order_type: 1, store_id: store_ids.first, status: 'submitted', draft: true)
-            item = order.line_items[0]
-            item.update_attributes(suborder_id: first_order.id)
           end
         else
           render json: { ec: 400, em: "line_items缺失" }, status: :bad_requst and return
