@@ -183,8 +183,9 @@ class Order < ApplicationRecord
       else
         puts "else res"
         puts res
-        res['data'].each do |li|
-          order = Order.where(source_id: li['order_id'].to_s).first
+        list = res['data']['updateList'] rescue []
+        list.each do |li|
+          order = Order.where(source_id: li.to_s).first
           order.update_attributes(sync_at: Time.now) if order && order.sync_at.nil?
         end
       end
