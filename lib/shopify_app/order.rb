@@ -61,6 +61,7 @@ module ShopifyApp
         payload = {
           draft_order: {
             line_items: items,
+            note: order.note,
             shipping_address: {
               address1: address.address1,
               address2: address.address2,
@@ -99,6 +100,7 @@ module ShopifyApp
         payload = {
           draft_order: {
             line_items: items,
+            note: order.note,
             shipping_address: {
               address1: address.address1,
               address2: address.address2,

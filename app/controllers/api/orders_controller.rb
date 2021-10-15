@@ -30,6 +30,7 @@ class Api::OrdersController < ApiController
         if params[:order][:status] == 'draft'
           order.status = 'submitted'
           order.draft = true
+          order.note = params[:order][:note] if params[:order][:note]
           order.ctr_order_id = params[:order][:ctr_order_id] if params[:order][:ctr_order_id]
           order.save
         end
@@ -58,7 +59,7 @@ class Api::OrdersController < ApiController
               s_id = pv.product.store_id
               # 2. If it has multple stores create suborder
               if store_ids.size > 1
-                s_order = Order.where(master_order_id: order.id, order_type: 1, store_id: s_id, status: 'submitted', draft: true).first_or_create
+                s_order = Order.where(master_order_id: order.id, order_type: 1, note: order.note, store_id: s_id, status: 'submitted', draft: true).first_or_create
                 item.update_attributes(suborder_id: s_order.id)
               end
             end
@@ -117,6 +118,7 @@ class Api::OrdersController < ApiController
         end
       end
       order.update_attributes(ctr_order_id: params[:order][:ctr_order_id]) if params[:order][:ctr_order_id]
+      order.update_attributes(note: params[:order][:note]) if params[:order][:note]
       items = params[:order][:line_items]
       items.each do |item|
         li = order.line_items.joins(:product_variant).where("product_variants.ctr_sku_id = ?", item[:ctr_sku_id]).first
@@ -232,6 +234,10 @@ class Api::OrdersController < ApiController
 
   def update_order(order, params)
     if params[:order][:line_items]
+      if params[:order][:note]
+        order.note = params[:order][:note]
+        order.save
+      end
       items = params[:order][:line_items]
       items.each do |item|
         li = order.line_items.joins(:product_variant).where("product_variants.ctr_sku_id = ?", item[:ctr_sku_id]).first
@@ -260,7 +266,7 @@ class Api::OrdersController < ApiController
   end
   
   def order_params
-    params.require(:order).permit(:ctr_order_id, :user_id, :shipping_address_id, :status, :currency, :shipping_method, :draft)
+    params.require(:order).permit(:ctr_order_id, :user_id, :shipping_address_id, :status, :currency, :shipping_method, :draft, :note)
   end
 
   def user_params
