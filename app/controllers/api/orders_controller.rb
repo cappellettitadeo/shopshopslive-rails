@@ -73,6 +73,9 @@ class Api::OrdersController < ApiController
               end
             end
           end
+          if store_ids.size == 1
+            order.update_attributes(store_id: store_ids.first)
+          end
         else
           render json: { ec: 400, em: "line_items缺失" }, status: :bad_requst and return
         end
