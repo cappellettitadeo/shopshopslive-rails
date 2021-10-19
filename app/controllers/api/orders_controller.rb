@@ -63,6 +63,7 @@ class Api::OrdersController < ApiController
                 if li[:note].present?
                   if s_order.note.present?
                     s_order.note = s_order.note.to_s + ';' + li[:note]
+                    s_order.save
                   else
                     s_order.note = li[:note]
                     s_order.save
@@ -250,6 +251,7 @@ class Api::OrdersController < ApiController
           if item[:note].present?
             if order.note.present?
               order.note = order.note.to_s + ';' + item[:note]
+              order.save
             else
               order.note = item[:note]
               order.save
