@@ -60,8 +60,14 @@ class Api::OrdersController < ApiController
               # 2. If it has multple stores create suborder
               if store_ids.size > 1
                 s_order = Order.where(master_order_id: order.id, order_type: 1, store_id: s_id, status: 'submitted', draft: true).first_or_create
-                s_order.note = s_order.note.to_s + ';' + li[:note] if li[:note]
-                s_order.save
+                if li[:note].present?
+                  if s_order.note.present?
+                    s_order.note = s_order.note.to_s + ';' + li[:note]
+                  else
+                    s_order.note = li[:note]
+                    s_order.save
+                  end
+                end
                 item.update_attributes(suborder_id: s_order.id)
               end
             end
@@ -241,9 +247,13 @@ class Api::OrdersController < ApiController
         li = order.line_items.joins(:product_variant).where("product_variants.ctr_sku_id = ?", item[:ctr_sku_id]).first
         if li
           # If order match this line_item, update note
-          if item[:note]
-            order.note = s_order.note.to_s + ';' + item[:note] 
-            order.save
+          if item[:note].present?
+            if order.note.present?
+              order.note = order.note.to_s + ';' + item[:note]
+            else
+              order.note = item[:note]
+              order.save
+            end
           end
           li.update_attributes(quantity: item[:quantity])
         end
