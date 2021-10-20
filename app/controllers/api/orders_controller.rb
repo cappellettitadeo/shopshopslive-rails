@@ -147,6 +147,8 @@ class Api::OrdersController < ApiController
           update_order(o, params)
         end
         order.update_price
+      else
+        update_order(order, params)
       end
       hash = OrderSerializer.new(order.reload).serializable_hash
       render json: hash, status: :ok
@@ -249,6 +251,8 @@ class Api::OrdersController < ApiController
   def update_order(order, params)
     if params[:order][:line_items]
       items = params[:order][:line_items]
+      # set order.note to nil first
+      order.note = nil
       items.each do |item|
         li = order.line_items.joins(:product_variant).where("product_variants.ctr_sku_id = ?", item[:ctr_sku_id]).first
         if li
