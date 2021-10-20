@@ -30,7 +30,6 @@ class Api::OrdersController < ApiController
         if params[:order][:status] == 'draft'
           order.status = 'submitted'
           order.draft = true
-          #order.note = params[:order][:note] if params[:order][:note]
           order.ctr_order_id = params[:order][:ctr_order_id] if params[:order][:ctr_order_id]
           order.save
         end
@@ -58,18 +57,21 @@ class Api::OrdersController < ApiController
                                       quantity: li[:quantity], name: pv.name, price: pv.price, color: pv.color, size_id: pv.size_id)
               s_id = pv.product.store_id
               # 2. If it has multple stores create suborder
+              s_order = nil
               if store_ids.size > 1
                 s_order = Order.where(master_order_id: order.id, order_type: 1, store_id: s_id, status: 'submitted', draft: true).first_or_create
-                if li[:note].present?
-                  if s_order.note.present?
-                    s_order.note = s_order.note.to_s + ';' + li[:note]
-                    s_order.save
-                  else
-                    s_order.note = li[:note]
-                    s_order.save
-                  end
-                end
                 item.update_attributes(suborder_id: s_order.id)
+              else
+                s_order = order
+              end
+              if li[:note].present?
+                if s_order.note.present?
+                  s_order.note = s_order.note.to_s + ';' + li[:note]
+                  s_order.save
+                else
+                  s_order.note = li[:note]
+                  s_order.save
+                end
               end
             end
           end
