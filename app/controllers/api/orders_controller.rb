@@ -141,7 +141,7 @@ class Api::OrdersController < ApiController
         end
       end
       order.save
-      if order.master_order
+      if order.type == 0
         orders = order.suborders
         orders.each do |o|
           update_order(o, params)
