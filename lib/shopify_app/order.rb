@@ -101,7 +101,6 @@ module ShopifyApp
         else
           address = order.shipping_address
         end
-        address = order.shipping_address
         payload = {
           draft_order: {
             line_items: items,
