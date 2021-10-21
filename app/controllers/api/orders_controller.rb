@@ -146,7 +146,6 @@ class Api::OrdersController < ApiController
         orders.each do |o|
           update_order(o, params)
         end
-        order.update_price
       else
         update_order(order, params)
       end
