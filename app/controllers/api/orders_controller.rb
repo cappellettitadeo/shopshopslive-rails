@@ -141,7 +141,7 @@ class Api::OrdersController < ApiController
         end
       end
       order.save
-      if order.order_type == 0
+      if order.suborders.present?
         orders = order.suborders
         orders.each do |o|
           update_order(o, params)
