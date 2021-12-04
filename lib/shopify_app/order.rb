@@ -81,10 +81,11 @@ module ShopifyApp
         }
         res = HTTParty.post(url, body: payload, headers: headers)
         Rails.logger.warn res
-        if res.code == 201
+        if res.code == 201 || res.code == 202
           res["draft_order"]
         else
-          Rails.logger.warn res
+          puts res.code
+          puts "Error"
           raise "Shopify Error: " + res["errors"] 
         end
       end
