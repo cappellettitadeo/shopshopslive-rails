@@ -6,7 +6,7 @@ class User < ApplicationRecord
 
   before_save :set_full_name
   after_create :set_slug
-  after_commit :update_shopify_customer, if: proc { |user| user.previous_changes.present?  }
+  #after_commit :update_shopify_customer, if: proc { |user| user.previous_changes.present?  }
 
   def default_shipping_address
     shipping_addresses.where(default_address: true).first
