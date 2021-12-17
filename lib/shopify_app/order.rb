@@ -79,6 +79,11 @@ module ShopifyApp
         headers = {
           "X-Shopify-Access-Token": store.source_token
         }
+        puts "Shopify reqeust url: #{url}"
+        puts "Shopify reqeust header:"
+        puts headers
+        puts "Shopify reqeust body:"
+        puts payload
         res = HTTParty.post(url, body: payload, headers: headers)
         Rails.logger.warn res
         if res.code == 201 || res.code == 202
@@ -123,6 +128,10 @@ module ShopifyApp
         headers = {
           "X-Shopify-Access-Token": store.source_token
         }
+        puts "Shopify reqeust url: #{url}"
+        puts "Shopify reqeust header:"
+        puts headers
+        puts "Shopify reqeust body:"
         puts payload
         res = HTTParty.put(url, body: payload, headers: headers)
         puts res
@@ -182,6 +191,11 @@ module ShopifyApp
             refund_line_items: items,
           }
         }
+        puts "Shopify reqeust url: #{url}"
+        puts "Shopify reqeust header:"
+        puts headers
+        puts "Shopify reqeust body:"
+        puts payload
         res = HTTParty.post(url, body: payload, headers: headers)
         Rails.logger.warn res
         if res.code == 200
@@ -215,6 +229,11 @@ module ShopifyApp
         payload = {
           refund: res
         }
+        puts "Shopify reqeust url: #{url}"
+        puts "Shopify reqeust header:"
+        puts headers
+        puts "Shopify reqeust body:"
+        puts payload
         res = HTTParty.post(url, body: payload, headers: headers)
         trans = res['refund']['transactions'].first
         status = trans['status']
