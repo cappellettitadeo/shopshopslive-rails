@@ -15,6 +15,7 @@ class ShopifyAppController < ApplicationController
 
   def install
     shop = request.params['shop']
+store = Store.find_by(store_id: store_id) if store_id
     if shop
       session = ShopifyAPI::Session.new(domain: shop, api_version: '2020-07', token: nil)
       permission_url = session.create_permission_url(ShopifyApp::Const::SCOPE, "#{ShopifyApp::Const::APP_URL}/auth")
@@ -34,6 +35,7 @@ class ShopifyAppController < ApplicationController
         if myshopify_domain && access_token
           ShopifyApp::Utils.instantiate_session(myshopify_domain, access_token)
           # Call shopify API to fetch all product ids to check if user has posted product to our channel
+          byebug
           @product_ids = ShopifyAPI::ProductListing.product_ids
         end
       end

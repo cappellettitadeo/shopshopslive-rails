@@ -255,7 +255,7 @@ module ShopifyApp
 
       def webhook_ok?(hmac, data)
         digest = OpenSSL::Digest.new('sha256')
-        calculated_hmac = Base64.encode64(OpenSSL::HMAC.digest(digest, ShopifyApp::Const::API_SECRET, data)).strip
+        calculated_hmac = Base64.strict_encode64(OpenSSL::HMAC.digest(digest, ShopifyApp::Const::API_SECRET, data)).strip
 
         ActiveSupport::SecurityUtils.secure_compare(hmac, calculated_hmac)
       end

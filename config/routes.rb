@@ -58,4 +58,9 @@ Rails.application.routes.draw do
       get :welcome
     end
   end
+
+  # Mandatory webhooks
+  post "/customers/redact" => "customer#redact_customer", :as => :redact_customer
+  post "/shop/redact" => "customer#redact_shop", :as => :redact_shop
+  post "/customers/data_request" => "customer#data_request", :as => :data_request
 end
