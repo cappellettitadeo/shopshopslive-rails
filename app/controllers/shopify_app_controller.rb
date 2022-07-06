@@ -35,7 +35,6 @@ store = Store.find_by(store_id: store_id) if store_id
         if myshopify_domain && access_token
           ShopifyApp::Utils.instantiate_session(myshopify_domain, access_token)
           # Call shopify API to fetch all product ids to check if user has posted product to our channel
-          byebug
           @product_ids = ShopifyAPI::ProductListing.product_ids
         end
       end
