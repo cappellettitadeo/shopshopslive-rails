@@ -44,6 +44,27 @@ module ShopifyApp
         end
       end
 
+      # Shopify cancel order API
+      def cancel_order(store, order)
+        order_source_id = order.source_id
+        url = "https://#{store.source_url}/admin/api/#{API_VERSION}/orders/#{order_source_id}/cancel.json"
+        ShopifyApp::Utils.instantiate_session(store.source_url, store.source_token)
+        headers = {
+          "X-Shopify-Access-Token": store.source_token
+        }
+        res = HTTParty.post(url, headers: headers)
+
+        # logs res into logger
+        Rails.logger.warn res
+        # handle the res status code
+        if res.code == 200
+          res["cancel_order"]
+        else
+          Rails.logger.warn res
+          raise "Shopify Error: " + res["errors"]
+        end
+      end
+
       def create_draft_order(store, order)
         url = "https://#{store.source_url}/admin/api/#{API_VERSION}/draft_orders.json"
         ShopifyApp::Utils.instantiate_session(store.source_url, store.source_token)
