@@ -4,6 +4,7 @@ class ApiController < ActionController::API
   private
 
   def authenticate_request
+    puts "---- headers: #{request.headers} -----"
     @api_key = AuthorizeApiRequest.call(request.headers).result
     render json: { error: 'Not Authorized' }, status: 401 unless @api_key
   end
