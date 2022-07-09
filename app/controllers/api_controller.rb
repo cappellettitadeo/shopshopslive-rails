@@ -18,7 +18,7 @@ class ApiController < ActionController::API
     @api_key ||= ApiKey.find_by_key(decoded_auth_token[:api_key]) if decoded_auth_token
     puts '@api_key'
     puts @api_key
-    @api_key || errors.add(:token, 'Invalid token') && nil
+    @api_key
   end
 
   def decoded_auth_token
@@ -30,9 +30,8 @@ class ApiController < ActionController::API
   def http_auth_header
     if @headers['Authorization'].present?
       return @headers['Authorization'].split(' ').last
-    else
-      errors.add(:token, 'Missing token')
     end
+
     nil
   end
 end
