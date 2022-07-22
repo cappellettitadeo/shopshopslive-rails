@@ -203,6 +203,56 @@ class Api::OrdersController < ApiController
     end
   end
 
+  # Endpoint for cancel order API
+  def cancel_order
+    # Find the order with params[:ctr_order_id]
+      order = Order.find_by(ctr_order_id: params[:ctr_order_id])
+    # Call method to hit cancel order API if order present
+    if order
+      begin
+        # Check the order status
+        if order.status == 'closed'
+          # Handle response when order already cancelled
+          render json: { code: 200, msg: 'Order already closed', data: {} }
+        else
+          # Call a method to the hit cancel order api
+          res = order.cancel_order_with_shopify(order.store, order)
+          # Return json response of cancel order API
+          render json: { code: 200, msg: 'SUCCESS', data: res }, status: :ok
+        end
+      rescue => e
+        # Error handling when something goes wrong
+        render json: { ec: 400, em: e.message }, status: :bad_request and return
+      end
+    else
+      # When order not found return error message
+      render json: { ec: 404, em: '未找到订单' }, status: :not_found
+    end
+  end
+
+  # Remove the line item from order using Refund API
+  def remove_line_item
+    # Find order with params[:ctr_order_id]
+    order = Order.find_by(ctr_order_id: params[:ctr_order_id])
+    # Find product_variant using ctr_sku_id
+    product_variant = ProductVariant.find_by(ctr_sku_id: params[:ctr_sku_id])
+    line_item = order.line_items.where(product_variant_id: product_variant.id).first if product_variant
+    if order && line_item
+      begin
+       # call method to hit refund API
+       res = order.remove_line_item_form_order_shopify(order.store, order, line_item, product_variant)
+       # Return response on success
+       render json: { code: 201, msg: 'SUCCESS', data: res }, status: :ok
+      rescue => e
+        # Error handling when something goes wrong
+        render json: { ec: 400, em: e.message }, status: :bad_request and return
+      end
+    else
+      # When order not found return error message
+      render json: { ec: 404, em: '未找到订单' }, status: :not_found
+    end
+  end
+
   def shopify_webhook
     # inspect hmac value in header and verify webhook
     hmac = request.env['HTTP_X_SHOPIFY_HMAC_SHA256']
@@ -287,7 +337,7 @@ class Api::OrdersController < ApiController
       end
     end
   end
-  
+
   def order_params
     params.require(:order).permit(:ctr_order_id, :user_id, :shipping_address_id, :status, :currency, :shipping_method, :draft, :note)
   end

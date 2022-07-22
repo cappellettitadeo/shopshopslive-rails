@@ -262,6 +262,21 @@ class Order < ApplicationRecord
     end
   end
 
+    # Method to call cancel order API
+    def cancel_order_with_shopify(store, order)
+      # Call cancel order API
+      res = ShopifyApp::Order.cancel_order(order.store, order)
+      # Update the order status with close
+      order.update!(status: 'closed') if res.code == 200
+      res
+    end
+
+    # Method to call to refund an line_item from order using Refund API
+    def remove_line_item_form_order_shopify(store, order, line_item, product_variant)
+      res = ShopifyApp::Order.refund_line_item_from(order.store, order, line_item, product_variant)
+      res
+    end
+
   def generate_order_with_shopify
     # 1. If there are suborders, create orders on shopify for each suborder
     if suborders.present?

@@ -58,7 +58,7 @@ module ShopifyApp
         Rails.logger.warn res
         # handle the res status code
         if res.code == 200
-          res["cancel_order"]
+          res
         else
           Rails.logger.warn res
           raise "Shopify Error: " + res["errors"]
@@ -226,13 +226,45 @@ module ShopifyApp
         end
       end
 
+      def refund_line_item_from(store, order, line_item, product_variant)
+        # hit refund api to remove line item from order
+        url = "https://#{store.source_url}/admin/api/#{API_VERSION}/orders/#{order.source_id}/refunds.json"
+        ShopifyApp::Utils.instantiate_session(store.source_url, store.source_token)
+        headers = {
+          "X-Shopify-Access-Token": store.source_token
+        }
+        # set payload to refund a line_item from order
+        payload = {
+          refund: {
+            currency: "#{product_variant.currency}",
+            refund_line_items: [
+              {
+                line_item_id: "#{line_item.source_id}",
+                quantity: 1,
+                restock_type: "no_restock"
+              }
+            ]
+          }
+        }
+        res = HTTParty.post(url, body: payload, headers: headers)
+        # logs res into logger
+        Rails.logger.warn res
+        # handle the res status code
+        if res.code == 201 && status == 'success'
+          res["refund"]
+        else
+          Rails.logger.warn res
+          raise "Shopify Error: " + res["errors"]
+        end
+      end
+
       def refund(store, order, line_items)
         # 1. Calculate refund
         res = calculate_refund(store, order, line_items)
         new_trans = []
         res["transactions"].each do |trans|
           if trans["kind"] == 'suggested_refund' 
-            trans["kind"] = 'refund'  
+            trans["kind"] = 'refund'
             new_trans << trans
           end
         end

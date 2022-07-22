@@ -23,6 +23,8 @@ Rails.application.routes.draw do
     get 'inventory/trigger_callback', to: 'api_keys#trigger_inventory_callback'
     get 'delete_customer', to: 'callback_settings#delete_customer'
     get 'delete_store', to: 'callback_settings#delete_store'
+    post 'orders/:ctr_order_id/cancel_order', to: 'orders#cancel_order'
+    post 'orders/:ctr_order_id/remove_line_item/:ctr_sku_id', to: 'orders#remove_line_item'
 
     # RESTful规范的routes定义如下
     resources :products do
