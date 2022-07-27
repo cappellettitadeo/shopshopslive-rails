@@ -9,7 +9,7 @@ class ApplicationController < ActionController::Base
   end
 
   def content_security_headers
-    response.headers['Content-Security-Policy'] = current_domain_header if request.get?
+    response.headers['Content-Security-Policy'] = current_domain_header
   end
 
   def current_domain_header
