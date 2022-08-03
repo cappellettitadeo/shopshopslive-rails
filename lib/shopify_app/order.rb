@@ -181,7 +181,7 @@ module ShopifyApp
       end
 
       def get_order(store, order)
-        url = "https://#{store.source_url}/admin/api/#{API_VERSION}/orders/#{order.source_id}.json"
+        url = "https://#{store.source_url}/admin/api/#{API_VERSION}/orders/#{order.source_order_id}.json"
         ShopifyApp::Utils.instantiate_session(store.source_url, store.source_token)
         headers = {
           "X-Shopify-Access-Token": store.source_token
@@ -228,7 +228,7 @@ module ShopifyApp
 
       def refund_line_item_from(store, order, line_item, product_variant)
         # hit refund api to remove line item from order
-        url = "https://#{store.source_url}/admin/api/#{API_VERSION}/orders/#{order.source_id}/refunds.json"
+        url = "https://#{store.source_url}/admin/api/#{API_VERSION}/orders/#{order.source_order_id}/refunds.json"
         ShopifyApp::Utils.instantiate_session(store.source_url, store.source_token)
         headers = {
           "X-Shopify-Access-Token": store.source_token
@@ -239,9 +239,10 @@ module ShopifyApp
             currency: "#{product_variant.currency}",
             refund_line_items: [
               {
-                line_item_id: "#{line_item.source_id}",
+                line_item_id: "#{line_item['id']}",
                 quantity: 1,
-                restock_type: "no_restock"
+                restock_type: "cancel",
+                location_id: order['location_id']
               }
             ]
           }
@@ -250,7 +251,7 @@ module ShopifyApp
         # logs res into logger
         Rails.logger.warn res
         # handle the res status code
-        if res.code == 201 && status == 'success'
+        if res.code == 201
           res["refund"]
         else
           Rails.logger.warn res

@@ -236,7 +236,15 @@ class Api::OrdersController < ApiController
     order = Order.find_by(ctr_order_id: params[:ctr_order_id])
     # Find product_variant using ctr_sku_id
     product_variant = ProductVariant.find_by(ctr_sku_id: params[:ctr_sku_id])
-    line_item = order.line_items.where(product_variant_id: product_variant.id).first if product_variant
+    # Get the order from shopify store using get order API
+    begin
+      res = ShopifyApp::Order.get_order(store, order)
+    rescue => e
+      render json: { ec: 400, em: e.message }, status: :bad_request and return
+    end
+
+    line_item = res['line_items'].find{ |line_item| line_item["variant_id"] == product_variant.source_id.to_i } if product_variant
+
     if order && line_item
       begin
        # call method to hit refund API
