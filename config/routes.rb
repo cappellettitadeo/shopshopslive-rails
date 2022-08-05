@@ -11,6 +11,8 @@ Rails.application.routes.draw do
   get 'docs' => 'docs#index'
   root to: redirect('/shopify_app')
 
+  get 'auth/shopify/callback' => 'shopify_app#install'
+
   namespace :api do
     # 根据中心系统要求进行routes配置
     post 'setting/callback', to: 'callback_settings#callback'
@@ -58,6 +60,7 @@ Rails.application.routes.draw do
       get :install
       get :err_page
       get :welcome
+      get :verify_oauth
     end
   end
 

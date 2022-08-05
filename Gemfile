@@ -15,6 +15,9 @@ gem 'rubyfish'
 gem 'responders'
 #The Shopify API gem allows Ruby developers to programmatically access the admin section of Shopify stores.
 gem 'shopify_api'
+
+# verify oauth from shopify
+gem 'omniauth-shopify-oauth2'
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails', '~> 5.1.6'
 # Use postgres as the database for Active Record

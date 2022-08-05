@@ -13,6 +13,16 @@ class ShopifyAppController < ApplicationController
   def index
   end
 
+  def verify_oauth
+    shop = request.params['shop']
+
+    if shop
+      redirect_to "/auth/shopify?shop=#{shop}"
+    else
+      redirect_to root_path
+    end
+  end
+
   def install
     shop = request.params['shop']
 
