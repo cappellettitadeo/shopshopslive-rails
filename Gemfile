@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-ruby '2.5.1'
+ruby '2.7.6'
 
 git_source(:github) do |repo_name|
   repo_name = "#{repo_name}/#{repo_name}" unless repo_name.include?("/")
@@ -14,10 +14,10 @@ gem 'rubyfish'
 #respond_to has been extracted to the responders gem
 gem 'responders'
 #The Shopify API gem allows Ruby developers to programmatically access the admin section of Shopify stores.
-gem 'shopify_api'
+gem 'shopify_api', '9.1.0'
 
 # verify oauth from shopify
-gem 'omniauth-shopify-oauth2'
+gem 'omniauth-shopify-oauth2', '2.1.0'
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails', '~> 5.1.6'
 # Use postgres as the database for Active Record
@@ -80,7 +80,7 @@ gem 'httparty'
 gem 'fast_jsonapi', git: 'https://github.com/jiasilu/fast_jsonapi.git'
 gem 'nokogiri'
 gem "nilify_blanks"
-gem 'sidekiq'
+gem 'sidekiq', '6.2.0'
 gem 'sidekiq-scheduler'
 gem 'airbrake', '~> 7.3'
 gem 'newrelic_rpm'
