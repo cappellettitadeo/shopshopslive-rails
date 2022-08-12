@@ -14,7 +14,7 @@ class ShopifyAppController < ApplicationController
   end
 
   def verify_oauth
-    shop = request.params['shop']
+    shop = ShopifyApp::Utils.sanitize_shop_domain(params[:shop])
 
     if shop
       redirect_to "/auth/shopify?shop=#{shop}"

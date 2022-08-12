@@ -18,6 +18,18 @@ module ShopifyApp
         end
       end
 
+      def sanitize_shop_domain(shop_domain)
+        myshopify_domain = "myshopify.com"
+        name = shop_domain.to_s.downcase.strip
+        name += ".#{myshopify_domain}" if !name.include?(myshopify_domain.to_s) && !name.include?(".")
+        name.sub!(%r|https?://|, "")
+
+        u = URI("http://#{name}")
+        u.host if u.host&.match(/^[a-z0-9][a-z0-9\-]*[a-z0-9]\.#{Regexp.escape(myshopify_domain)}$/)
+      rescue URI::InvalidURIError
+        nil
+      end
+
       # Exchange temp code to permernant access_token
       def get_shop_access_token(shop, code)
         url = "https://#{shop}/admin/oauth/access_token"
